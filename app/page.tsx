@@ -2,7 +2,7 @@ const projects = [
   {
     name: "Chordlift",
     description: "Turn copied chord charts into clean, editable ChordPro.",
-    category: "Music tools",
+    category: "Chord chart tool",
     href: "https://chordlift.kmproto.com",
     accent: "coral",
   },
@@ -37,12 +37,11 @@ export default function Home() {
           <span className="wordmark-mark" aria-hidden="true">K</span>
           <span>KM Proto</span>
         </a>
-        <span className="header-note">Independent web projects</span>
       </header>
 
       <section className="hero" id="top" aria-labelledby="page-title">
         <p className="eyebrow">A SMALL COLLECTION</p>
-        <h1 id="page-title">Useful things,<br /><em>well considered.</em></h1>
+        <h1 id="page-title">Apps that<br /><em>do things.</em></h1>
         <p className="intro">
           KM Proto is home to a growing collection of focused digital projects—each made to do one thing well.
         </p>
@@ -71,7 +70,7 @@ export default function Home() {
 
       <footer>
         <span>KM Proto</span>
-        <span>Thoughtful projects for everyday life.</span>
+        <a href="https://github.com/SydFloyd" target="_blank" rel="noreferrer">GitHub <b aria-hidden="true">↗</b></a>
       </footer>
     </main>
   );
