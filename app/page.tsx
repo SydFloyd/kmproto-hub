@@ -42,9 +42,6 @@ export default function Home() {
       <section className="hero" id="top" aria-labelledby="page-title">
         <p className="eyebrow">A SMALL COLLECTION</p>
         <h1 id="page-title">Apps that<br /><em>do things.</em></h1>
-        <p className="intro">
-          KM Proto is home to a growing collection of focused digital projects—each made to do one thing well.
-        </p>
       </section>
 
       <section className="projects" aria-labelledby="projects-heading">
