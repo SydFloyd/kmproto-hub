@@ -1,13 +1,13 @@
 const projects = [
   {
-    name: "Chordlift",
+    name: "ChordLift",
     description: "Turn copied chord charts into clean, editable ChordPro.",
     category: "Chord chart tool",
     href: "https://chordlift.kmproto.com",
     accent: "coral",
   },
   {
-    name: "Foodmiller",
+    name: "Food Miller",
     description: "A welcoming place to share recipes worth making again.",
     category: "Recipes",
     href: "https://foodmiller.com",
