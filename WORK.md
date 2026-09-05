@@ -27,13 +27,19 @@ For normal hosts, use the project's supported Node version and npm ci.
 Preview: Vite production preview on 127.0.0.1:4173 while the process remains running.
 Ignored outputs/ holds browser verification script, results and screenshots.
 
-Deployment blocker: GitHub repository Actions secrets list is empty. The last
-inspected deployment run failed because --token had no value:
+Deployment: Vercel's built-in GitHub integration was connected after the review
+branch was pushed. An empty trigger commit, `a040c21`, produced a Vercel preview
+deployment that the user reviewed and approved. That commit was fast-forwarded to
+`main` and pushed on 2026-09-04. Vercel reported the production deployment as
+started; check its dashboard before calling the production site verified.
+
+The old GitHub Actions workflow remains unconfigured: its repository Actions
+secrets list is empty, and its last inspected run failed because --token had no value:
 https://github.com/SydFloyd/kmproto-hub/actions/runs/32672689484
 The existing workflow requires VERCEL_TOKEN, VERCEL_ORG_ID and VERCEL_PROJECT_ID.
 No credential values were requested/read. No deployment has been performed.
 
-Next: restore the Vercel connection with the user
-and publish the reviewed change through the existing workflow. Never paste tokens
-into chat or commit them. Main pushes trigger production deployment; avoid publishing
-unreviewed work. Do not rerun a failing deployment until its missing connection is fixed.
+Next: confirm the production deployment and remove or disable the redundant GitHub
+Actions workflow when authorized, so it does not report misleading failures. Never
+paste tokens into chat or commit them. Main pushes trigger production deployment;
+avoid publishing unreviewed work.
