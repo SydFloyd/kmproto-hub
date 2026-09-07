@@ -15,14 +15,16 @@ Source order is Verseform → Shep Study → Milk Yeller and the target link is 
 The earlier responsive/browser evidence for the common card system remains the
 baseline; no new visual-browser claim was made for this small addition.
 
-Preview: Vinext development server is on localhost:3001 while the process remains
-running. Dependencies were installed only in the disposable clone.
+Preview: the disposable Vinext development server supported the local check and was
+stopped after production verification. Dependencies were installed only in the clone.
 
 Deployment: Verseform's Vercel project and final custom domain are live. Vercel
 reports valid production configuration for `verseform.kmproto.com`; HTTPS navigation
 and a real NASB John 3:16 insertion passed on that origin. The Verseform card commit
 was pushed to this repository's `main` branch on 2026-09-07, allowing the existing
-Vercel Git integration to publish the updated collection.
+Vercel Git integration to publish the updated collection. `https://www.kmproto.com`
+then rendered five projects in the expected order and its Verseform card opened the
+custom production origin successfully.
 
 The old GitHub Actions workflow remains unconfigured: its repository Actions
 secrets list is empty, and its last inspected run failed because --token had no value:
@@ -31,7 +33,5 @@ The existing workflow requires VERCEL_TOKEN, VERCEL_ORG_ID and VERCEL_PROJECT_ID
 No credential values were requested or read; deployment remains owned by the existing
 Vercel Git integration.
 
-Next: verify the existing Vercel Git integration completed the hub production build
-and that kmproto.com renders Verseform before Shep Study and Milk Yeller with the live
-custom-domain link. The old GitHub Actions workflow remains redundant and
-unconfigured; this item does not change it.
+Next: no work remains for this item. The old GitHub Actions workflow remains
+redundant and unconfigured; this item did not change it.
