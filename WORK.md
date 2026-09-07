@@ -18,21 +18,20 @@ baseline; no new visual-browser claim was made for this small addition.
 Preview: Vinext development server is on localhost:3001 while the process remains
 running. Dependencies were installed only in the disposable clone.
 
-Deployment: Vercel's built-in GitHub integration was connected after the review
-branch was pushed. An empty trigger commit, `a040c21`, produced a Vercel preview
-deployment that the user reviewed and approved. That commit was fast-forwarded to
-`main` and pushed on 2026-09-04. Vercel reported the production deployment as
-started; check its dashboard before calling the production site verified.
+Deployment: Verseform's Vercel project and final custom domain are live. Vercel
+reports valid production configuration for `verseform.kmproto.com`; HTTPS navigation
+and a real NASB John 3:16 insertion passed on that origin. The Verseform card commit
+was pushed to this repository's `main` branch on 2026-09-07, allowing the existing
+Vercel Git integration to publish the updated collection.
 
 The old GitHub Actions workflow remains unconfigured: its repository Actions
 secrets list is empty, and its last inspected run failed because --token had no value:
 https://github.com/SydFloyd/kmproto-hub/actions/runs/32672689484
 The existing workflow requires VERCEL_TOKEN, VERCEL_ORG_ID and VERCEL_PROJECT_ID.
-No credential values were requested/read. No deployment has been performed.
+No credential values were requested or read; deployment remains owned by the existing
+Vercel Git integration.
 
-Next: do not publish the hub card until the Verseform Vercel project and final domain
-are live, so kmproto.com does not ship a broken destination. The Verseform CLI/browser
-session is logged out. After owner sign-in, import `SydFloyd/verseform`, assign
-`verseform.kmproto.com`, copy the project-specific CNAME shown by Vercel into DNS,
-verify HTTPS/live DBS/offline reopening, then push this hub commit to main. The old
-GitHub Actions workflow remains redundant and unconfigured; this item does not change it.
+Next: verify the existing Vercel Git integration completed the hub production build
+and that kmproto.com renders Verseform before Shep Study and Milk Yeller with the live
+custom-domain link. The old GitHub Actions workflow remains redundant and
+unconfigured; this item does not change it.
