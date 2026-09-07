@@ -93,6 +93,17 @@ h3 { margin-bottom: 0; font-family: Georgia, serif; font-size: 35px; font-weight
 .leaf-three { top: 80px; left: 38px; transform: rotate(-40deg); background: #899b61; }
 .tomato { position: absolute; width: 28px; height: 28px; border-radius: 50%; background: #b45f3d; box-shadow: inset 2px 2px 0 #cc8152; }
 .tomato-one { top: 44px; left: 92px; }.tomato-two { top: 112px; left: 77px; }
+.verse-art { background: #eadfc3; color: #4d3e2e; }
+.verse-art::before { content: ""; position: absolute; width: 210px; height: 210px; right: -22px; top: -18px; border: 1px solid #9b845e66; border-radius: 50%; }
+.verse-art::after { content: "+"; position: absolute; right: 25px; bottom: 14px; color: #8f7652; font: 32px Georgia, serif; }
+.verse-specimen { position: absolute; inset: 63px auto auto 12%; width: 76%; min-height: 176px; padding: 22px 25px; border: 1px solid #bca886; background: #fbf7ea; box-shadow: 8px 9px 0 #8a715236; transform: rotate(-2deg); }
+.verse-specimen > span { display: block; padding-bottom: 12px; border-bottom: 1px solid #d4c6ac; font-size: 6px; letter-spacing: 1.5px; }
+.verse-specimen strong { display: inline-block; margin: 20px 0 16px; border-bottom: 2px solid #b88243; font: 29px Georgia, serif; font-weight: 400; line-height: 1.15; }
+.verse-specimen div { width: 70%; }
+.verse-specimen i { display: block; height: 1px; margin: 8px 0; background: #cfc3ad; }
+.verse-specimen i:last-child { width: 58%; }
+.verse-specimen small { position: absolute; right: 22px; bottom: 18px; font: italic 9px Georgia, serif; color: #7c684c; }
+.verse-note { position: absolute; left: 24px; bottom: 15px; font-size: 6px; letter-spacing: 1.5px; }
 .study-art { background: #dae3dc; color: #40594e; }
 .sun-disc { position: absolute; width: 136px; height: 136px; border-radius: 50%; background: #f4ecd1; left: calc(50% - 68px); top: 35px; }
 .open-book { position: absolute; display: flex; width: 290px; height: 164px; left: calc(50% - 145px); top: 87px; transform: rotate(-5deg); filter: drop-shadow(0 10px 9px #40594e20); }

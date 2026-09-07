@@ -16,6 +16,14 @@ const projects = [
     label: "Something worth sharing.",
   },
   {
+    name: "Verseform",
+    description: "Write freely. Type a Scripture reference, then preview or insert the passage without leaving the page.",
+    category: "For writing with Scripture",
+    href: "https://verseform.kmproto.com",
+    accent: "verse",
+    label: "Keep writing.",
+  },
+  {
     name: "Shep Study",
     description: "A little space to slow down, open Scripture, and follow your curiosity deeper.",
     category: "For growing in faith",
@@ -58,6 +66,16 @@ function ProjectArt({ kind }: { kind: string }) {
         <span className="art-caption">FROM ONE KITCHEN TO ANOTHER</span>
         <div className="recipe-note"><span>FROM THE RECIPE BOX</span><strong>Made with<br /><em>a little love.</em></strong><i /> <i /><i /><small>Keep this one.</small></div>
         <div className="plate"><span className="leaf leaf-one" /><span className="leaf leaf-two" /><span className="leaf leaf-three" /><span className="tomato tomato-one" /><span className="tomato tomato-two" /></div>
+      </>}
+      {kind === "verse" && <>
+        <span className="art-caption">SCRIPTURE, RIGHT WHEN YOU NEED IT</span>
+        <div className="verse-specimen">
+          <span>VERSEFORM / WRITING 03</span>
+          <strong>John 3:16</strong>
+          <div><i /><i /><i /><i /></div>
+          <small>preview → insert</small>
+        </div>
+        <span className="verse-note">TYPE. PAUSE. CONTINUE.</span>
       </>}
       {kind === "study" && <>
         <span className="art-caption">A QUIETER KIND OF DISCOVERY</span>
@@ -109,7 +127,7 @@ export default function Home() {
         </section>
 
         <section className="projects" id="projects" aria-labelledby="projects-heading">
-          <div className="section-heading"><div><p className="eyebrow">THE COLLECTION</p><h2 id="projects-heading">Go on. <em>Find your thing.</em></h2></div><span className="collection-count">04 projects & counting <span aria-hidden="true">↙</span></span></div>
+          <div className="section-heading"><div><p className="eyebrow">THE COLLECTION</p><h2 id="projects-heading">Go on. <em>Find your thing.</em></h2></div><span className="collection-count">05 projects & counting <span aria-hidden="true">↙</span></span></div>
           <div className="project-list">
             {projects.map((project, index) => (
               <a className={`project-card ${project.accent}`} href={project.href} key={project.name} aria-label={`Explore ${project.name}: ${project.category.toLowerCase()}`}>

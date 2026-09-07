@@ -1,31 +1,22 @@
 # Current work
 
-Updated: 2026-09-04
-Outcome: give kmproto.com a more polished, distinctive landing page while keeping
-its four existing project destinations and lightweight static deployment.
+Updated: 2026-09-07
+Outcome: add Verseform to the KM Proto collection, linking to the intended
+`https://verseform.kmproto.com` production origin.
 
-Implemented: warm ivory / forest green editorial design, oversized serif headline,
-CSS-drawn project illustrations, responsive cards, about section, keyboard skip
-link, visible focus treatment, reduced-motion support, consistent page metadata
-and matching favicon. No dependency or deployment workflow changes. Removed the
-unused Tailwind CSS import after the production build exposed unprocessed directives.
+Implemented: Verseform is the third of five projects, immediately before Shep Study
+and Milk Yeller. Its copy focuses on writing and inline Scripture insertion, with a
+typographic reference specimen in the existing editorial card system. The project
+count is five. No dependency, metadata, navigation, or deployment workflow changed.
 
-Checks: production Vite build, ESLint and TypeScript passed. Browser checks and
-screenshots pass at 1440, 768, 390 and 320px: correct project links, working skip
-and return links, no horizontal overflow or page errors, and zero axe WCAG A/AA
-violations after correcting the record-label contrast. Desktop and phone screenshots
-were visually inspected. This is Chromium verification, not an all-browser guarantee. Full Git integrity passed
-on the fresh clone; no pre-existing working edits were present.
+Checks: `npm run build:vercel` and `npm run lint` passed on a fresh clone with the
+existing lockfile. The dev route compiled and returned HTTP 200 at localhost:3001.
+Source order is Verseform → Shep Study → Milk Yeller and the target link is exact.
+The earlier responsive/browser evidence for the common card system remains the
+baseline; no new visual-browser claim was made for this small addition.
 
-Host: Node was absent. Verified official Node 22.23.2 archive against its SHA-256
-and unpacked under /tmp/kmproto-toolchain. npm dependencies use the existing lockfile.
-Temporary Playwright, Chromium and extracted Debian libraries live under /tmp;
-temporary Liberation / DejaVu fonts supplied through /tmp/kmproto-fonts.conf;
-no system packages installed. These temporary paths may disappear between sessions.
-For normal hosts, use the project's supported Node version and npm ci.
-
-Preview: Vite production preview on 127.0.0.1:4173 while the process remains running.
-Ignored outputs/ holds browser verification script, results and screenshots.
+Preview: Vinext development server is on localhost:3001 while the process remains
+running. Dependencies were installed only in the disposable clone.
 
 Deployment: Vercel's built-in GitHub integration was connected after the review
 branch was pushed. An empty trigger commit, `a040c21`, produced a Vercel preview
@@ -39,7 +30,9 @@ https://github.com/SydFloyd/kmproto-hub/actions/runs/32672689484
 The existing workflow requires VERCEL_TOKEN, VERCEL_ORG_ID and VERCEL_PROJECT_ID.
 No credential values were requested/read. No deployment has been performed.
 
-Next: confirm the production deployment and remove or disable the redundant GitHub
-Actions workflow when authorized, so it does not report misleading failures. Never
-paste tokens into chat or commit them. Main pushes trigger production deployment;
-avoid publishing unreviewed work.
+Next: do not publish the hub card until the Verseform Vercel project and final domain
+are live, so kmproto.com does not ship a broken destination. The Verseform CLI/browser
+session is logged out. After owner sign-in, import `SydFloyd/verseform`, assign
+`verseform.kmproto.com`, copy the project-specific CNAME shown by Vercel into DNS,
+verify HTTPS/live DBS/offline reopening, then push this hub commit to main. The old
+GitHub Actions workflow remains redundant and unconfigured; this item does not change it.
