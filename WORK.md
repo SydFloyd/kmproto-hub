@@ -25,12 +25,15 @@ or deployment workflow changed. Local checks use the prepared Stillcraft Node/br
 toolchain; preview must use `--config vite.vercel.config.ts` to match the public build.
 The default Vinext/Cloudflare preview requires a different build and is not this target.
 
-Publication: pending the final merged browser check, push this branch then
-fast-forward main under the existing Vercel Git integration. Verify the actual public
-`https://www.kmproto.com` card and destination. The earlier Verseform release was
-verified on that origin on 2026-09-07. Vercel’s integration is the production path;
-the old GitHub Actions deploy workflow is redundant and unconfigured (missing token
-secret), so its failure alone does not establish a Vercel deployment failure.
+Publication complete: `a415afaa52d842758e193e630ef7afe43653a5a2` was pushed to the
+review branch and fast-forwarded to main. The existing Vercel Git integration’s
+production deployment `6337854724` reports success. Live
+`https://www.kmproto.com` verification found six cards, the exact Verseform destination,
+the derived 06 count, and a Stillcraft card that opens the usable public editor with
+no page errors. The source implementation is `02365ec` plus merge `c97afc5`, preserving
+remote Verseform work through `ca59638`. The final follow-up only records this result.
+The old GitHub Actions deploy workflow remains redundant and unconfigured; it is
+not the active production path.
 
 The `.openai/hosting.json` Sites project
 `appgprj_6a8b5731a4c48191901cb5e31a749036` was inspected with Sites. It is an older
