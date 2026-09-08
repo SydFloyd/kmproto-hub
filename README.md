@@ -9,10 +9,13 @@ npm install
 npm run dev
 ```
 
-## Vercel deployment
+## Publishing
 
-The GitHub Actions workflow deploys pushes to `main` after these repository secrets are configured:
+The public [KM Proto hub](https://www.kmproto.com) deploys through Vercel’s GitHub
+integration when reviewed changes reach `main`. Use `npm run build:vercel`, `npm run
+lint` and `npx tsc --noEmit` before publication. Preview that build with
+`npx vite preview --config vite.vercel.config.ts`.
 
-- `VERCEL_TOKEN`
-- `VERCEL_ORG_ID`
-- `VERCEL_PROJECT_ID`
+WORK.md records current deployment evidence and the older, unconfigured GitHub
+Actions workflow. The owner-private Sites publication in `.openai/hosting.json` is
+separate from the public Vercel destination; preserve its audience unless requested.
