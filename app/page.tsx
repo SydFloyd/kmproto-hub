@@ -1,5 +1,13 @@
 const projects = [
   {
+    name: "Stillcraft",
+    description: "Bring a photo. Add another. Arrange, crop and make a picture of your own. Try the early preview, right on your device.",
+    category: "For making it your own",
+    href: "https://stillcraft.kyleaddison98.chatgpt.site",
+    accent: "stillcraft",
+    label: "A little room to create.",
+  },
+  {
     name: "ChordLift",
     description: "Less formatting. More playing. Turn the chord chart you found into the one you need.",
     category: "For making music",
@@ -71,6 +79,12 @@ function ProjectArt({ kind }: { kind: string }) {
         <div className="photo-print print-front"><div><span className="landscape-sun" /><span className="landscape-hill back-hill" /><span className="landscape-hill front-hill" /></div><span>A moment, kept.</span></div>
         <span className="photo-edition">LIGHT / LIFE / LITTLE THINGS</span>
       </>}
+      {kind === "stillcraft" && <>
+        <span className="art-caption">YOUR PHOTOS. YOUR POSSIBILITIES.</span>
+        <div className="composition-paper"><svg viewBox="0 0 260 175"><rect width="260" height="175" fill="#e4e7dc"/><circle cx="198" cy="45" r="24" fill="#d4aa73"/><path d="M0 120Q70 45 140 119T260 88V175H0" fill="#96a38d"/><path d="M0 148Q70 93 144 145T260 120V175H0" fill="#557561"/></svg></div>
+        <div className="composition-piece"><svg viewBox="0 0 110 145"><rect width="110" height="145" fill="#d9b59e"/><circle cx="58" cy="49" r="20" fill="#f3e4c8"/><path d="M0 104Q35 75 73 105T110 85V145H0" fill="#aa7867"/></svg><i /></div>
+        <span className="composition-note">A picture worth keeping.</span>
+      </>}
     </div>
   );
 }
@@ -109,7 +123,7 @@ export default function Home() {
         </section>
 
         <section className="projects" id="projects" aria-labelledby="projects-heading">
-          <div className="section-heading"><div><p className="eyebrow">THE COLLECTION</p><h2 id="projects-heading">Go on. <em>Find your thing.</em></h2></div><span className="collection-count">04 projects & counting <span aria-hidden="true">↙</span></span></div>
+          <div className="section-heading"><div><p className="eyebrow">THE COLLECTION</p><h2 id="projects-heading">Go on. <em>Find your thing.</em></h2></div><span className="collection-count">{String(projects.length).padStart(2, "0")} projects & counting <span aria-hidden="true">↙</span></span></div>
           <div className="project-list">
             {projects.map((project, index) => (
               <a className={`project-card ${project.accent}`} href={project.href} key={project.name} aria-label={`Explore ${project.name}: ${project.category.toLowerCase()}`}>
