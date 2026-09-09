@@ -3,7 +3,7 @@ const projects = [
     name: "Stillcraft",
     description: "Bring a photo. Add another. Arrange, crop and make a picture of your own. Try the early preview, right on your device.",
     category: "For making it your own",
-    href: "https://stillcraft.vercel.app",
+    href: "https://stillcraft.kmproto.com",
     accent: "stillcraft",
     label: "A little room to create.",
   },

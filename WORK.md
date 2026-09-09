@@ -4,13 +4,21 @@ Updated: 2026-09-08
 Outcome: list Stillcraft’s usable early photo-editor preview on the public KM Proto
 hub, under the user’s standing “Publish at will” authority for this app and listing.
 
-Current follow-up: the user selected Vercel hosting for Stillcraft. Its workspace/frame
-release `9fbe493` is deployed and verified publicly at `https://stillcraft.vercel.app`.
-Only Stillcraft's card destination changes on `codex/stillcraft-vercel`; the other five
-cards remain intact. The app's custom `stillcraft.kmproto.com` address still has no DNS
-record, so the verified Vercel production origin is the temporary destination.
-App checks: public desktop/phone frame editing, outside-photo preservation and offline
-save/export/reopen passed; hosted app CI passed. Hub publication/check evidence follows.
+Current follow-up: Stillcraft is now on Vercel at **https://stillcraft.kmproto.com**.
+The user added its DNS record; Google and Cloudflare public resolvers agree on the
+Vercel CNAME. HTTPS and the full desktop/phone-layout app workflow pass using that
+public IP with certificate verification enabled; the development host's resolver
+still has the earlier NXDOMAIN cached. Only Stillcraft's card destination changes.
+The other five cards and derived count remain intact.
+
+The temporary Vercel alias release `88ff3ed` deployed successfully (`6341829079`)
+and its six-card listing was observed live, but the alias subsequently returned 404
+during the custom-domain transition. The final link below replaces it. The app's
+export-preview correction is published as `c8a2d6a`; exact app checks and deployment
+IDs remain in `../stillcraft/WORK.md`. Hub production build, lint, TypeScript and
+diff checks pass. Final public navigation verification follows publication.
+
+## Earlier hub listing — historical evidence
 
 Implemented on `codex/stillcraft-preview`: Stillcraft is the first of six cards, with
 an original composition illustration and plain early-preview copy. It links to the
@@ -49,8 +57,6 @@ owner-private publication at `kmproto-hub.kyleaddison98.chatgpt.site`, with no c
 domains. Its audience and deployed version were not changed. This task does not
 migrate the public hub between hosts.
 
-Next: after Stillcraft’s exact custom hostname passes DNS/SSL and live app checks,
-replace only its temporary card URL with `https://stillcraft.kmproto.com` and verify
-again. App-side deployment IDs and exact DNS records live in
+App-side deployment IDs and exact DNS records live in
 `../stillcraft/docs/HOSTING.md`; the owning app checkpoint is `../stillcraft/WORK.md`.
 No app photo uploads or paid inference are involved.
