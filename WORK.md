@@ -16,7 +16,18 @@ and its six-card listing was observed live, but the alias subsequently returned 
 during the custom-domain transition. The final link below replaces it. The app's
 export-preview correction is published as `c8a2d6a`; exact app checks and deployment
 IDs remain in `../stillcraft/WORK.md`. Hub production build, lint, TypeScript and
-diff checks pass. Final public navigation verification follows publication.
+diff checks pass. Main release `106f2e25b1932af64114dcd8ff2c66a2252a0384`
+deployed successfully through Vercel production `6341925335` at 2026-09-09 03:32:23 UTC.
+The public hub shows six cards, retains the exact Verseform link and 06 count, and
+its Stillcraft card opens the custom-domain editor with its photo picker enabled.
+No page errors occurred. This check used the publicly resolved Stillcraft IP because
+the host's ordinary resolver still returned NXDOMAIN; HTTPS verification stayed on.
+The ignored live-check script initially sampled readiness before the worker had
+started; waiting for the existing enabled picker condition completed the check.
+
+Outcome complete: custom-domain link published and public hub-to-editor journey
+verified. No further hub work is needed for this slice. The following commit records
+only this release evidence; the built application remains identical.
 
 ## Earlier hub listing — historical evidence
 
