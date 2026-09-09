@@ -4,6 +4,14 @@ Updated: 2026-09-08
 Outcome: list Stillcraft’s usable early photo-editor preview on the public KM Proto
 hub, under the user’s standing “Publish at will” authority for this app and listing.
 
+Current follow-up: the user selected Vercel hosting for Stillcraft. Its workspace/frame
+release `9fbe493` is deployed and verified publicly at `https://stillcraft.vercel.app`.
+Only Stillcraft's card destination changes on `codex/stillcraft-vercel`; the other five
+cards remain intact. The app's custom `stillcraft.kmproto.com` address still has no DNS
+record, so the verified Vercel production origin is the temporary destination.
+App checks: public desktop/phone frame editing, outside-photo preservation and offline
+save/export/reopen passed; hosted app CI passed. Hub publication/check evidence follows.
+
 Implemented on `codex/stillcraft-preview`: Stillcraft is the first of six cards, with
 an original composition illustration and plain early-preview copy. It links to the
 verified public app at `https://stillcraft.kyleaddison98.chatgpt.site` while
