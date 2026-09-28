@@ -1,5 +1,23 @@
 # Current work
 
+Updated: 2026-09-28
+Outcome: turn kmproto.com into the KM Proto business site (websites, AI automation &
+custom software for small businesses) and move the app portal behind it at `/lab`.
+
+Implemented and pushed to `main`: full redesign replacing all prior styling. Vercel's Git
+integration builds production from `main`.
+Home has hero, services, the interactive Busywork Sorter (pick chores, mascot "Proto"
+tallies hours saved and pre-fills a mailto), process, about, Lab teaser and contact with
+the public email kyleaddison98@gmail.com. `/lab` lists the same six apps with the same
+destinations. New favicon, OG image and metadata. Vite build gained a `lab.html` entry.
+ESLint now disables Next's `<Link>`/page-font rules because production is plain Vite.
+
+Checks: `npm run build:vercel`, `npm run build`, lint and `tsc --noEmit` pass. Checked at
+1440px and 390px for horizontal overflow and page errors (none); screenshots reviewed.
+Not yet deployed or verified live.
+
+## Previous hub work — historical evidence
+
 Updated: 2026-09-08
 Outcome: list Stillcraft’s usable early photo-editor preview on the public KM Proto
 hub, under the user’s standing “Publish at will” authority for this app and listing.

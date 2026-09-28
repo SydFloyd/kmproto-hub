@@ -1,108 +1,75 @@
-const projects = [
-  {
-    name: "Stillcraft",
-    description: "Bring a photo. Add another. Arrange, crop and make a picture of your own. Try the early preview, right on your device.",
-    category: "For making it your own",
-    href: "https://stillcraft.kmproto.com",
-    accent: "stillcraft",
-    label: "A little room to create.",
-  },
-  {
-    name: "ChordLift",
-    description: "Less formatting. More playing. Turn the chord chart you found into the one you need.",
-    category: "For making music",
-    href: "https://chordlift.kmproto.com",
-    accent: "chord",
-    label: "Find your rhythm.",
-  },
-  {
-    name: "Food Miller",
-    description: "The recipes you pass around, come back to, and make your own. Pull up a chair.",
-    category: "For gathering around",
-    href: "https://foodmiller.com",
-    accent: "food",
-    label: "Something worth sharing.",
-  },
-  {
-    name: "Verseform",
-    description: "Write freely. Type a Scripture reference, then preview or insert the passage without leaving the page.",
-    category: "For writing with Scripture",
-    href: "https://verseform.kmproto.com",
-    accent: "verse",
-    label: "Keep writing.",
-  },
-  {
-    name: "Shep Study",
-    description: "A little space to slow down, open Scripture, and follow your curiosity deeper.",
-    category: "For growing in faith",
-    href: "https://shepstudy.com",
-    accent: "study",
-    label: "Room for reflection.",
-  },
-  {
-    name: "Milk Yeller",
-    description: "An eye for the ordinary. Photography and stories that invite a second look.",
-    category: "For looking closer",
-    href: "https://milk-yeller.com",
-    accent: "photo",
-    label: "Notice a little more.",
-  },
-] as const;
+import BusyworkSorter from "./components/BusyworkSorter";
+import CopyEmail from "./components/CopyEmail";
+import { Arrow, Footer, Header } from "./components/chrome";
+import { EMAIL, mailto, principles, process, projects, services } from "./data";
 
-function Arrow({ diagonal = false }: { diagonal?: boolean }) {
+const marquee = ["Websites", "AI automation", "Custom software", "Prototypes", "Integrations", "Dashboards", "Care & support"];
+
+function ServiceIcon({ id }: { id: string }) {
   return (
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path d={diagonal ? "M6 18 18 6M6 6h12v12" : "M4 12h15m-6-6 6 6-6 6"} />
+    <svg className="service-icon" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+      {id === "websites" && (
+        <>
+          <rect x="5" y="9" width="38" height="30" rx="4" />
+          <path d="M5 17h38" />
+          <circle cx="10" cy="13" r="1" className="fill" />
+          <circle cx="14" cy="13" r="1" className="fill" />
+          <path d="M11 24h14M11 29h9" />
+          <rect x="29" y="23" width="8" height="10" rx="1.5" className="accent" />
+        </>
+      )}
+      {id === "automation" && (
+        <>
+          <circle cx="11" cy="24" r="5" />
+          <circle cx="37" cy="12" r="5" />
+          <circle cx="37" cy="36" r="5" className="accent" />
+          <path d="M16 22.5 32 14M16 25.5 32 34" />
+        </>
+      )}
+      {id === "software" && (
+        <>
+          <path d="m17 15-9 9 9 9M31 15l9 9-9 9" />
+          <path d="m27 11-6 26" className="accent" />
+        </>
+      )}
     </svg>
   );
 }
 
-function ProjectArt({ kind }: { kind: string }) {
+function Workbench() {
   return (
-    <div className={`project-art ${kind}-art`} aria-hidden="true">
-      {kind === "chord" && <>
-        <span className="art-caption">A GOOD PLACE TO FIND YOUR GROOVE</span>
-        <div className="music-sheet">
-          <div className="sheet-heading"><span>Sunday kind of sound</span><span>♪</span></div>
-          <div className="chords"><span>G</span><span>D</span><span>Em</span><span>C</span></div>
-          <div className="music-lines"><i /><i /><i /></div>
-          <span className="sheet-note">A few chords. Endless possibilities.</span>
+    <div className="workbench" aria-hidden="true">
+      <div className="wb-grid" />
+      <div className="wb-browser">
+        <div className="wb-bar">
+          <span className="wb-dots"><i /><i /><i /></span>
+          <span className="wb-url">yourbusiness.com</span>
         </div>
-        <div className="record"><span>CL<br /><small>33⅓</small></span></div>
-      </>}
-      {kind === "food" && <>
-        <span className="art-caption">FROM ONE KITCHEN TO ANOTHER</span>
-        <div className="recipe-note"><span>FROM THE RECIPE BOX</span><strong>Made with<br /><em>a little love.</em></strong><i /> <i /><i /><small>Keep this one.</small></div>
-        <div className="plate"><span className="leaf leaf-one" /><span className="leaf leaf-two" /><span className="leaf leaf-three" /><span className="tomato tomato-one" /><span className="tomato tomato-two" /></div>
-      </>}
-      {kind === "verse" && <>
-        <span className="art-caption">SCRIPTURE, RIGHT WHEN YOU NEED IT</span>
-        <div className="verse-specimen">
-          <span>VERSEFORM / WRITING 03</span>
-          <strong>John 3:16</strong>
-          <div><i /><i /><i /><i /></div>
-          <small>preview → insert</small>
+        <div className="wb-site">
+          <div className="wb-nav"><b /><span><i /><i /><i /></span></div>
+          <p className="wb-headline">Your business,<br /><em>looking its best.</em></p>
+          <div className="wb-lines"><i /><i /></div>
+          <span className="wb-button">Book a visit</span>
+          <div className="wb-tiles"><i /><i /><i /></div>
         </div>
-        <span className="verse-note">TYPE. PAUSE. CONTINUE.</span>
-      </>}
-      {kind === "study" && <>
-        <span className="art-caption">A QUIETER KIND OF DISCOVERY</span>
-        <div className="sun-disc" />
-        <div className="open-book"><div><span>PAUSE.</span><i /><i /><i /><i /><i /></div><div><span>REFLECT.</span><i /><i /><i /><i /><i /></div></div>
-        <span className="study-note">Let the words take root.</span>
-      </>}
-      {kind === "photo" && <>
-        <span className="art-caption">THE EVERYDAY, SEEN DIFFERENTLY</span>
-        <div className="photo-print print-back"><div /></div>
-        <div className="photo-print print-front"><div><span className="landscape-sun" /><span className="landscape-hill back-hill" /><span className="landscape-hill front-hill" /></div><span>A moment, kept.</span></div>
-        <span className="photo-edition">LIGHT / LIFE / LITTLE THINGS</span>
-      </>}
-      {kind === "stillcraft" && <>
-        <span className="art-caption">YOUR PHOTOS. YOUR POSSIBILITIES.</span>
-        <div className="composition-paper"><svg viewBox="0 0 260 175"><rect width="260" height="175" fill="#e4e7dc"/><circle cx="198" cy="45" r="24" fill="#d4aa73"/><path d="M0 120Q70 45 140 119T260 88V175H0" fill="#96a38d"/><path d="M0 148Q70 93 144 145T260 120V175H0" fill="#557561"/></svg></div>
-        <div className="composition-piece"><svg viewBox="0 0 110 145"><rect width="110" height="145" fill="#d9b59e"/><circle cx="58" cy="49" r="20" fill="#f3e4c8"/><path d="M0 104Q35 75 73 105T110 85V145H0" fill="#aa7867"/></svg><i /></div>
-        <span className="composition-note">A picture worth keeping.</span>
-      </>}
+      </div>
+
+      <div className="wb-flow">
+        <span className="mono">Automation · running</span>
+        <ol>
+          <li><i />New inquiry received</li>
+          <li><i />Added to your CRM</li>
+          <li><i />Friendly reply drafted</li>
+          <li><i />Follow-up scheduled</li>
+        </ol>
+      </div>
+
+      <div className="wb-code">
+        <span><em>const</em> quote = <b>await</b> build(job)</span>
+        <span>send(quote) <i>{"// ✓ done"}</i></span>
+      </div>
+
+      <div className="wb-note">prototype v0.1<br />looks good →</div>
     </div>
   );
 }
@@ -110,56 +77,216 @@ function ProjectArt({ kind }: { kind: string }) {
 export default function Home() {
   return (
     <>
-      <a className="skip-link" href="#projects">Skip to projects</a>
-      <header className="site-header" id="top">
-        <a className="wordmark" href="#top" aria-label="KM Proto home">
-          <span className="wordmark-mark" aria-hidden="true">K<span>↗</span></span>
-          <span>km<span className="wordmark-light">proto</span><span className="wordmark-dot">.</span></span>
-        </a>
-        <nav aria-label="Main navigation"><a href="#projects">The projects <span aria-hidden="true">↘</span></a><a href="#about">A little about us</a></nav>
-        <span className="header-note"><i /> Independently made</span>
-      </header>
+      <a className="skip-link" href="#main">Skip to content</a>
+      <Header current="home" />
 
-      <main>
-        <section className="hero" aria-labelledby="page-title">
-          <div className="hero-copy">
-            <p className="eyebrow"><span /> SMALL PROJECTS. OPEN POSSIBILITIES.</p>
-            <h1 id="page-title">Good ideas.<br />Made <em>useful.</em></h1>
-            <p className="hero-description">For the things you love doing.<br />And the little things that make them better.</p>
-            <a className="primary-link" href="#projects">Find your next little thing <Arrow /></a>
-            <p className="hero-footnote">A small collection. A lot of heart.</p>
-          </div>
-          <div className="hero-art" aria-hidden="true">
-            <div className="art-grid" />
-            <span className="hero-art-label">THE KM PROTO COLLECTION</span>
-            <div className="orbit orbit-one" /><div className="orbit orbit-two" />
-            <div className="idea-card idea-music"><span className="idea-symbol">♫</span><span>Make a little<br /><strong>music.</strong></span><i>01 / PLAY</i></div>
-            <div className="idea-card idea-wonder"><span className="spark">✳</span><span>Leave room for<br /><strong>wonder.</strong></span><i>02 / EXPLORE</i></div>
-            <span className="art-coordinate">A FEW GOOD THINGS, ALL IN ONE PLACE.</span>
-            <span className="art-plus">+</span>
+      <main id="main">
+        {/* ─── Hero ─── */}
+        <section className="hero" aria-labelledby="hero-title">
+          <div className="shell hero-inner">
+            <div className="hero-copy">
+              <p className="status">
+                <span className="status-dot" aria-hidden="true" />
+                Independent studio · Taking on new projects
+              </p>
+              <h1 id="hero-title">
+                Practical technology for <em>small businesses.</em>
+              </h1>
+              <p className="hero-lede">
+                Websites, AI automation and custom software, designed and built by one developer who
+                answers his own email.
+              </p>
+              <div className="hero-actions">
+                <a className="button button-accent" href={mailto("New project inquiry")}>
+                  Start a project <Arrow />
+                </a>
+                <a className="button button-ghost" href="#services">
+                  See what I do
+                </a>
+              </div>
+            </div>
+            <Workbench />
           </div>
         </section>
 
-        <section className="projects" id="projects" aria-labelledby="projects-heading">
-          <div className="section-heading"><div><p className="eyebrow">THE COLLECTION</p><h2 id="projects-heading">Go on. <em>Find your thing.</em></h2></div><span className="collection-count">{String(projects.length).padStart(2, "0")} projects & counting <span aria-hidden="true">↙</span></span></div>
-          <div className="project-list">
-            {projects.map((project, index) => (
-              <a className={`project-card ${project.accent}`} href={project.href} key={project.name} aria-label={`Explore ${project.name}: ${project.category.toLowerCase()}`}>
-                <ProjectArt kind={project.accent} />
-                <div className="project-copy"><div className="project-meta"><span>{project.category}</span><span>0{index + 1}</span></div><div className="project-title"><h3>{project.name}</h3><span className="project-arrow"><Arrow diagonal /></span></div><p>{project.description}</p><span className="project-link">{project.label} <span aria-hidden="true">↗</span></span></div>
-              </a>
+        <div className="marquee" aria-hidden="true">
+          <div className="marquee-track">
+            {[0, 1].map((n) => (
+              <span key={n}>
+                {marquee.map((m) => (
+                  <span key={m}>{m}<b>✳</b></span>
+                ))}
+              </span>
             ))}
           </div>
+        </div>
+
+        {/* ─── Services ─── */}
+        <section className="section" id="services" aria-labelledby="services-title">
+          <div className="shell">
+            <div className="section-head">
+              <p className="kicker">What I do</p>
+              <h2 id="services-title">
+                Three ways to make your business <em>run smoother.</em>
+              </h2>
+              <p className="section-intro">
+                Start with one, or combine them. Every project is sized to your business, with a clear plan and a
+                working result.
+              </p>
+            </div>
+
+            <div className="services">
+              {services.map((s) => (
+                <article className="service" key={s.id} id={s.id}>
+                  <div className="service-top">
+                    <ServiceIcon id={s.id} />
+                    <span className="mono">{s.index}</span>
+                  </div>
+                  <p className="service-name">{s.name}</p>
+                  <h3>{s.headline}</h3>
+                  <p className="service-summary">{s.summary}</p>
+                  <ul>
+                    {s.items.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
+                </article>
+              ))}
+            </div>
+          </div>
         </section>
 
-        <section className="about" id="about" aria-labelledby="about-heading">
-          <span className="about-flower" aria-hidden="true">✳</span>
-          <div><p className="eyebrow">A LITTLE ABOUT KM PROTO</p><h2 id="about-heading">Useful by nature.<br /><em>Personal by design.</em></h2></div>
-          <div className="about-copy"><p>Some things start with “wouldn’t it be nice if…” These projects are what happened next.</p><p>A place for music, food, faith, and a different way of seeing. Small, independent projects, made with care. We hope one finds a place in your day.</p><a href="https://github.com/SydFloyd" target="_blank" rel="noreferrer">See what’s taking shape <Arrow diagonal /></a></div>
+        {/* ─── Fun: busywork sorter ─── */}
+        <section className="section section-dark" id="sorter" aria-labelledby="sorter-title">
+          <div className="shell">
+            <div className="section-head">
+              <p className="kicker">The Busywork Sorter</p>
+              <h2 id="sorter-title">
+                What would you hand to <em>a robot?</em>
+              </h2>
+              <p className="section-intro">
+                Meet Proto. Feed it the chores that quietly eat your week and see how much time you could win back.
+              </p>
+            </div>
+            <BusyworkSorter />
+          </div>
+        </section>
+
+        {/* ─── Process ─── */}
+        <section className="section" id="process" aria-labelledby="process-title">
+          <div className="shell">
+            <div className="section-head section-head-split">
+              <div>
+                <p className="kicker">How it works</p>
+                <h2 id="process-title">
+                  Simple process. <em>Real progress.</em>
+                </h2>
+              </div>
+              <aside className="proto-note">
+                <span className="mono">Why “Proto”?</span>
+                <p>
+                  The quickest way to a good decision is a working prototype. You see real progress early, and we
+                  shape the final product together.
+                </p>
+              </aside>
+            </div>
+            <ol className="process">
+              {process.map((p) => (
+                <li key={p.step}>
+                  <span className="process-step mono">{p.step}</span>
+                  <h3>{p.name}</h3>
+                  <p>{p.copy}</p>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </section>
+
+        {/* ─── About ─── */}
+        <section className="section section-tint" id="about" aria-labelledby="about-title">
+          <div className="shell about">
+            <div className="about-intro">
+              <p className="kicker">Who you’ll work with</p>
+              <h2 id="about-title">
+                Hi, I’m Kyle. <em>Nice to meet you.</em>
+              </h2>
+              <p>
+                KM Proto is my independent practice. I help small businesses use technology to look sharper, work
+                faster, and spend less time on the tedious stuff.
+              </p>
+              <p>
+                No account managers, no handoffs. When you email, you get me, and I’ll be the one building your
+                project from first sketch to launch day.
+              </p>
+            </div>
+            <ul className="principles">
+              {principles.map((p, i) => (
+                <li key={p.title}>
+                  <span className="mono">0{i + 1}</span>
+                  <h3>{p.title}</h3>
+                  <p>{p.copy}</p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+
+        {/* ─── Lab teaser ─── */}
+        <section className="section" id="lab" aria-labelledby="lab-title">
+          <div className="shell lab-teaser">
+            <div className="section-head">
+              <p className="kicker">From the Lab</p>
+              <h2 id="lab-title">
+                I build my own products, <em>too.</em>
+              </h2>
+              <p className="section-intro">
+                Between client projects, I make small apps for music, food, faith and photography. They’re where I
+                try new ideas first.
+              </p>
+              <a className="text-link" href="/lab">
+                Visit the Lab <Arrow />
+              </a>
+            </div>
+            <ul className="lab-rows">
+              {projects.map((p) => (
+                <li key={p.name}>
+                  <a href={p.href} className={`tone-${p.tone}`}>
+                    <span className="lab-glyph" aria-hidden="true">{p.glyph}</span>
+                    <span className="lab-name">{p.name}</span>
+                    <span className="lab-cat">{p.category}</span>
+                    <Arrow diagonal />
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+
+        {/* ─── Contact ─── */}
+        <section className="contact" id="contact" aria-labelledby="contact-title">
+          <div className="shell contact-inner">
+            <p className="kicker">Get in touch</p>
+            <h2 id="contact-title">
+              Got a project, a problem, or <em>just a hunch?</em>
+            </h2>
+            <p className="contact-lede">
+              Tell me a little about your business and what you’d like to improve. I read every message myself.
+            </p>
+            <a className="contact-email" href={mailto("New project inquiry")}>
+              {EMAIL}
+              <Arrow diagonal />
+            </a>
+            <div className="contact-actions">
+              <a className="button button-accent" href={mailto("New project inquiry")}>
+                Write an email <Arrow />
+              </a>
+              <CopyEmail />
+            </div>
+          </div>
         </section>
       </main>
 
-      <footer><a className="footer-wordmark" href="#top">kmproto.</a><span>A few good things. Made with care.</span><a href="#top">Back to the top <span aria-hidden="true">↑</span></a></footer>
+      <Footer />
     </>
   );
 }

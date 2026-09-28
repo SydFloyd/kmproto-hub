@@ -1,6 +1,16 @@
-# KM Proto Hub
+# KM Proto
 
-The project directory for [kmproto.com](https://kmproto.com): a small, curated home for independent web projects.
+The business site for [kmproto.com](https://kmproto.com): **KM Proto — websites, AI
+automation & custom software. Practical technology for small businesses.**
+
+- `/` — the business site (services, the interactive Busywork Sorter, process, about, contact)
+- `/lab` — the portal to KM Proto's independent apps
+
+Content lives in `app/data.ts` (email, services, process, sorter chores, Lab projects).
+Pages are `app/page.tsx` and `app/lab/page.tsx`; styles are in `app/globals.css`.
+The public Vercel build is a static multi-page Vite app: `index.html` → `src/main.tsx`
+and `lab.html` → `src/lab.tsx` (served at `/lab` via `cleanUrls`). `public/og.png` is the
+1200×630 social card.
 
 ## Local development
 
