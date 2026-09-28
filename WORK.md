@@ -4,6 +4,28 @@ Updated: 2026-09-28
 Outcome: turn kmproto.com into the KM Proto business site (websites, AI automation &
 custom software for small businesses) and move the app portal behind it at `/lab`.
 
+Outcome complete: the redesigned business site is live at https://kmproto.com and the
+app portal serves at https://kmproto.com/lab. Publication used the existing Vercel Git
+integration: `ca56608` (`a27cee4..ca56608` on `main`) built as deployment `6713977716`;
+the commit status context `Vercel` reports `Deployment has completed` (success,
+2026-09-28T15:36:01Z). A local `gh` (2.101.0, installed to `~/.local/bin`) authorized via
+GitHub's device flow as `SydFloyd` because the host had no Git credentials; git now uses
+`gh auth git-credential`.
+
+Live verification with a headless browser against the public URLs: `/`, `/lab` and
+`/og.png` all return 200; `/lab` resolves through Vercel `cleanUrls`, confirming the new
+`lab.html` entry works in production and not just as a local `/lab.html`. Home titles as
+"KM Proto | Websites, AI automation & custom software" with the expected `h1`; Lab titles
+as "The Lab | KM Proto". Zero page errors and zero horizontal overflow at 1440px and
+390px. The Busywork Sorter interacts on the live site, totals 7.5 h/week and 360 h/year for
+three chores, and its button builds a `mailto:kyleaddison98@gmail.com` link. Screenshots
+were visually inspected.
+
+No further hub work is needed for this slice. The commit below records only this release
+evidence.
+
+## Previous redesign work — historical evidence
+
 Implemented and pushed to `main`: full redesign replacing all prior styling. Vercel's Git
 integration builds production from `main`.
 Home has hero, services, the interactive Busywork Sorter (pick chores, mascot "Proto"
@@ -14,7 +36,7 @@ ESLint now disables Next's `<Link>`/page-font rules because production is plain 
 
 Checks: `npm run build:vercel`, `npm run build`, lint and `tsc --noEmit` pass. Checked at
 1440px and 390px for horizontal overflow and page errors (none); screenshots reviewed.
-Not yet deployed or verified live.
+Deployment and live verification are recorded in the completion note above.
 
 ## Previous hub work — historical evidence
 
