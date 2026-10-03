@@ -1,7 +1,16 @@
 # Current work
 
 Updated: 2026-10-03
-Status: implemented and verified; production publication follows.
+Status: published and verified at https://www.kmproto.com.
+
+Production source: a9edf6f187877857ac03f9e7d765421ad9ecb31e, pushed to main.
+Vercel production deployment 6823067965 completed successfully at
+2026-10-03T04:08:39Z. Live desktop (1440px) and mobile (390px) checks confirm the
+new value offer, no hero pricing, no autoplay, working play/pause/resume and a
+single completed run. Reduced-motion playback shows the finished illustration
+without animation. /pricing and /lab return 200, and the public social card and
+pricing PDF match the released files. No page errors or horizontal overflow.
+Evidence: ignored outputs/live-hero-verification.json and outputs/live-hero-*.png.
 
 Replaced the homepage hero's Website projects price range and payment summary
 with a high-level value offer and an optional workflow illustration. The hero now
