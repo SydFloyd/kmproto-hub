@@ -11,6 +11,11 @@ buttons put Normal first. Existing saved voice choices are respected.
 All browser and installer assets are rebuilt with the UI update. The versioned
 browser bundle and checksum are recorded in `tools/bible-audio-release.json`.
 The builders enforce the 100 MB download/payload budgets and Android signatures.
+Published app source: `8c63bed`; standalone Vercel deployment
+`dpl_D4aKbaT8vzG1nWx6zeaia5YGdysB` is READY and aliased to the main subdomain.
+Hub source `9cdd6da` deployed successfully as `9JsoqPcG2CSFCXXXiJsehVvVzxn9`.
+The fallback production page serves Normal first, selected by default, followed
+by Light. Public release `bible-audio-v0.5.1-beta` contains all 15 expected assets.
 
 ## Initial publication: 0.5.0-beta
 
