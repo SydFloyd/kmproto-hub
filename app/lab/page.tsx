@@ -25,6 +25,11 @@ export default function Lab() {
             <h1 id="lab-title">Independent projects</h1>
             <p className="hero-lede">Applications I develop alongside client work, covering music, recipes, writing, Bible study and photography.</p>
             <p className="page-note">{projects.length} projects</p>
+            <a className="lab-games-link" href="/lab/games">
+              <svg className="lab-games-symbol" viewBox="0 0 36 36" fill="none" aria-hidden="true"><path d="M11 11h14c3 0 5 3 6 7l2 8c.6 2.5-2.2 4-4 2.2L24 23H12l-5 5.2C5.2 30 2.4 28.5 3 26l2-8c1-4 3-7 6-7Z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round"/><path d="M11 15v8m-4-4h8" stroke="currentColor" strokeWidth="1.6"/><circle cx="25" cy="16" r="1.4" fill="currentColor"/><circle cx="28" cy="20" r="1.4" fill="currentColor"/></svg>
+              <span><strong>Games</strong><span>Arcade classics to play in your browser.</span></span>
+              <Arrow />
+            </a>
           </div>
         </section>
         <section className="section" aria-label="Project directory">

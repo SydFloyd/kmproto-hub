@@ -1,4 +1,28 @@
-# Browser games: Bubble Bobble
+# Games portal
+
+Updated: 2026-10-03
+Status: implementation complete; publication verification follows.
+
+The Lab now contains a Games entry linking to /lab/games. The portal presents
+Asteroids, Contra and Bubble Bobble as cards with static gameplay artwork,
+descriptions, player counts and a Play game link. Cards share one catalog and
+use three columns on desktop, two on tablet and one on mobile. The previews
+are rendered from the games' existing canvas code, total approximately 50 KB,
+and do not load any game engine on the Lab or portal pages.
+
+Removed the header Games dropdown and its unused component/styles. Header
+navigation stays consistent across the site, with The Lab marked current on
+its game pages. Individual games now link back to the portal. All seven Lab
+project links remain in place. No game engine, control or scoring changes.
+
+Vinext and public Vercel builds, lint, TypeScript and diff checks pass. Browser
+checks at 1440/768/390/320px cover keyboard navigation from the Lab, loaded
+previews, responsive cards, starting all three games, and returning to Games
+and the Lab. Games remain idle and muted until started. No page errors,
+horizontal overflow or automated WCAG A/AA violations. Reviewed desktop and
+mobile screenshots. Final production evidence follows.
+
+## Earlier release: Bubble Bobble
 
 Updated: 2026-10-03
 Status: published and verified at https://www.kmproto.com/lab/games/bubble-bobble.

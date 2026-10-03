@@ -6,7 +6,8 @@ automation and custom software for small businesses and organizations.
 - `/` — the business site (services, website pricing, process, about, contact)
 - `/pricing` — website packages, inclusions, add-ons, optional monthly services and terms
 - `/lab` — the portal to KM Proto's independent apps
-- `/lab/games/asteroids` — the browser arcade game, reached through the Lab header's Games menu
+- `/lab/games` — the Games portal, linked from the Lab, with preview cards for every game
+- `/lab/games/asteroids` — the browser arcade game
 - `/lab/games/contra` — eight-zone run-and-gun recreation, with local two-player co-op
 - `/lab/games/bubble-bobble` — 100-round arcade recreation, with bubble riding and local co-op
 
@@ -23,8 +24,11 @@ via `cleanUrls`). `public/og.png` is the 1200×630 social card. Typography uses
 system fonts; the site does not fetch external fonts.
 
 Browser games have their own Vite entry points, so their engines are loaded only
-on game pages. `app/lab/games/catalog.ts` supplies the Games menu; add future
-games there and register their HTML entry in `vite.vercel.config.ts`.
+on game pages. `app/lab/games/catalog.ts` supplies the Games portal's cards;
+add future games there and register their HTML entry in `vite.vercel.config.ts`.
+The preview PNGs in `public/games/` are static scenes rendered from the games'
+own canvas code. The portal loads those small images without loading any game
+engines. Individual game pages link back to the portal.
 Asteroids uses a fixed-step canvas engine, original stroke graphics and
 procedural Web Audio in `app/lab/games/asteroids/`. Sound starts muted. Controls
 are scoped to the playfield, with multi-touch buttons, pause, full screen and a
