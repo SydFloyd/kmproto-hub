@@ -1,7 +1,16 @@
 # Browser games: Asteroids
 
 Updated: 2026-10-03
-Status: implemented and validated; publication pending.
+Status: published and verified at https://www.kmproto.com/lab/games/asteroids.
+
+Production source: 755ddee2411e14026b5aef8d0534deb2de42dd7d, pushed to main.
+Vercel production deployment 6831198566 reports success at
+2026-10-03T18:07:22Z. Live browser checks at 1440/768/390/320px confirm navigation
+from the Lab's Games menu, keyboard and simultaneous touch controls, pause and
+resume, audio, desktop full screen, restart and saved high scores. The ready
+screen stays still. Blocked browser storage remains playable. No page errors,
+horizontal overflow or automated WCAG A/AA violations.
+Evidence: ignored outputs/asteroids-live-verification.json and screenshots.
 
 Added a Games menu to the Lab header and an independently loaded game page at
 /lab/games/asteroids. The shared catalog supports future games without loading
