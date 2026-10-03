@@ -1,4 +1,40 @@
-# Games portal
+# R.C. Pro-Am
+
+Updated: 2026-10-03
+Status: implementation and local verification complete; production verification pending.
+
+Added /lab/games/rc-pro-am and a fourth card in the Games portal. Its separate
+Vite entry keeps the racing engine off directory and business pages. All seven
+Lab projects and existing game links remain available.
+
+The NES recreation includes isometric RC racing, relative steering and momentum,
+three drone rivals, 24 traced main course shapes, top-three advancement and
+first-finisher race endings. Includes missiles, bombs, shared ammo, horn, turbo,
+engine/tire upgrades, roll cages, water, oil, rain, pop-up barriers, zippers,
+trophies, NINTENDO letters, vehicle progression, three continues and repeated
+circuits. Pixel vehicles/scenery and motor/chip effects are authored locally.
+Reference provenance and approximation limits are recorded in README.md.
+Sound and play start off; keyboard and simultaneous touch controls, pause,
+automatic pause, full screen and optional local best scores are supported.
+
+All 19 racing engine tests pass, including a complete first race and driving
+all 24 courses through controls with functioning drone opponents. Campaign
+fixtures verify 49 transitions. Existing 13 Asteroids, 18 Contra and 18 Bubble
+Bobble tests also pass. Vinext and public Vercel builds, lint, TypeScript and
+diff checks pass.
+
+Browser checks at 1440/768/390/320px cover idle/muted startup, countdown pause,
+keyboard, touch, sound, automatic pause and accessibility. Full screen fits
+at 844x390 and 568x320. Actual game over and continuing pass at 320px; valid
+stored best scores reload, and blocked storage/missing audio still allow play.
+Portal checks cover all four cards, keyboard navigation, image loading,
+responsive columns, return links and starting/pausing all four games. No page
+errors, horizontal overflow or automated WCAG A/AA violations. Reviewed course,
+portal and game artwork. Local evidence is in ignored outputs/rc-pro-am-local-
+verification.json, outputs/rc-pro-am-local-extras.json, outputs/games-local-
+verification.json and screenshots.
+
+## Earlier release: Games portal
 
 Updated: 2026-10-03
 Status: published and verified at https://www.kmproto.com/lab/games.

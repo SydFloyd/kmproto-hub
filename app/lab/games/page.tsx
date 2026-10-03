@@ -4,7 +4,7 @@ import { games } from "./catalog";
 import "./games.css";
 
 const title = "Games | The Lab | KM Proto";
-const description = "Play Asteroids, Contra and Bubble Bobble in your browser. Explore KM Proto's arcade recreations with keyboard, touch controls and local co-op.";
+const description = "Play Asteroids, Contra, Bubble Bobble and R.C. Pro-Am in your browser. Explore KM Proto's arcade recreations with keyboard, touch controls and local co-op.";
 
 export const metadata: Metadata = {
   title, description,

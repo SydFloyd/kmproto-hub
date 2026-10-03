@@ -18,4 +18,10 @@ export const games = [
     description: "Trap monsters, ride bubbles and chain your pops through a hundred arcade rounds.",
     preview: "/games/bubble-bobble.png", width: 512, height: 448,
   },
+  {
+    id: "rc-pro-am", name: "R.C. Pro-Am", href: "/lab/games/rc-pro-am", year: 1988,
+    category: "Racing", players: "1 player",
+    description: "Slide through corners, collect upgrades and outsmart three rivals on the original NES courses.",
+    preview: "/games/rc-pro-am.png", width: 640, height: 480,
+  },
 ] as const;

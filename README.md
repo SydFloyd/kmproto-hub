@@ -10,6 +10,7 @@ automation and custom software for small businesses and organizations.
 - `/lab/games/asteroids` — the browser arcade game
 - `/lab/games/contra` — eight-zone run-and-gun recreation, with local two-player co-op
 - `/lab/games/bubble-bobble` — 100-round arcade recreation, with bubble riding and local co-op
+- `/lab/games/rc-pro-am` — NES isometric racing recreation, with weapons and vehicle upgrades
 
 Content lives in `app/data.ts` (email, services, process and Lab projects).
 Prices and package scopes live in `app/pricing.ts`, transcribed from the supplied
@@ -68,6 +69,26 @@ bubble riding, power-ups, co-op, time limits, continues and round progression.
 The control-driven first-round test protects Bub from damage to isolate navigation;
 the 100-round test uses controlled bubble fixtures to verify transitions and the
 full-health final fight. A shared bitmap font is in `app/lab/games/pixel-text.ts`.
+
+R.C. Pro-Am has an independent engine in `app/lab/games/rc-pro-am/`.
+The relative steering, gas, horn, weapons, top-three advancement, pickups and
+NINTENDO vehicle progression follow Nintendo's original
+[instruction manual](https://www.world-of-nintendo.com/manuals/nes/rc_pro-am.shtml).
+The 24 main course shapes in `courses.json` were traced from Rick Bruns's
+[NES course maps](https://vgmaps.com/Atlas/NES/index.htm#RCProAm), with small
+sprite/lettering holes filled and centerlines smoothed. Only geometry is shipped;
+reference images, original sprites, ROMs and sampled audio are not included.
+The repeating 24-course circuit and the orange drone's tenth-weapon-hit speedup
+are informed by the TAS authors' [firsthand observations](https://tasvideos.org/UserFiles/Game/1840).
+Driving physics, AI, hazard/pickup placement, scoring and lap counts are
+approximations; split-road detours are represented by a single main route.
+Pixel vehicles, scenery and chip effects are authored for this recreation.
+It starts idle and muted, supports keyboard and simultaneous touch controls,
+and saves the best score locally. Run `npm run test:rc-pro-am` for steering,
+momentum, walls, progress validation, weapons, upgrades, continues and campaign
+transitions. A control-driven test completes the first race; another drives all
+24 courses with working opponents, without editing physics or progress during
+a race. Campaign fixtures verify 49 transitions and the repeating circuit.
 
 Bible Audio is listed in the Lab at https://bible-audio.kmproto.com. Its browser
 player generates speech locally; Android, Windows, macOS and Linux downloads

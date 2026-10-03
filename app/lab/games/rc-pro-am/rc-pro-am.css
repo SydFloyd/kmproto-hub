@@ -1,0 +1,23 @@
+.rc-pro-am-player canvas { image-rendering: pixelated; }
+.rc-pro-am-player .arcade-touch { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.rc-pro-am-player .arcade-touch button:nth-child(3) { font-size: 16px; }
+.rc-pro-am-player .rc-ready { inset: 60% 0 auto; }
+.rc-pro-am-player .rc-paused { inset: 46% 0 auto; }
+.rc-pro-am-player .rc-result, .rc-pro-am-player .rc-over { inset: 61% 0 auto; gap: 8px; }
+.rc-pro-am-player .rc-over { flex-direction: row; flex-wrap: wrap; column-gap: 8px; }
+.rc-pro-am-player .rc-over .arcade-enter { flex-basis: 100%; }
+.rc-pro-am-player .arcade-enter { line-height: 1; color: #c4ddc3; }
+.rc-pro-am-player .rc-over .arcade-start { min-height: 38px; padding-block: 7px; }
+@media (max-width: 760px) {
+  .rc-pro-am-player .rc-over { gap: 4px; }
+  .rc-pro-am-player .rc-ready { inset: 58% 0 auto; gap: 4px; }
+  .rc-pro-am-player .rc-result { gap: 4px; }
+  .rc-pro-am-player .rc-result .arcade-start, .rc-pro-am-player .rc-ready .arcade-start { min-height: 32px; padding: 5px 14px; font-size: 12px; }
+  .rc-pro-am-player .rc-result .arcade-enter, .rc-pro-am-player .rc-ready .arcade-enter { font-size: 9px; }
+  .rc-pro-am-player .rc-over .arcade-start { min-height: 30px; padding: 4px 14px; font-size: 11px; }
+  .rc-pro-am-player .rc-over .arcade-enter { font-size: 9px; }
+}
+@media (pointer: coarse) and (orientation: landscape), (max-height: 500px) and (orientation: landscape) {
+  .rc-pro-am-player .arcade-cabinet:fullscreen .arcade-touch button:last-child { grid-column: auto; }
+  .rc-pro-am-player .arcade-cabinet:fullscreen .arcade-touch button:nth-child(3) { font-size: 14px; }
+}
