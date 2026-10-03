@@ -1,11 +1,11 @@
 {
-  "version": "0.5.0-beta",
+  "version": "0.5.1-beta",
   "release_repository": "SydFloyd/kmproto-hub",
-  "release_tag": "bible-audio-v0.5.0-beta",
-  "browser_archive": "bible-audio-browser-v0.5.0.zip",
-  "browser_archive_url": "https://github.com/SydFloyd/kmproto-hub/releases/download/bible-audio-v0.5.0-beta/bible-audio-browser-v0.5.0.zip",
-  "browser_archive_sha256": "d53148c0fe25d643e1fe3af24f4e6191c44a510f230dd6e4c8faf956f4a0bd24",
-  "browser_archive_bytes": 43436460,
+  "release_tag": "bible-audio-v0.5.1-beta",
+  "browser_archive": "bible-audio-browser-v0.5.1.zip",
+  "browser_archive_url": "https://github.com/SydFloyd/kmproto-hub/releases/download/bible-audio-v0.5.1-beta/bible-audio-browser-v0.5.1.zip",
+  "browser_archive_sha256": "551618c06ca21215811aba191481fb12e6bdbc84998af39766b5b99dd620643d",
+  "browser_archive_bytes": 43436719,
   "intended_url": "https://bible-audio.kmproto.com/",
   "fallback_url": "https://www.kmproto.com/bible-audio/"
 }

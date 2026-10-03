@@ -3,6 +3,17 @@
 Updated: 2026-10-03
 Status: published and verified at https://www.kmproto.com/lab and https://bible-audio.kmproto.com.
 
+## UI refresh: 0.5.1-beta
+
+Normal (Kitten Micro / Bella) is the first voice and default for new users.
+Light (Amy) is the ultra-tiny alternative. Both player and installer download
+buttons put Normal first. Existing saved voice choices are respected.
+All browser and installer assets are rebuilt with the UI update. The versioned
+browser bundle and checksum are recorded in `tools/bible-audio-release.json`.
+The builders enforce the 100 MB download/payload budgets and Android signatures.
+
+## Initial publication: 0.5.0-beta
+
 Bible Audio is live at https://bible-audio.kmproto.com. Dedicated Vercel project
 `bible-audio`, deployment `dpl_9xQ9bDJZqo4FFEg3UzKs414Sv4Qo`, reports READY.
 The custom domain is verified; HTTPS returns 200 using the current public DNS
