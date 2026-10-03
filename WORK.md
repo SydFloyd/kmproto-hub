@@ -1,7 +1,17 @@
 # Browser games: Contra
 
 Updated: 2026-10-03
-Status: verified locally; production publication pending.
+Status: published and verified at https://www.kmproto.com/lab/games/contra.
+
+Production source: b230c9075d3fa16891f05c212e3b2fb678ff9de5, pushed to main.
+Vercel production deployment 6831895921 reports success at
+2026-10-03T19:11:19Z. Live browser checks at 1440/768/390/320px pass the Games
+menu, keyboard and touch controls, co-op, sound, pause, restart and saved scores.
+Landscape full screen and continuing after actual game over also pass.
+Asteroids regression checks pass on the live site at 1440/390px.
+No page errors, horizontal overflow or automated WCAG A/AA violations.
+Evidence: ignored outputs/contra-live-verification.json,
+outputs/contra-live-extras.json, outputs/asteroids-live-verification.json and PNGs.
 
 Added /lab/games/contra to the shared Games menu. Its separate Vite entry keeps
 the engine off the business and Lab pages. Existing Asteroids and the seven Lab
