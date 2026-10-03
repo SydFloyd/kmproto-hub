@@ -1,5 +1,36 @@
 # Current work
 
+Updated: 2026-10-02
+Status: release prepared and verified; production deployment requested.
+
+Pulled origin/main with --ff-only; already current at 538a24e. Recovered the
+checkout's missing source files and Git references/objects before editing.
+
+Replaced the orange palette, star glyphs, animated marquee, mock workbench and
+Busywork Sorter with a navy/white layout, system typography and direct copy.
+Updated the business page, Lab directory, favicon, social card and metadata.
+All six project destinations are preserved.
+
+Added “Serving lower Bucks County” near the homepage introduction, with in-person
+meetings by appointment. Contact copy invites local project discussions in person;
+homepage search and sharing descriptions include the service area.
+
+Added /pricing, homepage package summaries and the original downloadable client
+PDF. Prices, inclusions, add-ons, monthly services and terms follow the supplied
+October 2026 guide. The quote-builder workbook remains outside the public build.
+
+Validation: Vercel and Vinext builds, lint, TypeScript and git diff --check pass.
+Browser checks cover /, /pricing and /lab at 1440, 768, 390 and 320px: no page
+errors, horizontal overflow or automated WCAG A/AA violations. Checked package
+inquiries, navigation, skip link, copy-email, all six project links, the $3,640
+example and exact PDF bytes. Reviewed desktop/mobile screenshots and social card.
+Evidence is in ignored outputs/verification.json and outputs/*.png.
+The final dist/ is the public Vercel build with the new social card and PDF.
+
+---
+
+# September 2026 release
+
 Updated: 2026-09-28
 Outcome: turn kmproto.com into the KM Proto business site (websites, AI automation &
 custom software for small businesses) and move the app portal behind it at `/lab`.

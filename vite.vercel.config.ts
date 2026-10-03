@@ -8,7 +8,7 @@ export default defineConfig({
   plugins: [react()],
   build: {
     rollupOptions: {
-      input: { main: page("./index.html"), lab: page("./lab.html") },
+      input: { main: page("./index.html"), lab: page("./lab.html"), pricing: page("./pricing.html") },
     },
   },
 });

@@ -1,4 +1,5 @@
 import { EMAIL, mailto } from "../data";
+import { PRICING_GUIDE } from "../pricing";
 
 export function Arrow({ diagonal = false }: { diagonal?: boolean }) {
   return (
@@ -8,35 +9,26 @@ export function Arrow({ diagonal = false }: { diagonal?: boolean }) {
   );
 }
 
-export function Mark() {
+function Brand() {
   return (
-    <svg className="mark" viewBox="0 0 32 32" aria-hidden="true">
-      <rect width="32" height="32" rx="8" className="mark-bg" />
-      <path d="M10 8v16M10.5 17 20 8M13.5 14.5 21 24" className="mark-k" />
-      <circle cx="24.5" cy="24.5" r="2.6" className="mark-dot" />
-    </svg>
+    <a className="brand" href="/" aria-label="KM Proto home">
+      <span className="brand-monogram" aria-hidden="true">KM</span>
+      <span>KM Proto</span>
+    </a>
   );
 }
 
-export function Header({ current }: { current: "home" | "lab" }) {
+export function Header({ current }: { current: "home" | "lab" | "pricing" }) {
   return (
     <header className="site-header">
       <div className="shell header-inner">
-        <a className="brand" href="/" aria-label="KM Proto home">
-          <Mark />
-          <span>
-            KM Proto
-          </span>
-        </a>
-        <nav aria-label="Main">
+        <Brand />
+        <nav aria-label="Main navigation">
           <a href="/#services">Services</a>
+          <a href="/pricing" aria-current={current === "pricing" ? "page" : undefined}>Pricing</a>
           <a href="/#process">Process</a>
-          <a href="/lab" aria-current={current === "lab" ? "page" : undefined}>
-            The Lab
-          </a>
-          <a className="nav-cta" href="/#contact">
-            Get in touch
-          </a>
+          <a href="/lab" aria-current={current === "lab" ? "page" : undefined}>The Lab</a>
+          <a className="nav-cta" href="/#contact">Contact</a>
         </nav>
       </div>
     </header>
@@ -48,21 +40,17 @@ export function Footer() {
     <footer className="site-footer">
       <div className="shell footer-inner">
         <div className="footer-brand">
-          <a className="brand" href="/" aria-label="KM Proto home">
-            <Mark />
-            <span>KM Proto</span>
-          </a>
-          <p>Websites, AI automation &amp; custom software.<br />Practical technology for small businesses.</p>
+          <Brand />
+          <p>Websites, automation and custom software<br />for small businesses and organizations.</p>
         </div>
-        <div className="footer-links">
-          <a href={mailto("Hello from kmproto.com")}>{EMAIL}</a>
-          <a href="/#services">Services</a>
+        <nav className="footer-links" aria-label="Footer navigation">
+          <a href="/pricing">Website pricing</a>
+          <a href={PRICING_GUIDE} download>Pricing guide (PDF)</a>
           <a href="/lab">The Lab</a>
           <a href="https://github.com/SydFloyd" target="_blank" rel="noreferrer">GitHub</a>
-        </div>
-        <p className="footer-fine">
-          © {new Date().getFullYear()} KM Proto · Designed &amp; built in-house, naturally.
-        </p>
+          <a href={mailto("Project inquiry")}>{EMAIL}</a>
+        </nav>
+        <p className="footer-fine">© {new Date().getFullYear()} KM Proto</p>
       </div>
     </footer>
   );

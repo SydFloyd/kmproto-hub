@@ -1,16 +1,23 @@
 # KM Proto
 
-The business site for [kmproto.com](https://kmproto.com): **KM Proto — websites, AI
-automation & custom software. Practical technology for small businesses.**
+The business site for [kmproto.com](https://kmproto.com): websites, workflow
+automation and custom software for small businesses and organizations.
 
-- `/` — the business site (services, the interactive Busywork Sorter, process, about, contact)
+- `/` — the business site (services, website pricing, process, about, contact)
+- `/pricing` — website packages, inclusions, add-ons, optional monthly services and terms
 - `/lab` — the portal to KM Proto's independent apps
 
-Content lives in `app/data.ts` (email, services, process, sorter chores, Lab projects).
-Pages are `app/page.tsx` and `app/lab/page.tsx`; styles are in `app/globals.css`.
+Content lives in `app/data.ts` (email, services, process and Lab projects).
+Prices and package scopes live in `app/pricing.ts`, transcribed from the supplied
+October 2026 client pricing guide. The PDF is served from
+`public/downloads/km-proto-website-pricing.pdf`. The root quote-builder workbook
+is an internal working file and is not copied into the public build.
+Pages are `app/page.tsx`, `app/pricing/page.tsx` and `app/lab/page.tsx`;
+styles are in `app/globals.css`.
 The public Vercel build is a static multi-page Vite app: `index.html` → `src/main.tsx`
-and `lab.html` → `src/lab.tsx` (served at `/lab` via `cleanUrls`). `public/og.png` is the
-1200×630 social card.
+with matching entries for pricing and the Lab (served at `/pricing` and `/lab`
+via `cleanUrls`). `public/og.png` is the 1200×630 social card. Typography uses
+system fonts; the site does not fetch external fonts.
 
 ## Local development
 
