@@ -19,6 +19,15 @@ with matching entries for pricing and the Lab (served at `/pricing` and `/lab`
 via `cleanUrls`). `public/og.png` is the 1200×630 social card. Typography uses
 system fonts; the site does not fetch external fonts.
 
+Bible Audio is listed in the Lab at https://bible-audio.kmproto.com. Its browser
+player generates speech locally; Android, Windows, macOS and Linux downloads
+are hosted in the public `bible-audio-v0.5.0-beta` release of this repository.
+The app source repository remains private. A matching browser demo is also
+served at `/bible-audio/`: the Vercel prebuild downloads the versioned public
+bundle, verifies its SHA-256 in `tools/bible-audio-release.json`, and extracts it
+to ignored `public/bible-audio/`. Voice models and installers are not committed
+to this repository. Isolation and cache headers apply only to the demo path.
+
 ## Local development
 
 ```bash

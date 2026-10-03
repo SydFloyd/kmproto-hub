@@ -38,6 +38,7 @@ export const process = [
 ] as const;
 
 export const projects = [
+  { name: "Bible Audio", description: "The whole English Bible spoken on your device, with small downloads and apps for offline listening.", category: "Offline audio", href: "https://bible-audio.kmproto.com" },
   { name: "Stillcraft", description: "An early photo composition editor for arranging and cropping images on your device.", category: "Photo composition", href: "https://stillcraft.kmproto.com" },
   { name: "ChordLift", description: "A music tool for adapting and formatting chord charts.", category: "Music tools", href: "https://chordlift.kmproto.com" },
   { name: "Food Miller", description: "A collection of recipes to browse, share and return to.", category: "Recipes", href: "https://foodmiller.com" },

@@ -13,7 +13,7 @@ const eslintConfig = defineConfig([
       '@next/next/no-page-custom-font': 'off',
     },
   },
-  globalIgnores(['dist/**', '.next/**', 'out/**', 'build/**', 'outputs/**', 'next-env.d.ts']),
+  globalIgnores(['dist/**', '.next/**', 'out/**', 'build/**', 'outputs/**', 'work/**', 'public/bible-audio/**', 'next-env.d.ts']),
 ]);
 
 export default eslintConfig;
