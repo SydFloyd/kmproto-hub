@@ -13,7 +13,8 @@
     "start": "vinext start",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
     "test:asteroids": "node --experimental-strip-types tests/asteroids.test.mjs",
-    "test:contra": "node --experimental-strip-types tests/contra.test.mjs"
+    "test:contra": "node --experimental-strip-types tests/contra.test.mjs",
+    "test:bubble-bobble": "node --experimental-strip-types tests/bubble-bobble.test.mjs"
   },
   "dependencies": {
     "next": "16.2.6",

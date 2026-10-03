@@ -8,6 +8,7 @@ automation and custom software for small businesses and organizations.
 - `/lab` — the portal to KM Proto's independent apps
 - `/lab/games/asteroids` — the browser arcade game, reached through the Lab header's Games menu
 - `/lab/games/contra` — eight-zone run-and-gun recreation, with local two-player co-op
+- `/lab/games/bubble-bobble` — 100-round arcade recreation, with bubble riding and local co-op
 
 Content lives in `app/data.ts` (email, services, process and Lab projects).
 Prices and package scopes live in `app/pricing.ts`, transcribed from the supplied
@@ -44,6 +45,25 @@ uses one keyboard; multi-touch controls operate Player 1. Run
 `npm run test:contra` for movement, weapons, collisions, bosses, co-op, continues
 and campaign progression. The traversal test plays all eight zones through
 control inputs with protection from enemy damage to isolate navigation and aiming.
+
+Bubble Bobble has an independent engine in `app/lab/games/bubble-bobble/`.
+Its 100 platform layouts and spawn positions were transcribed from Will Mallia's
+[arcade map collection](https://vgmaps.com/Atlas/Arcade/index.htm#BubbleBobble),
+with manual corrections where sprites overlap. The original arcade
+[instruction card](https://world-of-arcades.net/Taito/BubbleBobble/BubbleBobble_InstructionCard_2_x.jpg)
+and Chris Moore's [arcade mechanics reference](https://www.arcadeheaven.com/images/Bubble%20Bobble%20FAQ%2023.pdf)
+guide trapping, chain pops, bubble bouncing, candy, special bubbles, EXTEND and
+secret doors. Includes eight monster families, Hurry Up, Skel-Monsta, the final
+Super Drunk fight, co-op endings, title codes and a harder Super mode.
+Physics, air currents, enemy AI, item timing, secret rooms, pixel art and
+synthesized music are recreated approximations; this is not an emulator and
+does not load ROMs, original sprites or sampled audio. It starts idle and muted,
+supports keyboard and multi-touch controls, and saves high scores locally.
+Run `npm run test:bubble-bobble` for movement, wrapping, trapping, chain scoring,
+bubble riding, power-ups, co-op, time limits, continues and round progression.
+The control-driven first-round test protects Bub from damage to isolate navigation;
+the 100-round test uses controlled bubble fixtures to verify transitions and the
+full-health final fight. A shared bitmap font is in `app/lab/games/pixel-text.ts`.
 
 Bible Audio is listed in the Lab at https://bible-audio.kmproto.com. Its browser
 player generates speech locally; Android, Windows, macOS and Linux downloads

@@ -1,4 +1,37 @@
-# Browser games: Contra
+# Browser games: Bubble Bobble
+
+Updated: 2026-10-03
+Status: implementation complete; final publication verification follows.
+
+Added /lab/games/bubble-bobble to the Lab's shared Games menu, with its own Vite
+entry so the game engine stays off the business and Lab pages. All seven Lab
+projects and the existing Asteroids and Contra entries remain available.
+
+The recreation follows the 1986 arcade game: 100 transcribed platform layouts,
+Bub and Bob on one keyboard, bubble trapping and riding, touching chain pops,
+food and separate player scores, candy upgrades, shoes, water/fire/lightning,
+EXTEND, time limits and Skel-Monsta. Includes secret doors, umbrellas, title
+codes, a harder Super variant, the full-health Super Drunk fight and co-op endings.
+Pixel art and synthesized sound are authored for this implementation. Physics,
+air currents, enemy patterns, item timing and secret rooms are approximations,
+with reference provenance and limits recorded in README.md. No ROMs, sampled
+music or original sprite files are distributed. Play and sound start off.
+
+All 18 Bubble Bobble, 18 Contra and 13 Asteroids engine tests pass. A test clears
+the first round using movement, jump and bubble controls with damage protection
+to isolate traversal; campaign fixtures check all 100 round transitions and the
+final fight at full health. Both the Vinext and public Vercel builds, lint,
+TypeScript and diff checks pass. Reviewed rendered art for all 100 rounds.
+Browser checks cover desktop/mobile navigation, keyboard co-op, joining Bob,
+multi-touch input, sound, pause, automatic pause, high scores and blocked storage.
+All four widths (1440/768/390/320px) pass without page errors, horizontal overflow
+or automated WCAG A/AA violations. Contra and Asteroids browser regressions pass
+at 1440/390px; the Lab still has seven project links and three game links.
+Landscape full screen fits at 844×390 and 568×320, including readable touch labels.
+The Super title code and continuing after an actual game over pass at 320px.
+The shared bitmap font was extracted without changing Contra's rendering.
+
+## Earlier release: Contra
 
 Updated: 2026-10-03
 Status: published and verified at https://www.kmproto.com/lab/games/contra.
