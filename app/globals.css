@@ -54,19 +54,7 @@ ul, ol { margin: 0; padding: 0; }
 .text-link { display: inline-flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 700; }
 
 .hero { padding: 80px 0; background: var(--tint); border-bottom: 1px solid var(--line); }
-.hero-inner { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); align-items: center; gap: 64px; }
 .hero-lede { max-width: 620px; margin-top: 24px; font-size: 18px; line-height: 1.7; }
-
-.workflow-demo { min-width: 0; margin: 0; padding: 24px 20px 20px; border: 1px solid var(--line); border-top: 3px solid var(--ink); border-radius: 3px; background: var(--paper); }
-.workflow-demo h2 { font-size: 25px; }
-.workflow-demo figcaption > p { margin-top: 8px; color: var(--muted); font-size: 13px; }
-.workflow-scene { display: block; width: 100%; height: auto; margin: 22px 0; overflow: visible; }
-.workflow-label { fill: var(--text); font-family: var(--sans); font-size: 14px; }
-.workflow-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
-.workflow-controls .button { min-height: 42px; padding: 9px 14px; font-size: 13px; }
-.workflow-control-icon { width: 14px; height: 14px; fill: currentColor; flex: none; }
-.workflow-reset { min-height: 42px; padding: 8px; border: 0; background: none; color: var(--link); font-size: 13px; text-decoration: underline; text-underline-offset: 4px; }
-.workflow-status { min-height: 20px; margin-top: 12px; color: var(--muted); font-size: 12px; }
 
 .section { padding: 76px 0; }
 .section-tint { background: var(--tint); border-block: 1px solid var(--line); }
@@ -178,7 +166,6 @@ ul, ol { margin: 0; padding: 0; }
 .terms-list dd { margin: 0; font-size: 15px; }
 
 @media (max-width: 1000px) {
-  .hero-inner { gap: 32px; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); }
   .hero h1 { font-size: 44px; }
   .services-grid { gap: 24px; }
   .pricing-plan { padding: 22px; }
@@ -193,10 +180,9 @@ ul, ol { margin: 0; padding: 0; }
   .site-header nav { width: 100%; justify-content: space-between; gap: 6px 12px; font-size: 13px; }
   .site-header nav .nav-cta { padding: 0 12px; }
   .hero { padding: 48px 0; }
-  .hero-inner, .services-grid, .pricing-grid, .about-grid, .lab-overview, .contact-inner, .inclusion-grid { grid-template-columns: minmax(0, 1fr); gap: 32px; }
+  .services-grid, .pricing-grid, .about-grid, .lab-overview, .contact-inner, .inclusion-grid { grid-template-columns: minmax(0, 1fr); gap: 32px; }
   .hero h1 { font-size: clamp(36px, 6vw, 44px); }
   .hero-lede { font-size: 17px; }
-  .workflow-demo { max-width: 480px; width: 100%; margin-inline: auto; }
   .section { padding: 48px 0; }
   .section-head { margin-bottom: 28px; }
   .section-head-split { display: block; }
@@ -233,7 +219,7 @@ ul, ol { margin: 0; padding: 0; }
 }
 
 @media print {
-  .site-header, .site-footer, .skip-link, .actions, .plan-inquiry, .page-cta, .workflow-controls, .workflow-status { display: none; }
+  .site-header, .site-footer, .skip-link, .actions, .plan-inquiry, .page-cta { display: none; }
   body { color: #111; font-size: 11pt; }
   .shell { width: 100%; }
   .section, .page-intro { padding: 20px 0; background: #fff; }

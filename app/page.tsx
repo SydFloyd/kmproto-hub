@@ -1,6 +1,5 @@
 import CopyEmail from "./components/CopyEmail";
 import WebsitePackages from "./components/WebsitePackages";
-import WorkflowAnimation from "./components/WorkflowAnimation";
 import { Arrow, Footer, Header } from "./components/chrome";
 import { EMAIL, mailto, process, projects, services } from "./data";
 import { PRICING_DATE, PRICING_GUIDE } from "./pricing";
@@ -12,7 +11,7 @@ export default function Home() {
       <Header current="home" />
       <main id="main" tabIndex={-1}>
         <section className="hero" aria-labelledby="hero-title">
-          <div className="shell hero-inner">
+          <div className="shell">
             <div className="hero-copy">
               <p className="eyebrow">Independent web &amp; software development</p>
               <h1 id="hero-title">Make your business<br />easier to find and run.</h1>
@@ -23,7 +22,6 @@ export default function Home() {
                 <a className="button button-secondary" href="#services">Explore services</a>
               </div>
             </div>
-            <WorkflowAnimation />
           </div>
         </section>
 

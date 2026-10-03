@@ -19,11 +19,6 @@ with matching entries for pricing and the Lab (served at `/pricing` and `/lab`
 via `cleanUrls`). `public/og.png` is the 1200×630 social card. Typography uses
 system fonts; the site does not fetch external fonts.
 
-The homepage value offer includes an illustration in
-`app/components/WorkflowAnimation.tsx`. It stays still until played, runs once,
-supports pause/replay/reset and skips motion when reduced motion is preferred.
-Playback pauses when the illustration leaves view or the tab is hidden.
-
 ## Local development
 
 ```bash

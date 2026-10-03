@@ -1,6 +1,24 @@
 # Current work
 
 Updated: 2026-10-03
+Status: animation removal implemented and validated; publication pending.
+
+Removed the optional workflow illustration, its controls, component and CSS.
+The homepage introduction now uses the full content width, with the existing
+value offer, local service-area copy and quote/service actions. Hero pricing
+remains removed.
+
+Checks: Vercel build, lint, TypeScript and git diff --check pass. Browser checks
+at 1440, 390 and 320px confirm the animation and playback controls are gone,
+the value offer and quote/service links work, and there are no page errors or
+horizontal overflow. Desktop and mobile screenshots reviewed.
+Evidence: ignored outputs/animation-removed-local.json and matching PNGs.
+
+---
+
+# October 2026 hero release
+
+Updated: 2026-10-03
 Status: published and verified at https://www.kmproto.com.
 
 Production source: a9edf6f187877857ac03f9e7d765421ad9ecb31e, pushed to main.
