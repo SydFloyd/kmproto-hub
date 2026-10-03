@@ -1,5 +1,6 @@
 import { EMAIL, mailto } from "../data";
 import { PRICING_GUIDE } from "../pricing";
+import GamesMenu from "./GamesMenu";
 
 export function Arrow({ diagonal = false }: { diagonal?: boolean }) {
   return (
@@ -18,7 +19,7 @@ function Brand() {
   );
 }
 
-export function Header({ current }: { current: "home" | "lab" | "pricing" }) {
+export function Header({ current, currentGame }: { current: "home" | "lab" | "pricing" | "games"; currentGame?: string }) {
   return (
     <header className="site-header">
       <div className="shell header-inner">
@@ -28,6 +29,7 @@ export function Header({ current }: { current: "home" | "lab" | "pricing" }) {
           <a href="/pricing" aria-current={current === "pricing" ? "page" : undefined}>Pricing</a>
           <a href="/#process">Process</a>
           <a href="/lab" aria-current={current === "lab" ? "page" : undefined}>The Lab</a>
+          {(current === "lab" || current === "games") && <GamesMenu currentGame={currentGame} />}
           <a className="nav-cta" href="/#contact">Contact</a>
         </nav>
       </div>

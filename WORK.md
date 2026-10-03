@@ -1,3 +1,40 @@
+# Browser games: Asteroids
+
+Updated: 2026-10-03
+Status: implemented and validated; publication pending.
+
+Added a Games menu to the Lab header and an independently loaded game page at
+/lab/games/asteroids. The shared catalog supports future games without loading
+their engines on the business or Lab pages. Existing project links are retained.
+
+Asteroids recreates the original monochrome vector style and arcade rules:
+inertial thrust/rotation, screen wrapping, four player shots, three rock sizes,
+20/50/100-point splitting, large and small saucers, risky hyperspace, three ships
+and a bonus ship every 10,000 points. Waves progress through 4/6/8/10 large rocks.
+Scoring and waves were checked against Atari's 1979 operator manual. Canvas
+graphics and Web Audio effects are authored here; no ROM or game assets are used.
+
+Keyboard input belongs to the focused playfield; mobile buttons support
+simultaneous pointers and cancellation. Includes pause/resume, restart, full
+screen, muted-by-default sound and browser-local high scores. Leaving the
+game, hiding the tab or scrolling the playfield out of view pauses play.
+The ready screen stays still. Physics uses a fixed 120 Hz step independent of
+render rate; collisions check the full bullet path across screen edges.
+
+Checks: Vercel and Vinext builds, lint, TypeScript and git diff --check pass.
+All 13 engine tests pass, covering inertia, wrapping, shot limits, splitting,
+scoring, bonus lives, waves, respawn safety, game over, hyperspace, saucers and
+pause. Browser checks at 1440/768/390/320px pass navigation, keyboard controls,
+pause/resume, mute, desktop full screen, simultaneous touch inputs, restart,
+saved-score loading and blocked storage. No page errors, horizontal overflow
+or automated WCAG A/AA violations. Reviewed desktop/mobile screenshots.
+Landscape full screen fits at 844×390 and 568×320, with controls alongside the
+playfield. Actual browser gameplay scored 2,230 points; the high score survived
+a new game and page reload.
+Evidence: ignored outputs/asteroids-*-verification.json and matching PNGs.
+
+---
+
 # Bible Audio publication
 
 Updated: 2026-10-03

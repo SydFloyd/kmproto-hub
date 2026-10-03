@@ -41,6 +41,14 @@ ul, ol { margin: 0; padding: 0; }
 .site-header nav a:hover, .site-header nav a[aria-current="page"] { color: var(--link); text-decoration: underline; }
 .site-header nav .nav-cta { padding: 0 18px; border: 1px solid var(--ink); color: var(--ink); }
 .site-header nav .nav-cta:hover { background: var(--tint); }
+.games-menu { position: relative; }
+.games-menu summary { display: flex; align-items: center; gap: 6px; min-height: 44px; cursor: pointer; list-style: none; }
+.games-menu summary::-webkit-details-marker { display: none; }
+.games-menu[open] summary, .games-menu[data-active] summary { color: var(--link); text-decoration: underline; text-underline-offset: 4px; }
+.games-menu ul { position: absolute; z-index: 20; top: calc(100% + 8px); right: 0; min-width: 200px; padding: 6px; border: 1px solid var(--line); border-top: 2px solid var(--ink); background: var(--paper); list-style: none; box-shadow: 0 4px 12px #1f344614; }
+.site-header .games-menu a { display: flex; justify-content: space-between; gap: 24px; padding: 8px 12px; }
+.site-header .games-menu a:hover { background: var(--tint); }
+.games-menu a span { color: var(--muted); font-size: 12px; }
 
 .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
 .button { display: inline-flex; align-items: center; justify-content: center; gap: 12px; min-height: 46px; padding: 10px 20px; border: 1px solid var(--ink); border-radius: 2px; font-size: 14px; font-weight: 700; line-height: 1.45; text-align: center; text-decoration: none; }
