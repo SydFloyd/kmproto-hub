@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { Asteroids, HEIGHT, NO_CONTROLS, STEP, WIDTH, type Controls, type Snapshot } from "./engine";
 import { drawAsteroids } from "./draw";
 import { ArcadeSound } from "./sound";
-import "./asteroids.css";
+import "../arcade.css";
 
 type Action = keyof Controls;
 type Commands = {

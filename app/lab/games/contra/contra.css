@@ -1,0 +1,44 @@
+.contra-player canvas { image-rendering: pixelated; }
+.contra-player .arcade-screen { background: #080c1c; }
+.contra-player .arcade-overlay { inset-block-start: 52%; gap: 12px; }
+.contra-choice, .contra-end-actions { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; }
+.contra-choice button { min-height: 44px; padding: 7px 18px; border: 1px solid #8995ab; border-radius: 0; background: #080c1c; color: #fff0d0; font-family: "Courier New", monospace; font-size: 14px; }
+.contra-choice button[aria-pressed="true"] { color: #080c1c; background: #fff0d0; border-color: #fff0d0; }
+.contra-end-actions .arcade-start { padding-inline: 16px; }
+.contra-coop-note { font-size: 13px; color: var(--muted); }
+.contra-touch { display: none; grid-template-columns: 132px minmax(0, 1fr); align-items: center; gap: 12px; padding: 12px; border-top: 1px solid #343434; touch-action: none; }
+.contra-dpad { display: grid; grid-template: repeat(3, 44px) / repeat(3, 44px); touch-action: none; user-select: none; -webkit-user-select: none; }
+.contra-dpad button, .contra-touch-actions button { touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; color: #f1f1eb; background: #181d2c; border: 1px solid #748097; border-radius: 3px; font-family: "Courier New", monospace; }
+.contra-dpad button { width: 44px; height: 44px; padding: 0; font-size: 22px; }
+.contra-dpad button[data-action="up"] { grid-area: 1 / 2; }
+.contra-dpad button[data-action="left"] { grid-area: 2 / 1; }
+.contra-dpad button[data-action="right"] { grid-area: 2 / 3; }
+.contra-dpad button[data-action="down"] { grid-area: 3 / 2; }
+.contra-dpad::after { content: ""; grid-area: 2 / 2; background: #181d2c; }
+.contra-touch-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.contra-touch-actions button { min-width: 0; min-height: 66px; padding: 8px 2px; font-size: 14px; }
+.contra-touch-actions button:first-child { margin-top: 26px; }
+.contra-touch-actions button:last-child { margin-bottom: 26px; }
+.contra-touch button:disabled { opacity: .45; }
+.contra-touch button:active { color: #080c1c; background: #fff0d0; }
+.contra-player .arcade-instructions h2 { margin-top: 24px; margin-bottom: 12px; font-family: var(--sans); font-size: 16px; font-weight: 700; }
+.contra-player:has(.arcade-cabinet:fullscreen) .arcade-notice { display: none; }
+@media (pointer: coarse), (max-width: 760px) {
+  .contra-touch { display: grid; }
+  .contra-player .arcade-cabinet:fullscreen .arcade-screen { width: min(100%, calc((100dvh - 220px) * 4 / 3)); }
+  .contra-touch { flex: none; width: min(100%, 420px); margin-inline: auto; }
+}
+@media (max-width: 760px) {
+  .contra-player .arcade-overlay { gap: 8px; }
+  .contra-player .arcade-enter { display: none; }
+  .contra-choice button { min-height: 38px; padding: 5px 12px; font-size: 12px; }
+  .contra-touch { gap: 8px; padding: 10px; }
+  .contra-end-actions .arcade-start { padding-inline: 9px; font-size: 12px; }
+}
+@media (pointer: coarse) and (orientation: landscape), (max-height: 500px) and (orientation: landscape) {
+  .contra-player .arcade-cabinet:fullscreen { grid-template-columns: minmax(0, 1fr) 152px; }
+  .contra-player .arcade-cabinet:fullscreen .arcade-screen { width: min(100%, calc((100dvh - 16px) * 4 / 3)); }
+  .contra-player .arcade-cabinet:fullscreen .contra-touch { grid-area: 1 / 2 / 2 / 3; display: flex; flex-direction: column; justify-content: center; width: 100%; margin: 0; padding: 0; gap: 8px; border: 0; }
+  .contra-player .arcade-cabinet:fullscreen .contra-touch-actions { width: 100%; }
+  .contra-player .arcade-cabinet:fullscreen .contra-touch-actions button { min-height: 44px; margin: 0; }
+}

@@ -12,7 +12,8 @@
     "build:vercel": "vite build --config vite.vercel.config.ts",
     "start": "vinext start",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
-    "test:asteroids": "node --experimental-strip-types tests/asteroids.test.mjs"
+    "test:asteroids": "node --experimental-strip-types tests/asteroids.test.mjs",
+    "test:contra": "node --experimental-strip-types tests/contra.test.mjs"
   },
   "dependencies": {
     "next": "16.2.6",

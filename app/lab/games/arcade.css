@@ -5,7 +5,7 @@
 .game-title-row > a { font-size: 14px; white-space: nowrap; }
 .game-intro .game-description { margin-top: 12px; max-width: 680px; font-size: 15px; }
 .game-section { padding: 0 0 56px; }
-.asteroids-player { max-width: 1024px; margin-inline: auto; }
+.asteroids-player, .arcade-player { max-width: 1024px; margin-inline: auto; }
 .arcade-cabinet { overflow: hidden; border: 1px solid #343434; border-radius: 3px; background: #050505; color: #f1f1eb; }
 .arcade-screen { position: relative; aspect-ratio: 4 / 3; width: 100%; background: #050505; }
 .arcade-screen:focus-visible { outline: 2px solid #f1f1eb; outline-offset: -4px; }

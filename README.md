@@ -7,6 +7,7 @@ automation and custom software for small businesses and organizations.
 - `/pricing` — website packages, inclusions, add-ons, optional monthly services and terms
 - `/lab` — the portal to KM Proto's independent apps
 - `/lab/games/asteroids` — the browser arcade game, reached through the Lab header's Games menu
+- `/lab/games/contra` — eight-zone run-and-gun recreation, with local two-player co-op
 
 Content lives in `app/data.ts` (email, services, process and Lab projects).
 Prices and package scopes live in `app/pricing.ts`, transcribed from the supplied
@@ -31,6 +32,18 @@ Scoring, rock splitting, wave counts and saucers follow Atari's
 [1979 operator manual](https://www.manualslib.com/manual/4171318/Atari-Asteroids.html?page=14).
 This is a browser recreation, with no ROMs or original game assets.
 Run `npm run test:asteroids` for the physics, collision and game-rule tests.
+
+Contra uses an independent fixed-step engine in `app/lab/games/contra/`, with
+side-scrolling zones, forward-facing base corridors and a vertical waterfall.
+The controls, weapon badges, lives and continues follow the NES
+[instruction manual](https://world-of-nintendo.com/manuals/nes/contra.shtml).
+Level layouts, pixel art and synthesized music are original to this recreation;
+it does not load ROMs or original assets. The shared cabinet styles live in
+`app/lab/games/arcade.css`. Sound is optional and starts muted. Keyboard co-op
+uses one keyboard; multi-touch controls operate Player 1. Run
+`npm run test:contra` for movement, weapons, collisions, bosses, co-op, continues
+and campaign progression. The traversal test plays all eight zones through
+control inputs with protection from enemy damage to isolate navigation and aiming.
 
 Bible Audio is listed in the Lab at https://bible-audio.kmproto.com. Its browser
 player generates speech locally; Android, Windows, macOS and Linux downloads

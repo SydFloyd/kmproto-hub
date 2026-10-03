@@ -1,3 +1,38 @@
+# Browser games: Contra
+
+Updated: 2026-10-03
+Status: verified locally; production publication pending.
+
+Added /lab/games/contra to the shared Games menu. Its separate Vite entry keeps
+the engine off the business and Lab pages. Existing Asteroids and the seven Lab
+project links remain available. Shared cabinet styles moved to games/arcade.css.
+Asteroids already has optional, muted-by-default synthesized sound effects.
+
+Contra is an eight-zone browser recreation modeled on the NES game: side-scrolling
+areas, two forward-facing bases and the ascending waterfall; directional fire,
+crouching, somersault jumps, swimming, weapon capsules, shielded bosses and local
+two-player co-op. Includes three lives, three continues, stage-clear bonus lives,
+the optional 30-life code, synthesized effects and original chiptune music.
+Code, level layouts and pixel art are original; no ROMs or sampled game assets.
+Sound is muted initially and play starts only on request. Keyboard and multi-touch
+input, pause, automatic pause when leaving the playfield, full screen and optional
+browser-local high scores match the existing cabinet behavior.
+
+All 18 Contra engine tests and the existing 13 Asteroids tests pass. Campaign
+verification traverses all eight zones and defeats full-health bosses using
+control inputs, with enemy-damage protection to isolate navigation and aiming;
+no level skips or reduced boss health. No falls during that run. Browser checks
+at 1440/768/390/320px pass navigation, keyboard input, co-op, the 30-life code,
+multi-touch input, pause, sound, restart, saved scores and blocked storage.
+No page errors, horizontal overflow or automated WCAG A/AA violations.
+Reviewed ready/playing screenshots and the art for all eight zones.
+Landscape full screen fits at 844×390 and 568×320. The continue button restores
+three lives after an actual browser game over, including at 320px width.
+Vercel and Vinext builds, lint, TypeScript and git diff --check pass.
+Evidence: ignored outputs/contra-*-verification.json and matching PNGs.
+
+---
+
 # Browser games: Asteroids
 
 Updated: 2026-10-03
