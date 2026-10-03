@@ -1,7 +1,16 @@
 # Games portal
 
 Updated: 2026-10-03
-Status: implementation complete; publication verification follows.
+Status: published and verified at https://www.kmproto.com/lab/games.
+
+Production source: b83e63108bf30c8ff75b2cb9e44c3d306ed7575e, pushed to main.
+Vercel production deployment 6834273036 reports success at
+2026-10-03T23:12:11Z. Live checks at 1440/768/390/320px pass the Lab → Games →
+game journeys and return links, all previews and responsive card layouts,
+keyboard navigation, starting and pausing all three games, and automated
+accessibility checks. Seven Lab projects remain available. No page errors,
+horizontal overflow or game-engine loads on the directory pages.
+Evidence: ignored outputs/games-live-verification.json and screenshots.
 
 The Lab now contains a Games entry linking to /lab/games. The portal presents
 Asteroids, Contra and Bubble Bobble as cards with static gameplay artwork,
@@ -20,7 +29,7 @@ checks at 1440/768/390/320px cover keyboard navigation from the Lab, loaded
 previews, responsive cards, starting all three games, and returning to Games
 and the Lab. Games remain idle and muted until started. No page errors,
 horizontal overflow or automated WCAG A/AA violations. Reviewed desktop and
-mobile screenshots. Final production evidence follows.
+mobile screenshots.
 
 ## Earlier release: Bubble Bobble
 
