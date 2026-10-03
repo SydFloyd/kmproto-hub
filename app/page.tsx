@@ -1,5 +1,6 @@
 import CopyEmail from "./components/CopyEmail";
 import WebsitePackages from "./components/WebsitePackages";
+import WorkflowAnimation from "./components/WorkflowAnimation";
 import { Arrow, Footer, Header } from "./components/chrome";
 import { EMAIL, mailto, process, projects, services } from "./data";
 import { PRICING_DATE, PRICING_GUIDE } from "./pricing";
@@ -14,25 +15,15 @@ export default function Home() {
           <div className="shell hero-inner">
             <div className="hero-copy">
               <p className="eyebrow">Independent web &amp; software development</p>
-              <h1 id="hero-title">Websites and software<br />for small businesses.</h1>
-              <p className="hero-lede">I build business websites, automate routine work, and develop custom tools. You work directly with Kyle, from the initial brief through launch.</p>
+              <h1 id="hero-title">Make your business<br />easier to find and run.</h1>
+              <p className="hero-lede">Websites, automation and custom software that help customers reach you and give your team a simpler way to work. Designed and built directly with Kyle.</p>
               <p className="page-note">Serving lower Bucks County · In-person meetings by appointment</p>
               <div className="actions">
                 <a className="button button-primary" href={mailto("New project inquiry")}>Request a quote <Arrow /></a>
-                <a className="button button-secondary" href="/pricing">View website pricing</a>
+                <a className="button button-secondary" href="#services">Explore services</a>
               </div>
             </div>
-            <aside className="hero-summary" aria-label="Website project fees">
-              <h2>Website projects</h2>
-              <p className="summary-price">$1,200–$4,500</p>
-              <p className="summary-unit">Base build prices · USD</p>
-              <ul>
-                <li>Scope and fee agreed before work begins</li>
-                <li>50% to begin; 50% before launch or handoff</li>
-                <li>Optional hosting and support</li>
-              </ul>
-              <a className="text-link" href="/pricing">Compare packages <Arrow /></a>
-            </aside>
+            <WorkflowAnimation />
           </div>
         </section>
 

@@ -1,5 +1,31 @@
 # Current work
 
+Updated: 2026-10-03
+Status: implemented and verified; production publication follows.
+
+Replaced the homepage hero's Website projects price range and payment summary
+with a high-level value offer and an optional workflow illustration. The hero now
+reads “Make your business easier to find and run.” Its actions are Request a quote
+and Explore services. The full pricing section and /pricing remain available.
+The social card follows the same value offer and no longer advertises a price.
+
+The illustration untangles four connections and sends a signal along each one.
+It is still on load and plays once only after a click or keyboard activation.
+Visitors can pause, resume, replay and reset it. Reduced-motion preferences skip
+the transition, including when the preference changes during playback. Playback
+pauses off screen or when the document is hidden. No new dependency was added.
+
+Checks: Vercel build, lint, TypeScript and git diff --check pass. Browser checks at
+1440, 768, 390 and 320px find no horizontal overflow, page errors or automated
+WCAG A/AA violations. Verified no autoplay, keyboard play, pause/resume, one-run
+completion, replay/reset, offscreen pause and reduced-motion behavior. Reviewed
+idle, playing and completed screenshots. /pricing and /lab smoke checks pass.
+Evidence: ignored outputs/workflow-verification.json and outputs/workflow-*.png.
+
+---
+
+# October 2026 redesign release
+
 Updated: 2026-10-02
 Status: published and verified at https://www.kmproto.com.
 
