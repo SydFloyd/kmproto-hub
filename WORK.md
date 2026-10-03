@@ -1,6 +1,96 @@
 # Current work
 
-Updated: 2026-09-08
+Updated: 2026-09-11
+Complete: the owner added Postmark's DKIM TXT and Return-Path CNAME manually.
+Authoritative DNS and independent public resolvers return the intended records;
+the DKIM value matches the supplied payload byte-for-byte (hash below), and the
+CNAME points directly to pm.mtasv.net. Owner reports Auto TTL and DNS-only CNAME.
+No agent DNS writes occurred. Postmark dashboard verification status is not visible.
+
+Return to `../stillcraft/WORK.md`: the user requests a direct Titus/Neon connection
+and is creating the Stillcraft project. Recommend Free for family testing.
+
+## Completed DNS task — connection history
+
+Prepared exact records in ignored
+`../stillcraft/.local/secrets/cloudflare/postmark-dns.json` (mode 0600):
+- TXT `20260912023849pm._domainkey.kmproto.com`, exact owner-supplied public DKIM
+  value, SHA-256 `bf1cc42b02b563314579199ba7c2c02f099e900894eca1cbfb48bb64faa9afc0`.
+- CNAME `pm-bounces.kmproto.com` → `pm.mtasv.net`, DNS-only, automatic TTL.
+
+Authoritative DNS returns NXDOMAIN for both names. Existing Wrangler OAuth lacks
+general DNS read/edit permissions: record-list API calls return HTTP 403/code
+10000. No record writes attempted. The existing email/Workers login is preserved.
+Cloudflare's documented `cf` CLI 0.10.0 was prepared in Stillcraft's ignored npm
+cache. Its DNS scope catalog supports dns_records:read/edit, but its device-grant
+request returned invalid_grant before issuing a code. Do not repeat that grant.
+Use the cf browser OAuth flow with only DNS read/edit and account/user/zone reads;
+on this remote host, owner must relay the one-time localhost callback URL if the
+browser cannot reach the listener. Keep callback URLs and credentials out of notes.
+
+Recovery: the first cf callback listener timed out (the installed authentication
+library uses a fixed 120-second wait). The owner's supplied callback arrived after
+the process exited; do not retry that code, whose PKCE verifier was process-local.
+Prepare a fresh standard PKCE authorization using the same registered cf client,
+redirect URI and limited scopes, with verifier/state saved mode 0600 in ignored
+`../stillcraft/.local/secrets/cloudflare/pending-dns-oauth.json`. This removes the
+local listener timeout; Cloudflare's code expiry and authorization still apply.
+On receipt, validate exact callback origin/path, state and local freshness, then
+exchange the code directly at Cloudflare's official token endpoint using the
+saved verifier/client/redirect. Save the returned credentials in cf's existing
+native config location, `cloudflare/config/default.json` under the private XDG
+root. Remove pending state after success. Do not print tokens or save callback URLs.
+No DNS mutation, paid request or new access grant has occurred in this recovery.
+
+The final saved callback exchange returned HTTP 403 and no credential. Since the
+owner completed the records, this extra DNS login is no longer needed: pending
+one-time state was removed, and no further authorization is requested. The original
+Wrangler email/Workers connection remains available. Do not resume/retry the old
+DNS grants or recreate records. This was a provider auth limitation, not an
+automatic approval-review rejection. Actual DNS verification passes.
+
+## Domain forwarding — configured
+
+Outcome: configured `kyle@kmproto.com` to forward to the owner's verified Gmail,
+providing a domain address for Stillcraft's Postmark setup. No setup spend.
+
+Completed 2026-09-12 02:29 UTC (2026-09-11 local). The owner approved Wrangler
+device authorization; its machine connection and private storage are checkpointed
+in `../stillcraft/WORK.md`. Authenticated API reads confirm the active kmproto.com
+zone. The account's email exactly matches the requested Gmail address and that
+destination was already verified on 2026-03-16, resolving the omitted domain suffix.
+Keep the private destination and OAuth credentials out of tracked notes.
+
+Before activation, authoritative DNS had no apex MX/TXT records and Cloudflare
+reported Email Routing unconfigured. Enabled routing using POST
+`/zones/{zone_id}/email/routing/dns`, then created one exact-address forwarding rule:
+`dcc5c2f2aaa9421b9c86f969175907d0`. Readback confirms enabled=true, status=ready,
+synced=true and the exact intended alias/destination. Existing disabled catch-all
+drop rule `fc4769a3df1840d48e02b25f51b657bc` is unchanged. Do not recreate the rule.
+
+Cloudflare's authoritative nameserver now serves all three routing MX records,
+SPF and DKIM; both 1.1.1.1 and 8.8.8.8 return the same MX targets/priorities.
+No website records, hosting deployments, subscriptions or outbound email service
+were changed. Routing is configured and verified; actual inbox delivery has not
+been observed. The owner can use Postmark's verification email or a message from a
+different email account for that check. No test message was sent by the agent.
+
+Next: confirm receipt in Gmail, then return to `../stillcraft/WORK.md` for Postmark's
+Stillcraft Server/sender authentication and the invited-family hosted AI alpha.
+This connection is for receiving/forwarding; application sending remains separate.
+
+Sources checked 2026-09-11:
+- [Cloudflare routing setup](https://developers.cloudflare.com/email-service/get-started/route-emails/)
+- [Cloudflare free forwarding](https://developers.cloudflare.com/dns/manage-dns-records/how-to/email-records/)
+- [Postmark Servers FAQ](https://postmarkapp.com/support/article/1137-servers-faq): a
+  separate Server per project can reuse the owner's existing Postmark account.
+
+No application code changed; repository diff and Berean content checks pass for
+the handoff documentation. The authenticated configuration readback and public DNS
+queries above qualify the actual external change.
+
+## Stillcraft hub listing — completed 2026-09-08/09
+
 Outcome: list Stillcraft’s usable early photo-editor preview on the public KM Proto
 hub, under the user’s standing “Publish at will” authority for this app and listing.
 
