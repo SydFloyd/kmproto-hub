@@ -1,7 +1,14 @@
 # Current work
 
 Updated: 2026-10-03
-Status: animation removal implemented and validated; publication pending.
+Status: published and verified at https://www.kmproto.com.
+
+Production source: 20797edbcd86fb103f170bec095bbaa7ab11269c, pushed to main.
+Vercel production deployment 6829388953 completed successfully at
+2026-10-03T15:20:52Z. Live browser checks at 1440, 390 and 320px confirm the
+animation is removed, the value offer and quote/service actions remain, and
+there are no page errors or horizontal overflow.
+Evidence: ignored outputs/animation-removed-live.json and matching PNGs.
 
 Removed the optional workflow illustration, its controls, component and CSS.
 The homepage introduction now uses the full content width, with the existing
