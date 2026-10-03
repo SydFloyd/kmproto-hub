@@ -1,7 +1,7 @@
 # Bible Audio publication
 
 Updated: 2026-10-03
-Status: application published; Lab entry ready for production.
+Status: published and verified at https://www.kmproto.com/lab and https://bible-audio.kmproto.com.
 
 Bible Audio is live at https://bible-audio.kmproto.com. Dedicated Vercel project
 `bible-audio`, deployment `dpl_9xQ9bDJZqo4FFEg3UzKs414Sv4Qo`, reports READY.
@@ -26,7 +26,12 @@ the original backup branch and earlier private releases remain available.
 Checks: Vercel build, lint, TypeScript and git diff --check pass. App browser
 checks cover both voices, live speed, offline saving and all four download
 platforms. App verification also passes chapter continuity and cold offline
-reopening. Hub-to-player browser verification follows production publication.
+reopening. Hub production source `195ed9b` deployed successfully as Vercel deployment
+`HCGZgErtL54UoqFwWtVpoxk2pf3i`. Live browser checks confirm seven Lab entries,
+all six original destinations, navigation into the speaking custom-domain player,
+and the isolated `/bible-audio/` fallback. Both voices, live speed, offline saving
+and all installer links also pass on the custom domain with public DNS. Evidence:
+ignored `outputs/bible-audio-live.json` and matching screenshots.
 
 ---
 
