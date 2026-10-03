@@ -1,7 +1,17 @@
 # Current work
 
 Updated: 2026-10-02
-Status: release prepared and verified; production deployment requested.
+Status: published and verified at https://www.kmproto.com.
+
+Production source: e3a7ee585b1ef1b062299694cdfa43a39aa9815f, pushed to main.
+Vercel production deployment 6822499204 reports success at
+2026-10-03T03:03:39Z. Public /, /pricing and /lab return 200 at 1440px and 390px,
+with the new headings, lower Bucks County copy and no page errors or horizontal
+overflow. The public PDF, social image and favicon match the released files
+byte-for-byte. Evidence is in ignored outputs/live-verification.json.
+
+The custom software page and broader business positioning remain proposed
+follow-up work; this release publishes the reviewed redesign and service-area copy.
 
 Pulled origin/main with --ff-only; already current at 538a24e. Recovered the
 checkout's missing source files and Git references/objects before editing.
