@@ -1,7 +1,18 @@
 # Browser games: Bubble Bobble
 
 Updated: 2026-10-03
-Status: implementation complete; final publication verification follows.
+Status: published and verified at https://www.kmproto.com/lab/games/bubble-bobble.
+
+Production source: b14cdfed0b1846e47dbdef2b5f98f102bacbd035, pushed to main.
+Vercel production deployment 6832801777 reports success at
+2026-10-03T20:38:14Z. Live verification passes at 1440/768/390/320px, including
+the three-game header menu, seven Lab projects, playable keyboard/touch controls,
+co-op, sound, pause and saved scores. Landscape full screen, the Super title code
+and continuing after actual game over pass. Live Contra and Asteroids regressions
+pass at 1440/390px. No page errors, overflow or automated WCAG A/AA violations.
+Evidence: ignored outputs/bubble-bobble-live-verification.json,
+outputs/bubble-bobble-live-extras.json, outputs/contra-live-verification.json,
+outputs/asteroids-live-verification.json and screenshots.
 
 Added /lab/games/bubble-bobble to the Lab's shared Games menu, with its own Vite
 entry so the game engine stays off the business and Lab pages. All seven Lab
