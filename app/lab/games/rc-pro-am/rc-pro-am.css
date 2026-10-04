@@ -11,6 +11,7 @@
 @media (max-width: 760px) {
   .rc-pro-am-player .rc-over { gap: 4px; }
   .rc-pro-am-player .rc-ready { inset: 58% 0 auto; gap: 4px; }
+  .rc-pro-am-player .rc-ready .arcade-enter { display: none; }
   .rc-pro-am-player .rc-result { gap: 4px; }
   .rc-pro-am-player .rc-result .arcade-start, .rc-pro-am-player .rc-ready .arcade-start { min-height: 32px; padding: 5px 14px; font-size: 12px; }
   .rc-pro-am-player .rc-result .arcade-enter, .rc-pro-am-player .rc-ready .arcade-enter { font-size: 9px; }
