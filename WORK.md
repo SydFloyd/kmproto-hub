@@ -1,7 +1,15 @@
 # R.C. Pro-Am
 
 Updated: 2026-10-03
-Status: implementation and local verification complete; production verification pending.
+Status: published and verified at https://www.kmproto.com/lab/games/rc-pro-am.
+
+Production source: cc8904b076bb3762be0460ecf4c595fd603b04e0, pushed to main.
+Vercel production deployment 6834715156 reports success at
+2026-10-04T00:03:05Z. Live checks pass at 1440/768/390/320px for keyboard,
+touch, sound, pause, automatic pause, accessibility and portal navigation.
+All four games start and return correctly; seven Lab projects remain available.
+Mobile full screen, actual game over, continues, stored best scores, blocked
+storage and unavailable audio pass. No page errors or horizontal overflow.
 
 Added /lab/games/rc-pro-am and a fourth card in the Games portal. Its separate
 Vite entry keeps the racing engine off directory and business pages. All seven
@@ -30,9 +38,9 @@ stored best scores reload, and blocked storage/missing audio still allow play.
 Portal checks cover all four cards, keyboard navigation, image loading,
 responsive columns, return links and starting/pausing all four games. No page
 errors, horizontal overflow or automated WCAG A/AA violations. Reviewed course,
-portal and game artwork. Local evidence is in ignored outputs/rc-pro-am-local-
-verification.json, outputs/rc-pro-am-local-extras.json, outputs/games-local-
-verification.json and screenshots.
+portal and game artwork. Evidence is in ignored outputs/rc-pro-am-live-verification.json,
+outputs/rc-pro-am-live-extras.json, outputs/games-live-verification.json and
+screenshots.
 
 ## Earlier release: Games portal
 
