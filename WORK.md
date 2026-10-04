@@ -1,7 +1,13 @@
 # Lab project order
 
 Updated: 2026-10-04
-Status: verified locally; publication in progress.
+Status: published and verified at https://www.kmproto.com/lab.
+
+Production source: ac8cd7b8e3845b985ca464b5a87fed1159b35cc4, pushed to main.
+Vercel production deployment 6843916029 reports success at
+2026-10-04T16:59:16Z. Live checks at 1440/768/390/320px confirm the requested
+eight-item order, Games as the final row, the eight-project count and keyboard
+navigation to the four-game portal and back. No page errors or overflow.
 
 The Lab directory now lists Stillcraft, Food Miller, Verseform, Shep Study,
 ChordLift, Bible Audio, Milk Yeller and Games in that order. Games is a normal
@@ -16,7 +22,8 @@ Vercel build, lint, TypeScript and diff checks pass. Browser checks at
 count, removed intro panel, keyboard navigation to the four-game portal and
 return navigation. No page errors, horizontal overflow or game-engine loads
 on the Lab. Desktop and mobile screenshots reviewed.
-Evidence: ignored outputs/lab-order-local.json and screenshots.
+Evidence: ignored outputs/lab-order-local.json, outputs/lab-order-live.json
+and screenshots.
 
 ## Earlier release: R.C. Pro-Am end screen alignment
 
