@@ -1,4 +1,24 @@
-# R.C. Pro-Am end screen alignment
+# Lab project order
+
+Updated: 2026-10-04
+Status: verified locally; publication in progress.
+
+The Lab directory now lists Stillcraft, Food Miller, Verseform, Shep Study,
+ChordLift, Bible Audio, Milk Yeller and Games in that order. Games is a normal
+final directory row linking to /lab/games; its former intro panel and unused
+styles are removed. The Lab count is derived from all eight entries. The seven
+external destinations are preserved; the homepage's shared project list uses
+the same application order and does not gain a Games entry. The requested list
+covers every existing Lab item.
+
+Vercel build, lint, TypeScript and diff checks pass. Browser checks at
+1440/768/390/320px verify the exact eight-item order and destinations, updated
+count, removed intro panel, keyboard navigation to the four-game portal and
+return navigation. No page errors, horizontal overflow or game-engine loads
+on the Lab. Desktop and mobile screenshots reviewed.
+Evidence: ignored outputs/lab-order-local.json and screenshots.
+
+## Earlier release: R.C. Pro-Am end screen alignment
 
 Updated: 2026-10-04
 Status: published and verified at https://www.kmproto.com/lab/games/rc-pro-am.

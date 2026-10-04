@@ -124,13 +124,6 @@ ul, ol { margin: 0; padding: 0; }
 
 .page-intro { padding: 64px 0; background: var(--tint); border-bottom: 1px solid var(--line); }
 .page-note { margin-top: 20px; color: var(--muted); font-size: 13px; }
-.lab-games-link { display: flex; align-items: center; gap: 18px; max-width: 620px; margin-top: 28px; padding: 20px 24px; border: 1px solid var(--line); border-left: 3px solid var(--ink); background: var(--paper); text-decoration: none; }
-.lab-games-link:hover { border-color: var(--ink); }
-.lab-games-link > span { min-width: 0; }
-.lab-games-link strong { display: block; color: var(--ink); font-size: 18px; }
-.lab-games-link span span { display: block; margin-top: 3px; color: var(--muted); font-size: 14px; }
-.lab-games-link > .icon { margin-left: auto; }
-.lab-games-symbol { width: 36px; height: 36px; flex: none; color: var(--ink); }
 .project-directory { list-style: none; border-top: 2px solid var(--ink); }
 .project-entry { display: grid; grid-template-columns: 160px minmax(0, 1fr) auto; align-items: start; gap: 40px; padding: 32px 0; border-bottom: 1px solid var(--line); }
 .project-entry > .project-category { padding-top: 5px; }

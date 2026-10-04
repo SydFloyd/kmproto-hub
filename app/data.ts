@@ -38,11 +38,16 @@ export const process = [
 ] as const;
 
 export const projects = [
-  { name: "Bible Audio", description: "The whole English Bible spoken on your device, with small downloads and apps for offline listening.", category: "Offline audio", href: "https://bible-audio.kmproto.com" },
   { name: "Stillcraft", description: "An early photo composition editor for arranging and cropping images on your device.", category: "Photo composition", href: "https://stillcraft.kmproto.com" },
-  { name: "ChordLift", description: "A music tool for adapting and formatting chord charts.", category: "Music tools", href: "https://chordlift.kmproto.com" },
   { name: "Food Miller", description: "A collection of recipes to browse, share and return to.", category: "Recipes", href: "https://foodmiller.com" },
   { name: "Verseform", description: "A writing app with Scripture previews and passage insertion.", category: "Writing", href: "https://verseform.kmproto.com" },
   { name: "Shep Study", description: "A Bible study app for reading and exploring Scripture.", category: "Bible study", href: "https://shepstudy.com" },
+  { name: "ChordLift", description: "A music tool for adapting and formatting chord charts.", category: "Music tools", href: "https://chordlift.kmproto.com" },
+  { name: "Bible Audio", description: "The whole English Bible spoken on your device, with small downloads and apps for offline listening.", category: "Offline audio", href: "https://bible-audio.kmproto.com" },
   { name: "Milk Yeller", description: "Photography and written stories.", category: "Photography", href: "https://milk-yeller.com" },
+] as const;
+
+export const labProjects = [
+  ...projects,
+  { name: "Games", description: "Arcade classics to play in your browser.", category: "Browser games", href: "/lab/games" },
 ] as const;
