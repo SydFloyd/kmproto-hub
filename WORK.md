@@ -1,7 +1,14 @@
 # R.C. Pro-Am end screen alignment
 
 Updated: 2026-10-04
-Status: local verification complete; production verification pending.
+Status: published and verified at https://www.kmproto.com/lab/games/rc-pro-am.
+
+Production source: f5971ddf2a62fb92f28c8880f599aabdb906c532, pushed to main.
+Vercel production deployment 6840484286 reports success at
+2026-10-04T11:39:07Z. Live checks confirm centered actions and trophy rows at
+1440/768/390/320px, landscape full screen at 844x390 and 568x320, and the single
+New game button after all continues are spent. Continue and New game work;
+no clipping, overflow or page errors.
 
 Centered the game-over Continue/New game buttons with explicit flex alignment.
 Centered the trophy row across the playfield, accounting for the width of each
@@ -12,7 +19,7 @@ game-over button and trophy positions at 1440/768/390/320px and landscape full
 screen at 844x390 and 568x320. Continue and New game work; the remaining button
 stays centered after all three continues are spent. No clipping, overflow or
 page errors. Rendered trophy counts remain centered with one or two digits.
-Evidence: ignored outputs/rc-pro-am-alignment-local.json and screenshots.
+Evidence: ignored outputs/rc-pro-am-alignment-live.json and screenshots.
 
 ## Earlier release: R.C. Pro-Am
 
