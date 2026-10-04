@@ -106,7 +106,19 @@ function conditions(ctx:CanvasRenderingContext2D,game:RCProAm){
   if(game.mode==="result"||game.mode==="over")pixelText(ctx,`${game.player.place}${["ST","ND","RD","TH"][game.player.place-1]} PLACE`,128,53,game.mode==="over"?"#ffab72":"#cfeccc",2,true);
   miniMap(ctx,game,16,80,104,52,false,game.mode==="result"?new Course(game.race):game.course);pixelText(ctx,vehicles[game.vehicle],180,82,"#ffb858",1,true);
   const p=game.player;([['TURBO',p.turbo],['ENGINE',p.engine],['TIRES',p.tires]] as const).forEach(([name,n],i)=>{pixelText(ctx,name,132,98+i*14,"#c3d8d0");for(let j=0;j<4;j++){ctx.fillStyle=j<n?"#8cd352":"#304b3c";ctx.fillRect(174+j*13,98+i*14,10,6);}});
-  game.trophies.forEach((n,i)=>{const x=21+i*29;ctx.fillStyle=["#ffe490","#d0dfe0","#d79755"][i];ctx.fillRect(x,135,6,5);ctx.fillRect(x+2,140,2,2);ctx.fillRect(x,142,6,1);pixelText(ctx,String(Math.min(99,n)),x+9,136,"#c3d8d0");});
+  const trophyCounts = game.trophies.map(n => String(Math.min(99, n)));
+  const trophyWidths = trophyCounts.map(count => 9 + count.length * 6 - 1);
+  const trophyGap = 16;
+  const trophyRowWidth = trophyWidths.reduce((sum, width) => sum + width, 0) + trophyGap * (trophyCounts.length - 1);
+  let trophyX = Math.floor((WIDTH - trophyRowWidth) / 2);
+  trophyCounts.forEach((count, i) => {
+    ctx.fillStyle = ["#ffe490", "#d0dfe0", "#d79755"][i];
+    ctx.fillRect(trophyX, 135, 6, 5);
+    ctx.fillRect(trophyX + 2, 140, 2, 2);
+    ctx.fillRect(trophyX, 142, 6, 1);
+    pixelText(ctx, count, trophyX + 9, 136, "#c3d8d0");
+    trophyX += trophyWidths[i] + trophyGap;
+  });
   pixelText(ctx,`SCORE ${String(game.score).padStart(7,"0")}`,128,204,"#ffe6a1",1,true);
   pixelText(ctx,`BEST  ${String(game.best).padStart(7,"0")}`,128,218,"#a9c9b7",1,true);
 }

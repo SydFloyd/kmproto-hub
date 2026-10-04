@@ -4,7 +4,7 @@
 .rc-pro-am-player .rc-ready { inset: 60% 0 auto; }
 .rc-pro-am-player .rc-paused { inset: 46% 0 auto; }
 .rc-pro-am-player .rc-result, .rc-pro-am-player .rc-over { inset: 61% 0 auto; gap: 8px; }
-.rc-pro-am-player .rc-over { flex-direction: row; flex-wrap: wrap; column-gap: 8px; }
+.rc-pro-am-player .rc-over { flex-direction: row; flex-wrap: wrap; justify-content: center; column-gap: 8px; }
 .rc-pro-am-player .rc-over .arcade-enter { flex-basis: 100%; }
 .rc-pro-am-player .arcade-enter { line-height: 1; color: #c4ddc3; }
 .rc-pro-am-player .rc-over .arcade-start { min-height: 38px; padding-block: 7px; }
