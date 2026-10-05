@@ -3,7 +3,11 @@
   "buildCommand": "npm run build:vercel",
   "outputDirectory": "dist",
   "cleanUrls": true,
-  "redirects": [{ "source": "/bible-audio", "destination": "/bible-audio/", "permanent": true }],
+  "redirects": [
+    { "source": "/pricing", "destination": "/#services", "permanent": true },
+    { "source": "/pricing.html", "destination": "/#services", "permanent": true },
+    { "source": "/bible-audio", "destination": "/bible-audio/", "permanent": true }
+  ],
   "headers": [{
     "source": "/bible-audio/(.*)",
     "headers": [

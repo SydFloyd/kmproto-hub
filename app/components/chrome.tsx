@@ -1,5 +1,4 @@
 import { EMAIL, mailto } from "../data";
-import { PRICING_GUIDE } from "../pricing";
 
 export function Arrow({ diagonal = false }: { diagonal?: boolean }) {
   return (
@@ -18,14 +17,13 @@ function Brand() {
   );
 }
 
-export function Header({ current }: { current: "home" | "lab" | "pricing" | "games" }) {
+export function Header({ current }: { current: "home" | "lab" | "games" }) {
   return (
     <header className="site-header">
       <div className="shell header-inner">
         <Brand />
         <nav aria-label="Main navigation">
           <a href="/#services">Services</a>
-          <a href="/pricing" aria-current={current === "pricing" ? "page" : undefined}>Pricing</a>
           <a href="/#process">Process</a>
           <a href="/lab" aria-current={current === "lab" ? "page" : current === "games" ? "true" : undefined}>The Lab</a>
           <a className="nav-cta" href="/#contact">Contact</a>
@@ -44,8 +42,6 @@ export function Footer() {
           <p>Websites, automation and custom software<br />for small businesses and organizations.</p>
         </div>
         <nav className="footer-links" aria-label="Footer navigation">
-          <a href="/pricing">Website pricing</a>
-          <a href={PRICING_GUIDE} download>Pricing guide (PDF)</a>
           <a href="/lab">The Lab</a>
           <a href="https://github.com/SydFloyd" target="_blank" rel="noreferrer">GitHub</a>
           <a href={mailto("Project inquiry")}>{EMAIL}</a>

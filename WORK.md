@@ -1,4 +1,25 @@
-# Lab project order
+# Pricing removal
+
+Updated: 2026-10-04
+Status: verified locally; ready for the public Vercel deployment.
+
+Removed the homepage pricing section, standalone pricing page, package data and
+components, pricing links in the shared header/footer, pricing PDF download and
+unused pricing styles. Removed fee, payment and monthly-plan terms from the
+homepage. The only remaining price is “Websites starting at $1,200” in the hero.
+The Websites service now links directly to a website inquiry email. Old /pricing
+and /pricing.html links redirect permanently to /#services on the public site.
+Root internal pricing documents are not published.
+
+Vercel build, lint, TypeScript and diff checks pass. Built assets contain no old
+pricing page, guide, package prices or payment terms. Browser checks at
+1440/768/390/320px confirm the single starting price, removed section and links,
+working Services navigation and no horizontal overflow or page errors. Shared
+navigation also checked on the Lab, Games portal and all four game pages at
+390px. Desktop and mobile screenshots reviewed.
+Evidence: ignored outputs/pricing-removed-local.json and screenshots.
+
+## Earlier release: Lab project order
 
 Updated: 2026-10-04
 Status: published and verified at https://www.kmproto.com/lab.

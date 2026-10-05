@@ -1,8 +1,6 @@
 import CopyEmail from "./components/CopyEmail";
-import WebsitePackages from "./components/WebsitePackages";
 import { Arrow, Footer, Header } from "./components/chrome";
 import { EMAIL, mailto, process, projects, services } from "./data";
-import { PRICING_DATE, PRICING_GUIDE } from "./pricing";
 
 export default function Home() {
   return (
@@ -16,7 +14,7 @@ export default function Home() {
               <p className="eyebrow">Independent web &amp; software development</p>
               <h1 id="hero-title">Make your business<br />easier to find and run.</h1>
               <p className="hero-lede">Websites, automation and custom software that help customers reach you and give your team a simpler way to work. Designed and built directly with Kyle.</p>
-              <p className="page-note">Serving lower Bucks County · In-person meetings by appointment</p>
+              <p className="page-note">Websites starting at $1,200.<br />Serving lower Bucks County · In-person meetings by appointment</p>
               <div className="actions">
                 <a className="button button-primary" href={mailto("New project inquiry")}>Request a quote <Arrow /></a>
                 <a className="button button-secondary" href="#services">Explore services</a>
@@ -30,7 +28,7 @@ export default function Home() {
             <div className="section-head">
               <p className="eyebrow">Services</p>
               <h2 id="services-title">What I can help with</h2>
-              <p>Start with the website or workflow your business needs. Automation and custom software are quoted individually.</p>
+              <p>Start with the website or workflow your business needs.</p>
             </div>
             <div className="services-grid">
               {services.map((service) => (
@@ -41,28 +39,6 @@ export default function Home() {
                   <a className="text-link" href={service.href}>{service.link} <Arrow /></a>
                 </article>
               ))}
-            </div>
-          </div>
-        </section>
-
-        <section className="section section-tint" id="pricing" aria-labelledby="pricing-title">
-          <div className="shell">
-            <div className="section-head section-head-split">
-              <div>
-                <p className="eyebrow">Website pricing</p>
-                <h2 id="pricing-title">A clear starting point</h2>
-                <p>Base prices for defined scopes. Your final scope and fee are agreed before work begins.</p>
-              </div>
-              <p className="pricing-date">{PRICING_DATE} · USD</p>
-            </div>
-            <WebsitePackages />
-            <div className="pricing-followup">
-              <p>Every build includes a mobile-friendly layout, one contact form, basic search setup, two consolidated revision rounds, launch handoff and 30 days of defect correction.</p>
-              <p>Supplied content, one language and standard pages. Add-ons, outside costs and applicable tax are separate. No mandatory maintenance contract.</p>
-              <div className="inline-links">
-                <a className="text-link" href="/pricing">Full pricing, inclusions &amp; terms <Arrow /></a>
-                <a href={PRICING_GUIDE} download>Download pricing guide (PDF)</a>
-              </div>
             </div>
           </div>
         </section>
@@ -95,9 +71,9 @@ export default function Home() {
               <p>My focus is small businesses and organizations that need a useful website or a better way to manage their work.</p>
             </div>
             <dl className="working-details">
-              <div><dt>Written scope</dt><dd>Deliverables and fees agreed in advance. Extra work is approved before it is billed.</dd></div>
-              <div><dt>Your accounts</dt><dd>Your domain and third-party accounts remain yours. Project-specific deliverables transfer after full payment.</dd></div>
-              <div><dt>Included handoff</dt><dd>Launch and account handoff are included, whether or not you choose a monthly support plan.</dd></div>
+              <div><dt>Written scope</dt><dd>Deliverables, feedback rounds and schedule agreed in advance.</dd></div>
+              <div><dt>Your accounts</dt><dd>Your domain and third-party accounts remain yours.</dd></div>
+              <div><dt>Project handoff</dt><dd>Receive your finished project and account handoff, with optional ongoing support.</dd></div>
             </dl>
           </div>
         </section>

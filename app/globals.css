@@ -60,27 +60,12 @@ ul, ol { margin: 0; padding: 0; }
 .section-tint { background: var(--tint); border-block: 1px solid var(--line); }
 .section-head { max-width: 680px; margin-bottom: 36px; }
 .section-head p:not(.eyebrow) { margin-top: 16px; }
-.section-head-split { display: flex; align-items: flex-end; justify-content: space-between; gap: 32px; max-width: none; }
-.section-head-split > div { max-width: 620px; }
-.pricing-date { color: var(--muted); font-size: 13px; white-space: nowrap; }
 .services-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 36px; }
 .service { display: flex; flex-direction: column; align-items: flex-start; border-top: 2px solid var(--ink); padding-top: 22px; }
 .service > p { margin-top: 14px; }
 .service ul { width: 100%; list-style: none; margin-top: 22px; margin-bottom: 24px; font-size: 14px; }
 .service li { padding: 8px 0; border-bottom: 1px solid var(--line); }
 .service .text-link { margin-top: auto; }
-
-.pricing-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
-.pricing-plan { display: flex; flex-direction: column; padding: 28px; border: 1px solid var(--line); border-top: 3px solid var(--ink); background: var(--paper); }
-.plan-price { margin-top: 18px; color: var(--ink); font-family: var(--serif); font-size: 42px; line-height: 1.25; }
-.plan-price span { display: block; color: var(--muted); font-family: var(--sans); font-size: 12px; margin-top: 6px; }
-.plan-description { margin-top: 22px; font-size: 15px; }
-.plan-features { list-style: none; margin-top: 20px; margin-bottom: 28px; font-size: 14px; }
-.plan-features li { padding: 10px 0; border-top: 1px solid var(--line); }
-.plan-inquiry { align-self: flex-start; margin-top: auto; font-size: 14px; font-weight: 700; }
-.pricing-followup { max-width: 850px; margin-top: 28px; font-size: 14px; }
-.pricing-followup > p + p { margin-top: 10px; }
-.inline-links { display: flex; align-items: baseline; flex-wrap: wrap; gap: 14px 28px; margin-top: 22px; }
 
 .process-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); list-style: none; gap: 32px; }
 .process-grid li { border-top: 1px solid var(--line); padding-top: 18px; }
@@ -139,36 +124,10 @@ ul, ol { margin: 0; padding: 0; }
 .page-cta .button { flex: none; }
 
 .section-note { margin-top: 18px; font-size: 13px; color: var(--muted); }
-.pricing-block { margin-top: 56px; }
-.pricing-block h2 { font-size: 30px; }
-.inclusion-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 56px; margin-top: 28px; }
-.detail-list { padding-left: 20px; margin-top: 16px; font-size: 15px; }
-.detail-list li { padding-left: 4px; margin-bottom: 8px; }
-.scope-note { padding: 28px; margin-top: 32px; background: var(--tint); border-left: 3px solid var(--ink); }
-.scope-note p { margin-top: 12px; font-size: 14px; }
-.payment-note { margin-top: 28px; }
-.payment-note h3 { font-size: 17px; }
-.payment-note p { margin-top: 8px; font-size: 14px; }
-.table-wrap { overflow-x: auto; }
-.rates-table { width: 100%; min-width: 640px; border-collapse: collapse; font-size: 14px; text-align: left; }
-.rates-table th, .rates-table td { padding: 18px 20px; border-bottom: 1px solid var(--line); vertical-align: top; }
-.rates-table thead { background: var(--ink); color: #fff; }
-.rates-table thead th { font-weight: 700; padding-block: 14px; }
-.rates-table tbody th { width: 26%; font-weight: 600; color: var(--ink); }
-.rates-table tbody td:last-child { width: 54%; }
-.rate-fee { white-space: nowrap; font-variant-numeric: tabular-nums; }
-.service-terms { margin-top: 22px; max-width: 900px; font-size: 14px; }
-.service-terms p + p { margin-top: 10px; }
-.cost-example { margin-top: 24px; padding: 20px 24px; border: 1px solid var(--line); background: var(--tint); font-size: 15px; }
-.terms-list { margin: 0; }
-.terms-list > div { display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 40px; border-top: 1px solid var(--line); padding: 22px 0; }
-.terms-list dt { font-weight: 700; color: var(--ink); }
-.terms-list dd { margin: 0; font-size: 15px; }
 
 @media (max-width: 1000px) {
   .hero h1 { font-size: 44px; }
   .services-grid { gap: 24px; }
-  .pricing-plan { padding: 22px; }
   .about-grid, .lab-overview, .contact-inner { gap: 48px; }
   .process-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .site-header nav { gap: 18px; }
@@ -180,16 +139,12 @@ ul, ol { margin: 0; padding: 0; }
   .site-header nav { width: 100%; justify-content: space-between; gap: 6px 12px; font-size: 13px; }
   .site-header nav .nav-cta { padding: 0 12px; }
   .hero { padding: 48px 0; }
-  .services-grid, .pricing-grid, .about-grid, .lab-overview, .contact-inner, .inclusion-grid { grid-template-columns: minmax(0, 1fr); gap: 32px; }
+  .services-grid, .about-grid, .lab-overview, .contact-inner { grid-template-columns: minmax(0, 1fr); gap: 32px; }
   .hero h1 { font-size: clamp(36px, 6vw, 44px); }
   .hero-lede { font-size: 17px; }
   .section { padding: 48px 0; }
   .section-head { margin-bottom: 28px; }
-  .section-head-split { display: block; }
-  .section-head-split > .pricing-date { margin-top: 16px; }
   h2 { font-size: 30px; }
-  .pricing-plan { padding: 26px; }
-  .plan-features { margin-bottom: 22px; }
   .about-grid, .lab-overview { gap: 28px; }
   .contact { padding: 48px 0; }
   .contact-inner { gap: 24px; }
@@ -201,10 +156,6 @@ ul, ol { margin: 0; padding: 0; }
   .project-entry > div { grid-column: 1 / -1; }
   .project-visit { margin-top: 4px; }
   .page-cta { flex-direction: column; align-items: flex-start; gap: 22px; margin-top: 32px; }
-  .pricing-block { margin-top: 40px; }
-  .inclusion-grid { margin-top: 24px; }
-  .scope-note { padding: 22px; }
-  .terms-list > div { grid-template-columns: minmax(0, 1fr); gap: 8px; }
 }
 
 @media (max-width: 380px) {
@@ -219,15 +170,8 @@ ul, ol { margin: 0; padding: 0; }
 }
 
 @media print {
-  .site-header, .site-footer, .skip-link, .actions, .plan-inquiry, .page-cta { display: none; }
+  .site-header, .site-footer, .skip-link, .actions, .page-cta { display: none; }
   body { color: #111; font-size: 11pt; }
   .shell { width: 100%; }
   .section, .page-intro { padding: 20px 0; background: #fff; }
-  .pricing-grid { gap: 16px; }
-  .pricing-plan { padding: 16px; break-inside: avoid; }
-  .table-wrap { overflow: visible; }
-  .rates-table { min-width: 0; }
-  .rates-table thead { color: #111; background: #eee; }
-  .rates-table th, .rates-table td { padding: 10px; }
-  tr, .terms-list > div { break-inside: avoid; }
 }

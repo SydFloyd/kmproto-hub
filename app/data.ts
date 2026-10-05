@@ -9,8 +9,8 @@ export const services = [
     name: "Websites",
     summary: "Business websites and redesigns that explain your services and make it easy for customers to contact you.",
     items: ["New websites and redesigns", "Mobile layouts and contact forms", "Search setup and performance", "Optional hosting and support"],
-    href: "/pricing",
-    link: "View website pricing",
+    href: mailto("Website project inquiry"),
+    link: "Discuss a website project",
   },
   {
     id: "automation",
@@ -31,7 +31,7 @@ export const services = [
 ] as const;
 
 export const process = [
-  { step: "01", name: "Agree the scope", copy: "We discuss your requirements, content and budget. You receive a written scope and fee before work begins." },
+  { step: "01", name: "Agree the scope", copy: "We discuss your requirements, content and goals. You receive a written scope and schedule before work begins." },
   { step: "02", name: "Review the design", copy: "You review the proposed design or prototype before the full build. Feedback is gathered in agreed revision rounds." },
   { step: "03", name: "Build and test", copy: "I develop the site or application, check it on mobile and desktop, and work through the agreed changes." },
   { step: "04", name: "Launch and hand off", copy: "You receive your project and account handoff. Website builds include 30 days of defect correction; ongoing support is optional." },
