@@ -1,4 +1,60 @@
-# Infinite blueprint and equally likely waves
+# Obliging marble machine and three equally likely themes
+
+Updated: 2026-10-05
+Status: implementation verified locally; production publication follows.
+
+The homepage selects waves, blueprint or the obliging marble machine with a
+one-third chance each on startup. Selection stays fixed through interaction,
+resize and full screen, and only the selected canvas engine is mounted.
+The original wave and blueprint implementations are preserved.
+
+The new scene is a monochrome mechanical drawing with one engraved marble,
+twin rails, hinged trestles, a telescoping platform, reduction gears, a return
+lift and a counterweight. The marble follows a continuous loop with downhill
+speed changes, a steady lift and a brief release. An approaching pointer
+opens a local detour with critically damped joints: the upper rail arches,
+the platform extends and the counterweight drops to open the passage.
+The marble waits when the detour is still opening, then carries on. Moving
+away folds the exact original rail back into place. No visible text, frame,
+score, extra control, face or audio was added to the animation.
+
+Touch taps hold an obstruction for two seconds; vertical swipes and pinch
+zoom remain native. Keyboard arrows move an imaginary obstruction,
+Space/Enter places it, Escape clears it and P pauses the marble. Reduced
+motion starts still and responds with immediate mechanical poses. The
+small corner icon supports native full screen and a focused viewport
+fallback, with Escape, focus restoration and scroll-lock cleanup.
+
+The rail stays at 180 nodes at every display size. Static chassis detail is
+cached in one sheet of at most 1.512 million pixels; the backing canvas is
+capped at 3 million pixels and DPR 2. Drawing is capped at 30 fps, with no
+painting offscreen or in a hidden tab. No new dependency, asset, font or
+external request is introduced.
+
+Production build, lint, TypeScript and diff checks pass. All six marble,
+six blueprint and five wave-field tests pass. Marble tests cover continuous
+loop transfers, clearance at 90 obstruction positions/sizes, exact folding,
+courtesy waiting, immediate reduced-motion poses and finite rapid-input
+behavior. Browser checks at 1440/768/390/320px pass all three mechanical
+responses, mouse/touch, keyboard, full screen, reduced motion and normal
+wheel/touch scrolling. Landscape and 980px phone desktop mode also pass.
+No page errors, horizontal overflow or automated WCAG A/AA violations.
+The selection checks verify both exact one-third boundaries and a single
+stable engine. Screenshots reviewed. Evidence: ignored outputs/marble-local.json,
+outputs/hero-thirds-selection-local.json and corresponding screenshots.
+
+The original blueprint and ripple interaction checks also pass with the
+updated selector. Evidence: ignored outputs/blueprint-thirds-local.json and
+outputs/ripple-blueprint-pair-local.json. Synthetic software-Chromium profiles
+cover idle motion and a continuously moving obstruction: under 4× CPU
+throttling, p90 callback work is 1.0–1.2ms on mobile/phone desktop layouts and
+median paint intervals are 33.2–33.4ms. Full screen at 1440×1000 and DPR 2
+uses 2,998,554 backing pixels and 1,512,000 cached pixels, with median/p90
+paint intervals of 33.3/39.3ms. Offscreen and hidden-state checks stop painting.
+These are synthetic measurements, not physical-phone benchmarks. Evidence:
+ignored outputs/marble-performance-local.json.
+
+## Earlier release: Infinite blueprint and equally likely waves
 
 Updated: 2026-10-05
 Status: published and verified at https://www.kmproto.com.

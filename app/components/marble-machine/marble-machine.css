@@ -1,0 +1,4 @@
+.marble-instrument canvas { cursor: default; touch-action: pan-y pinch-zoom; mask-image: none; }
+.marble-instrument .ripple-fullscreen { color: #dce7e0; }
+.marble-instrument .ripple-fullscreen:hover { color: #f1f4ed; }
+.marble-instrument canvas:focus-visible, .marble-instrument .ripple-fullscreen:focus-visible { outline-color: #dce7e0; }

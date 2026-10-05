@@ -22,8 +22,8 @@ with matching entries for the Lab and games (served via `cleanUrls`).
 `public/og.png` is the 1200×630 social card. Typography uses
 system fonts; the site does not fetch external fonts.
 
-The homepage chooses between the ASCII ripple tank and infinite blueprint with
-equal probability on each page load. `app/components/HeroAnimation.tsx` keeps
+The homepage chooses the ASCII ripple tank, infinite blueprint or obliging
+marble machine with a one-third chance each on startup. `app/components/HeroAnimation.tsx` keeps
 that choice stable during interaction and mounts only the selected engine.
 
 The ASCII ripple tank lives in `app/components/ripple-tank/`.
@@ -59,6 +59,22 @@ The backing canvas is capped at 3 million pixels and each sheet at 2 million;
 painting is limited to 30 fps and suspended offscreen or in a hidden tab.
 Run `npm run test:blueprint` for inheritance, seamless camera alignment,
 deterministic return paths, deep exploration and navigation.
+
+The obliging marble machine lives in `app/components/marble-machine/`.
+One engraved marble rolls around a continuous monochrome rail loop, with a
+powered return lift and a brief release at the top. An approaching pointer
+opens a local detour: the upper rail becomes a bridge, the lower platform
+telescopes, and a falling counterweight opens the hinged passage. The marble
+waits for clearance when necessary. Critically damped joints follow the pointer
+and fold back to the exact original rail when it leaves. A touch tap holds the
+obstruction briefly; vertical swipes and pinch zoom remain native. Arrow keys
+move an imaginary obstruction, Space/Enter places it, Escape clears it, and P
+pauses the marble. Reduced motion uses still, immediately responsive poses.
+The static chassis is cached, the rail has 180 nodes at every screen size,
+and the 30 fps display stops painting offscreen or in hidden tabs. The
+full-screen icon uses native expansion and a focused viewport fallback.
+Run `npm run test:marble-machine` for loop continuity, clearance, courtesy
+waiting, exact folding, reduced-motion poses and stability under rapid input.
 
 Browser games have their own Vite entry points, so their engines are loaded only
 on game pages. `app/lab/games/catalog.ts` supplies the Games portal's cards;
