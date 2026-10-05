@@ -41,7 +41,7 @@ WebGL draws the punctuation and fine, square KM lettering in one batch. Phone
 budgets are 1,600 water nodes, 900 letter nodes, 1,100 solver cells and 650,000
 backing pixels; desktop ceilings are 2,600 / 1,200 / 1,800 / 1,000,000. Quality
 reduces under sustained pressure, including texture-upload and presentation
-cost. An overloaded or unavailable GPU uses a software renderer with cached
+cost. An overloaded, unavailable or software-emulated GPU uses a software renderer with cached
 punctuation stamps and one pixel upload: at most 450 water nodes, 360 letter
 nodes, 360 solver cells and 160,000 pixels. Blocked or stalled workers use that
 same small field locally. Continued overload switches to input-driven snapshots

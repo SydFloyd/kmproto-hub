@@ -37,10 +37,25 @@ screen, rotation, offscreen/hidden suspension, reduced-motion opt-in, lost GPU
 contexts and stalled workers. No page errors. The refined software fallback
 sustained 30 fps at 4x CPU throttling, p95 draw 6.6 ms, no long tasks, 159,210
 backing pixels. Earlier fallback/profile failures were investigated and fixed;
-they are not counted as passing release evidence. A longer run is in progress.
+they are not counted as passing release evidence.
+
+The first five-minute stress test on this host's SwiftShader software WebGL
+backend did not meet the sustained 30 fps/no-long-task gate: it automatically
+fell back and then held a responsive 7.5 fps snapshot mode, with no long tasks
+in minutes 2–5 and bounded memory. This is not claimed as a passing smoothness
+result. Hardware-backend detection now skips software WebGL entirely and starts
+with the small pixel renderer; its final sustained check is in progress.
+
+Preview source d90999e6b99dc5284311c907811701fb6cb31294 deployed successfully as
+Vercel preview 6859839779. All nine homepage/theme/worker assets match the local
+build. The concrete preview was shared for the Samsung check. A follow-up adds
+the software-backend bypass; production remains unchanged pending device feedback.
+Final phone and zoomed-out desktop-phone screenshots were inspected; native
+swiping and automated WCAG A/AA checks pass without overflow or page errors.
 
 Evidence is in ignored `outputs/animation-behavior.json`,
-`outputs/animation-fallback-profile.json` and `outputs/animation-soak.json`.
+`outputs/animation-fallback-profile.json`, `outputs/animation-soak.json`,
+`outputs/animation-soak-final.json` and `outputs/animation-final-visuals.json`.
 Private pricing documents are excluded from staging and deployment.
 
 ---

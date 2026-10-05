@@ -110,7 +110,15 @@ export class BatchedWaterRenderer implements WaterRenderer {
     const gl = canvas.getContext("webgl", { alpha: true, antialias: false, depth: false, stencil: false, powerPreference: "low-power", preserveDrawingBuffer: false });
     if (!gl) throw new Error("WebGL unavailable");
     this.gl = gl;
-    if (gl.getParameter(gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS) < 1) throw new Error("Vertex textures unavailable");
+    const info = gl.getExtension("WEBGL_debug_renderer_info");
+    const adapter = info ? String(gl.getParameter(info.UNMASKED_RENDERER_WEBGL)) : "";
+    // Software WebGL can look fast at first and then saturate the browser's
+    // shared graphics process. Use the bounded pixel renderer from the start.
+    if (/SwiftShader|llvmpipe|Software Rasterizer|Microsoft Basic Render/i.test(adapter)
+      || gl.getParameter(gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS) < 1) {
+      gl.getExtension("WEBGL_lose_context")?.loseContext();
+      throw new Error("Hardware WebGL unavailable");
+    }
     this.parallel = gl.getExtension("KHR_parallel_shader_compile");
     const program = gl.createProgram()!;
     for (const [type, source] of [[gl.VERTEX_SHADER, VERTEX], [gl.FRAGMENT_SHADER, FRAGMENT]] as const) {
