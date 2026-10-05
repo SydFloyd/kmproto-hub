@@ -19,15 +19,13 @@ export default function RippleTank() {
   const pointer = useRef<{ x: number; y: number; id: number } | null>(null);
   const keyboard = useRef({ x: 0.5, y: 0.5, visible: false });
   const pausedRef = useRef(false);
-  const [paused, setPaused] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [fallback, setFallback] = useState(false);
-  const [notice, setNotice] = useState("");
 
   useEffect(() => {
     const surface = canvas.current, instrument = panel.current;
     if (!surface || !instrument) return;
-    const context = surface.getContext("2d", { alpha: false });
+    const context = surface.getContext("2d");
     if (!context) return;
     let animation = 0, last = 0, accumulator = 0, visible = true, width = 0, height = 0;
     let atlas: HTMLCanvasElement | null = null;
@@ -35,7 +33,6 @@ export default function RippleTank() {
     const media = window.matchMedia("(prefers-reduced-motion: reduce)");
     const setReduced = () => {
       pausedRef.current = media.matches;
-      setPaused(media.matches);
     };
     setReduced();
     media.addEventListener("change", setReduced);
@@ -43,8 +40,7 @@ export default function RippleTank() {
     const draw = () => {
       const water = field.current;
       if (!water || !atlas) return;
-      context.fillStyle = "#101b20";
-      context.fillRect(0, 0, surface.width, surface.height);
+      context.clearRect(0, 0, surface.width, surface.height);
       const tile = Math.ceil(cell * ratio * 1.8);
       const offsetX = (width - water.columns * cell) / 2;
       const offsetY = (height - water.rows * cell) / 2;
@@ -60,7 +56,7 @@ export default function RippleTank() {
       }
       if (keyboard.current.visible) {
         context.font = `${12 * ratio}px monospace`;
-        context.fillStyle = "#d9eee2";
+        context.fillStyle = "#234e70";
         const x = keyboard.current.x * width * ratio, y = keyboard.current.y * height * ratio;
         for (const [dx, dy] of [[-12, 0], [12, 0], [0, -12], [0, 12]]) context.fillText(":", x + dx * ratio, y + dy * ratio);
       }
@@ -95,7 +91,7 @@ export default function RippleTank() {
       ink.textAlign = "center"; ink.textBaseline = "middle";
       for (let shade = 0; shade < 16; shade++) {
         const mix = shade / 15;
-        ink.fillStyle = `rgb(${Math.round(48 + mix * 167)}, ${Math.round(74 + mix * 164)}, ${Math.round(78 + mix * 142)})`;
+        ink.fillStyle = `rgb(${Math.round(173 - mix * 142)}, ${Math.round(186 - mix * 134)}, ${Math.round(196 - mix * 126)})`;
         for (const [glyph, mark] of ["·", ",", ":", "~", "≈"].entries()) ink.fillText(mark, (glyph + 0.5) * tile, (shade + 0.5) * tile);
       }
       draw();
@@ -153,9 +149,8 @@ export default function RippleTank() {
     } catch { setFallback(true); setExpanded(true); }
   };
 
-  const togglePause = () => { pausedRef.current = !pausedRef.current; setPaused(pausedRef.current); };
   const drop = (x = 0.5, y = 0.5) => {
-    field.current?.drop(x, y); setNotice("Pebble dropped.");
+    field.current?.drop(x, y);
     if (pausedRef.current) { for (let i = 0; i < 12; i++) field.current?.step(); repaint.current?.(); }
   };
   const point = (event: PointerEvent<HTMLCanvasElement>) => {
@@ -166,11 +161,12 @@ export default function RippleTank() {
     if (event.pointerType !== "mouse" && !event.currentTarget.hasPointerCapture(event.pointerId)) return;
     const next = point(event), previous = pointer.current;
     keyboard.current.visible = false;
-    if (previous && previous.id === next.id && !pausedRef.current) {
+    if (previous && previous.id === next.id) {
       const dx = next.x - previous.x, dy = next.y - previous.y;
       const distance = Math.hypot(dx * (field.current?.columns || 1), dy * (field.current?.rows || 1));
       const samples = Math.min(90, Math.ceil(distance));
       for (let i = 1; i <= samples; i++) field.current?.wake(previous.x + dx * i / samples, previous.y + dy * i / samples, dx / samples, dy / samples);
+      if (pausedRef.current) for (let i = 0; i < 6; i++) field.current?.step();
     }
     pointer.current = next;
     if (pausedRef.current) repaint.current?.();
@@ -183,31 +179,21 @@ export default function RippleTank() {
       location.x = Math.max(0.04, Math.min(0.96, location.x + (event.key === "ArrowLeft" ? -0.025 : event.key === "ArrowRight" ? 0.025 : 0)));
       location.y = Math.max(0.04, Math.min(0.96, location.y + (event.key === "ArrowUp" ? -0.025 : event.key === "ArrowDown" ? 0.025 : 0)));
       location.visible = true;
-      if (!pausedRef.current) field.current?.wake(location.x, location.y, location.x - old.x, location.y - old.y);
+      field.current?.wake(location.x, location.y, location.x - old.x, location.y - old.y);
+      if (pausedRef.current) for (let i = 0; i < 6; i++) field.current?.step();
       repaint.current?.();
     } else if (event.key === " " || event.key === "Enter") { event.preventDefault(); drop(location.x, location.y); }
+    else if (event.key.toLowerCase() === "p") { event.preventDefault(); pausedRef.current = !pausedRef.current; }
   };
 
   return <div ref={panel} className={`ripple-instrument${fallback ? " ripple-immersive" : ""}`} aria-label="ASCII ripple tank">
-    <div className="ripple-heading"><div><span className="ripple-serial">KM / SURFACE STUDY 01</span><h2>Ripple tank</h2></div><span className="ripple-material" aria-hidden="true">· , : ~ ≈</span></div>
-    <div className="ripple-well">
-      <div className="ripple-scale ripple-scale-top" aria-hidden="true"><span>0</span><span>25</span><span>50</span><span>75</span><span>100</span></div>
-      <canvas ref={canvas} tabIndex={0} aria-label="Interactive water. Move your pointer or drag to stir; click or tap to drop a pebble. With the keyboard, use arrow keys to move and Space or Enter to drop."
+      <canvas ref={canvas} tabIndex={0} aria-label="Interactive water. Move your pointer or drag to stir; click or tap to drop a pebble. With the keyboard, use arrow keys to move, Space or Enter to drop, and P to pause or resume."
         onPointerMove={move} onPointerDown={event => { if (event.button !== 0) return; event.currentTarget.setPointerCapture(event.pointerId); pointer.current = point(event); drop(pointer.current.x, pointer.current.y); }}
         onPointerUp={event => { if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId); if (event.pointerType !== "mouse") pointer.current = null; }}
         onPointerLeave={() => { pointer.current = null; }} onPointerCancel={() => { pointer.current = null; }} onKeyDown={keys}
         onFocus={() => { keyboard.current.visible = true; repaint.current?.(); }} onBlur={() => { keyboard.current.visible = false; repaint.current?.(); }}>
-        A pool of punctuation. Ripples reflect from a submerged KM monogram. Use the Drop pebble button to disturb the surface.
+        Interactive punctuation water with a submerged KM monogram.
       </canvas>
-      <div className="ripple-scale ripple-scale-bottom" aria-hidden="true"><span>SHALLOW WATER</span><span>{paused ? "HELD" : "FLOWING"}</span></div>
-    </div>
-    <div className="ripple-controls">
-      <button type="button" onClick={() => drop()} className="ripple-drop">Drop pebble <span aria-hidden="true">·</span></button>
-      <button type="button" onClick={togglePause} aria-pressed={paused}>{paused ? "Resume" : "Pause"}</button>
-      <button type="button" onClick={() => { field.current?.clear(); repaint.current?.(); setNotice("The water is still."); }}>Still water</button>
-      <button type="button" className="ripple-fullscreen" onClick={fullScreen} aria-pressed={expanded}><ExpandIcon expanded={expanded} /><span>{expanded ? "Exit full screen" : "Full screen"}</span></button>
-    </div>
-    <p className="ripple-hint">Move to stir. Click to drop a pebble.</p>
-    <span className="sr-only" role="status">{notice}</span>
+      <button type="button" className="ripple-fullscreen" onClick={fullScreen} aria-label={expanded ? "Exit full screen" : "Full screen"} aria-pressed={expanded}><ExpandIcon expanded={expanded} /></button>
   </div>;
 }

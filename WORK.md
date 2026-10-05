@@ -1,4 +1,25 @@
-# ASCII ripple tank
+# Seamless ripple tank
+
+Updated: 2026-10-04
+Status: implemented and locally verified; publication pending.
+
+Removed the tank frame, dark backing, heading, scales, instructions and text
+controls. The punctuation now renders transparently in the homepage palette,
+with softly fading edges. The only visible control is a small full-screen
+icon in the corner. Wakes, pebble drops and the transient submerged KM remain.
+Native and fallback full screen fill the viewport with the homepage tint.
+Keyboard arrows, Space/Enter and P retain stirring, drops and pause/resume;
+reduced-motion users can disturb the still water directly without automatic
+animation. Accessible names remain invisible.
+
+Production build, lint, TypeScript and diff checks pass. Browser checks at
+1440/768/390/320px confirm transparent/no-frame rendering, no visible text,
+one icon, pointer/touch, keyboard and full screen. Fallback focus trapping and
+Escape, reduced-motion interaction and 568×320 landscape pass. No page errors,
+horizontal overflow or automated WCAG A/AA violations. Screenshots reviewed.
+Evidence: ignored outputs/ripple-seamless-local.json and screenshots.
+
+## Earlier release: ASCII ripple tank
 
 Updated: 2026-10-04
 Status: published and verified at https://www.kmproto.com.
