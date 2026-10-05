@@ -1,7 +1,14 @@
 # Pricing removal
 
 Updated: 2026-10-04
-Status: verified locally; ready for the public Vercel deployment.
+Status: published and verified at https://www.kmproto.com.
+
+Production source: f65200a778107a4448e135a109a8dd1e5fe65960, pushed to main.
+Vercel production deployment 6849182037 reports success at
+2026-10-05T01:02:02Z (October 4 in America/New_York). Live browser checks confirm
+only the $1,200 starting price, no pricing section or links on any page, permanent
+redirects from /pricing and /pricing.html to /#services, and a 404 for the removed
+pricing guide. No page errors or horizontal overflow.
 
 Removed the homepage pricing section, standalone pricing page, package data and
 components, pricing links in the shared header/footer, pricing PDF download and
@@ -17,7 +24,8 @@ pricing page, guide, package prices or payment terms. Browser checks at
 working Services navigation and no horizontal overflow or page errors. Shared
 navigation also checked on the Lab, Games portal and all four game pages at
 390px. Desktop and mobile screenshots reviewed.
-Evidence: ignored outputs/pricing-removed-local.json and screenshots.
+Evidence: ignored outputs/pricing-removed-local.json, outputs/pricing-removed-live.json
+and screenshots.
 
 ## Earlier release: Lab project order
 
