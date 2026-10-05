@@ -18,13 +18,12 @@ const motionSnapshot = () => matchMedia(motionQuery).matches;
 
 export default function MarbleMachine() {
   const panel = useRef<HTMLDivElement>(null), canvas = useRef<HTMLCanvasElement>(null);
-  const renderer = useRef<MarbleRenderer | null>(null), moving = useRef(false);
+  const renderer = useRef<MarbleRenderer | null>(null), moving = useRef(true), pace = useRef(1);
   const restart = useRef<(() => void) | null>(null), pending = useRef<Point | null | undefined>(undefined);
   const releaseTouch = useRef<ReturnType<typeof setTimeout> | null>(null);
   const keyboard = useRef({ x: 500, y: 208 });
   const reduced = useSyncExternalStore(subscribeMotion, motionSnapshot, () => true);
-  const [override, setOverride] = useState<boolean | null>(null);
-  const playing = override ?? !reduced;
+  const [playing, setPlaying] = useState(true);
   const { expanded, fallback, toggle } = useInstrumentFullscreen(panel);
 
   useEffect(() => {
@@ -40,7 +39,7 @@ export default function MarbleMachine() {
       const elapsed = last ? now - last : 1000 / 30;
       if (elapsed >= 1000 / 30 - 0.5) {
         if (pending.current !== undefined) { view.model.setPointer(pending.current, !moving.current); pending.current = undefined; dirty = true; }
-        if (moving.current || view.model.settling) { view.model.advance(Math.min(elapsed / 1000, 0.1), moving.current); dirty = true; }
+        if (moving.current || view.model.settling) { view.model.advance(Math.min(elapsed / 1000, 0.1) * pace.current, moving.current); dirty = true; }
         if (dirty) { view.draw(); dirty = false; }
         last = now;
       }
@@ -68,10 +67,11 @@ export default function MarbleMachine() {
   }, []);
   useEffect(() => {
     moving.current = playing;
+    pace.current = reduced ? 0.6 : 1;
     const view = renderer.current;
     if (view && !playing) view.model.setPointer(view.model.pointer, true);
     restart.current?.();
-  }, [playing]);
+  }, [playing, reduced]);
 
   const clear = () => {
     if (releaseTouch.current) { clearTimeout(releaseTouch.current); releaseTouch.current = null; }
@@ -94,7 +94,7 @@ export default function MarbleMachine() {
     } else if (event.key === " " || event.key === "Enter") {
       event.preventDefault(); view.keyboard = { ...keyboard.current }; pending.current = { ...keyboard.current }; restart.current?.();
     } else if (event.key === "Escape" && !expanded) { event.preventDefault(); clear(); }
-    else if (event.key.toLowerCase() === "p") { event.preventDefault(); setOverride(!playing); }
+    else if (event.key.toLowerCase() === "p") { event.preventDefault(); setPlaying(!playing); }
   };
   return <div ref={panel} className={`ripple-instrument marble-instrument${fallback ? " ripple-immersive" : ""}`} aria-label="Obliging marble machine">
     <canvas ref={canvas} tabIndex={0} aria-label="One marble travels through a mechanical loop. Put your pointer near a rail and the machine makes room. On touch screens, tap a rail. Arrow keys move an imaginary pointer; Space or Enter places it, Escape removes it, and P pauses or resumes the marble."
@@ -104,7 +104,7 @@ export default function MarbleMachine() {
       onKeyDown={keys} onBlur={clear}>
       A precision marble loop with accommodating rails, hinged platforms and a falling counterweight.
     </canvas>
-    <button type="button" className="ripple-fullscreen marble-playback" onClick={() => setOverride(!playing)} aria-label={playing ? "Pause animation" : "Play animation"} aria-pressed={playing}>
+    <button type="button" className="ripple-fullscreen marble-playback" onClick={() => setPlaying(!playing)} aria-label={playing ? "Pause animation" : "Play animation"} aria-pressed={playing}>
       <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
         {playing ? <path d="M5 4h3v12H5zm7 0h3v12h-3z" /> : <path d="M6 3l11 7-11 7z" />}
       </svg>

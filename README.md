@@ -34,7 +34,8 @@ Pointer movement leaves a wake; clicking or tapping drops a pebble. Full-screen
 touch dragging leaves a wake while ordinary page swipes remain native. Arrow keys
 move a cursor, Space/Enter drops a pebble, and P pauses or resumes. Scrolling,
 text selection and links stay native. The corner icon offers native full screen
-or a viewport fallback. Reduced motion starts still and responds to input.
+or a viewport fallback. Gentle currents continue without pointer input;
+reduced motion slows their pace, and manual pause freezes them.
 
 The solver runs in a request-driven worker with one reusable frame buffer and one
 pending pointer segment. A tick has at most 12 solver steps and 16 wake samples.
@@ -48,9 +49,11 @@ worker, with only a small completion message sent to the page. This path caps
 water nodes at 450, letter nodes at 360, solver cells at 360 and pixels at 160,000.
 Browsers without canvas transfer draw the same small surface on the page;
 blocked or stalled workers also use the small field locally. Continued overload
-switches to input-driven snapshots that fade to stillness. Normal interaction
-targets 30 fps; quiet GPU currents
-paint at 8–12 fps, while quiet software rendering sleeps. Hidden and offscreen
+switches the physical ripples to input-driven snapshots while ambient drawing
+continues at 8 fps. Normal interaction targets 30 fps; quiet currents paint at
+15 fps in software or 20 fps on the GPU without advancing the solver. The worker
+reuses its last field for these ambient frames. The KM uses muted color and at
+most 42% opacity. Hidden and offscreen
 views stop scheduling work. Run `npm run test:ripple-tank` for field physics,
 flat startup, node/pixel limits, bounded input, transfer reuse and quality control.
 
@@ -62,8 +65,9 @@ opens the hinged passage around a pointer. The marble waits for clearance and
 resumes after the joints make room. Moving away folds the original rail back.
 Touch taps briefly hold an obstruction; swipes and pinch zoom stay native.
 Arrow keys place an imaginary pointer, Space/Enter engages it, Escape clears it,
-and P or the small playback icon pauses/resumes. The play control explicitly
-opts into animation when reduced motion is enabled. Chassis and settled
+and P or the small playback icon pauses/resumes. Playback starts automatically;
+reduced motion uses 60% of the normal pace instead of stopping the marble.
+Chassis and settled
 mechanisms are cached, the rail has 180 nodes, the backing surface is capped at
 650,000 pixels, and the 30 fps loop sleeps while paused, hidden or offscreen.
 Run `npm run test:marble-machine` for continuity, clearance, stationary-obstacle

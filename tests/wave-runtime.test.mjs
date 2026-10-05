@@ -3,6 +3,7 @@ import { test } from 'node:test';
 import { WAVE_BUDGETS, WaveBudget } from '../app/components/ripple-tank/budget.ts';
 import { poolLayout, copyOpacity } from '../app/components/ripple-tank/geometry.ts';
 import { WaveSimulation } from '../app/components/ripple-tank/simulation.ts';
+import { currentHeight } from '../app/components/ripple-tank/appearance.ts';
 
 const config = { generation: 1, columns: 44, rows: 25, placement: { x: 30, y: 13, size: 15 } };
 test('startup is exactly still, with no monogram revealed', () => {
@@ -55,7 +56,7 @@ test('a stalled frame and enormous pointer jump have bounded catch-up', () => {
   assert.equal(steps, 12); assert.equal(wakes, 16);
   assert.equal(frame.buffer.byteLength, config.columns * config.rows * 4);
 });
-test('quality reduction requires sustained pressure, and ultimately stops continuous motion', () => {
+test('quality reduction requires sustained pressure before switching to a quiet cadence', () => {
   const budget = new WaveBudget(2); budget.reset(0);
   assert.equal(budget.observe(100, 100, 40, 33), 'keep');
   let now = 1000;
@@ -67,6 +68,24 @@ test('quality reduction requires sustained pressure, and ultimately stops contin
   assert.equal(sample(true, 18), 'reduce'); assert.equal(budget.tier, 0);
   now += 1000;
   assert.equal(sample(true, 18), 'rest'); assert.equal(budget.tier, 0);
+});
+
+test('visible ambient currents keep moving without disturbing the field or revealing the KM', () => {
+  const simulation = new WaveSimulation(); simulation.configure(config);
+  let changes = 0, crests = 0;
+  for (let y = 0; y < 40; y++) for (let x = 0; x < 60; x++) {
+    const u = x / 60, v = y / 40;
+    assert.equal(Math.abs(currentHeight(u, v, 0)), 0, 'flat first paint');
+    const a = currentHeight(u, v, 25), b = currentHeight(u, v, 29);
+    assert.ok(Math.abs(a) <= .047 && Math.abs(b) <= .047, 'quiet bounded currents');
+    assert.ok(Math.abs(a - currentHeight(u + .001, v, 25)) < .001, 'neighbors follow the same current');
+    if (Math.abs(a - b) > .008) changes++;
+    if (Math.abs(a) > .025) crests++;
+  }
+  assert.ok(changes > 500 && crests > 200, 'the unattended pool has visible moving crests');
+  assert.equal(simulation.water.active, false);
+  assert.ok(simulation.water.height.every(n => n === 0));
+  assert.ok(simulation.water.reveal.every(n => n === 0));
 });
 test('text protection attenuates only the copy and feathers continuously into the pool', () => {
   const copy = { x: 30, y: 20, width: 450, height: 300 };

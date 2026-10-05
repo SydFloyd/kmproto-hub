@@ -1,4 +1,5 @@
 import { copyOpacity } from "./geometry.ts";
+import { CURRENT_GLSL, currentHeight, KM_REVEAL_OPACITY } from "./appearance.ts";
 import type { PoolLayout } from "./geometry.ts";
 import type { PoolFrame } from "./simulation.ts";
 
@@ -25,6 +26,7 @@ uniform float u_energy;
 uniform sampler2D u_field;
 varying vec4 v_color;
 varying float v_glyph;
+${CURRENT_GLSL}
 void main() {
   vec2 p = a_position;
   float alpha = 1.0;
@@ -46,12 +48,10 @@ void main() {
         max(texture2D(u_field, a_uv + t * vec2(-0.5, 0.5)).b,
         texture2D(u_field, a_uv + t * vec2(0.5, 0.5)).b)) * u_energy;
       energy = glint * 1.8;
-      alpha *= a_letter * min(1.0, glint / 0.045);
-      color = mix(vec3(0.165, 0.392, 0.439), vec3(0.977, 0.906, 0.777), min(1.0, energy * 1.6 + 0.2));
+      alpha *= a_letter * min(1.0, glint / 0.045) * ${KM_REVEAL_OPACITY};
+      color = mix(vec3(0.165, 0.392, 0.439), vec3(0.741, 0.863, 0.812), min(1.0, energy * 1.6 + 0.2));
     } else {
-      float bend = sin(a_uv.x * 5.0 - a_uv.y * 3.0 + u_time * 0.09);
-      float tide = calm * 0.005 * sin(a_uv.x * 7.0 + a_uv.y * 8.0 + bend - u_time * 0.25);
-      float value = height * u_energy + tide;
+      float value = height * u_energy + currentHeight(a_uv, u_time);
       energy = abs(value) * 2.0;
       float ink = pow(clamp((energy * 24.0 + 2.0) / 15.0, 0.0, 1.0), 0.75);
       color = value >= 0.0 || energy < 0.016
@@ -203,7 +203,7 @@ export class QuietWaterRenderer implements WaterRenderer {
   private stamps = new Map<number, Uint16Array[]>();
   private colors: number[][] = [];
   constructor(private canvas: HTMLCanvasElement | OffscreenCanvas, private ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D) {
-    for (const [base, peak] of [[[29, 60, 80], [102, 173, 190]], [[41, 86, 104], [196, 244, 226]], [[42, 100, 112], [249, 231, 198]]]) {
+    for (const [base, peak] of [[[29, 60, 80], [102, 173, 190]], [[41, 86, 104], [196, 244, 226]], [[42, 100, 112], [189, 220, 207]]]) {
       for (let i = 0; i < 8; i++) this.colors.push(base.map((value, j) => Math.round(value + (peak[j] - value) * (i / 7) ** 0.75)));
     }
   }
@@ -250,7 +250,7 @@ export class QuietWaterRenderer implements WaterRenderer {
     if (this.values.length !== frame.buffer.byteLength) this.values = new Uint8Array(frame.buffer.byteLength);
     this.values.set(new Uint8Array(frame.buffer)); this.columns = frame.columns; this.rows = frame.rows;
   }
-  draw(_time: number, cursor: WaterCursor, scale = 1) {
+  draw(time: number, cursor: WaterCursor, scale = 1) {
     const layout = this.layout, frame = this.frame;
     if (!layout || !frame) return false;
     frame.data.set(this.base);
@@ -258,7 +258,8 @@ export class QuietWaterRenderer implements WaterRenderer {
       const sx = Math.max(0, Math.min(this.columns - 1, Math.round(node.u * (this.columns - 1))));
       const sy = Math.max(0, Math.min(this.rows - 1, Math.round(node.v * (this.rows - 1))));
       const j = (sy * this.columns + sx) * 4;
-      const value = (this.values[j] * 256 + this.values[j + 1] - 32768) / 32767 * scale;
+      const value = (this.values[j] * 256 + this.values[j + 1] - 32768) / 32767 * scale
+        + (node.letter ? 0 : currentHeight(node.u, node.v, time));
       let glint = 0;
       if (node.letter) for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
         const xx = Math.max(0, Math.min(this.columns - 1, sx + dx)), yy = Math.max(0, Math.min(this.rows - 1, sy + dy));
@@ -268,7 +269,7 @@ export class QuietWaterRenderer implements WaterRenderer {
       if (energy < (node.letter ? 0.004 : 0.016)) continue;
       const glyph = energy < 0.016 ? 0 : energy < 0.04 ? 1 : energy < 0.11 ? 2 : energy < 0.28 ? 3 : 4;
       const row = (node.letter ? 2 : value >= 0 ? 1 : 0) * 8 + Math.min(7, Math.floor(energy * 12 + 1));
-      this.stamp(frame.data, node.x, node.y, node.size, glyph, this.colors[row], node.alpha * (node.letter ? node.letter * Math.min(1, glint / 0.045) : 1));
+      this.stamp(frame.data, node.x, node.y, node.size, glyph, this.colors[row], node.alpha * (node.letter ? node.letter * Math.min(1, glint / 0.045) * KM_REVEAL_OPACITY : 1));
     }
     this.ctx.putImageData(frame, 0, 0);
     if (cursor.visible) {

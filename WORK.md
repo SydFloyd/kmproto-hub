@@ -1,4 +1,52 @@
-# Mobile animation repair — preview verification
+# Continuous hero motion and softer KM
+
+Updated: 2026-10-05
+Status: implementation, interaction and sustained performance checks pass;
+publication verification is pending.
+
+The user reports that the Samsung waves are substantially more performant,
+but stop without pointer input, and the desktop marble remains stationary.
+The previous preview reproduces both failure paths: software water stops its
+clock after its first paint; reduced-motion desktops start the marble paused.
+
+Both themes now play automatically. Reduced motion slows the waves to half
+pace and the marble to 60% pace; manual pause remains available. Quiet water
+has coherent, continuously evolving drawn currents independent of the solver.
+The worker repaints its cached field at 15 fps with no physical steps, encoding
+or field copies, and hardware WebGL draws quiet currents at 20 fps. Interactions
+still target 30 fps. Hidden/offscreen views suspend and resume without resetting
+their state. An overloaded renderer keeps an 8 fps ambient current rather than
+falling permanently still. Existing node, pixel, queue and input ceilings remain.
+
+KM reveal opacity is capped at 42% and its highlight color is muted mint.
+Ambient currents never expose it; real ripples still scatter off the same
+square, finely sampled reflective geometry and briefly reveal its shape.
+
+Production build, TypeScript, lint and 24 physics/runtime checks pass. Browser
+checks pass at 1440/390/320/1024 px for startup, actual marble progression,
+manual playback, slower default motion, native scrolling, hidden/offscreen
+suspension, native/fallback full screen, rotation, GPU loss and worker fallback.
+No page errors. Current evidence: ignored `outputs/continuous-motion-behavior.json`.
+
+The five-minute 4x CPU run passes, including untouched water, continuous pointer
+input/pebbles, landscape full screen, settling after input stops, and untouched
+water again. Idle painting holds 15.0 fps with zero physical steps; interaction
+holds 30.0 fps, and the settling minute averages 16.9 fps as it returns to idle.
+There are no long tasks, emergency fallback or overlapping worker jobs. The
+ambient clock advances roughly 60 seconds in every minute. Main-thread p95 work
+stays at 0.4–0.6 ms; worker p95 is 0.9–2.8 ms. Backing pixels remain below
+160,000 and retained main-thread heap growth is 240,438 bytes. The unattended
+screenshots visibly differ. Evidence: ignored `outputs/continuous-motion-soak.json`.
+
+Separate desktop checks verify actual visible drawing changes with no pointer
+movement under both motion preferences. A fully revealed letter measures at
+most 100/255 alpha in the software renderer. The hardware shader links and
+draws with no GL errors. Screenshots were inspected. Evidence: ignored
+`outputs/continuous-motion-visuals.json` and corresponding screenshots.
+
+---
+
+# Earlier mobile animation repair — preview verification
 
 Updated: 2026-10-05
 Status: sustained performance gate passes; Samsung device verification and

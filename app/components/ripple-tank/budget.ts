@@ -1,8 +1,8 @@
 export type WaveTier = 0 | 1 | 2;
 export const WAVE_BUDGETS = [
-  { water: 450, letters: 360, physics: 360, pixels: 160_000, fps: 30, idleFps: 8 },
-  { water: 1600, letters: 900, physics: 1100, pixels: 650_000, fps: 30, idleFps: 10 },
-  { water: 2600, letters: 1200, physics: 1800, pixels: 1_000_000, fps: 30, idleFps: 12 },
+  { water: 450, letters: 360, physics: 360, pixels: 160_000, fps: 30, idleFps: 15 },
+  { water: 1600, letters: 900, physics: 1100, pixels: 650_000, fps: 30, idleFps: 20 },
+  { water: 2600, letters: 1200, physics: 1800, pixels: 1_000_000, fps: 30, idleFps: 20 },
 ] as const;
 
 // Measure presentation cadence as well as JS time: an overloaded GPU can

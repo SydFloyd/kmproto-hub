@@ -51,7 +51,6 @@ export class PoolController {
     private stage: HTMLDivElement, readonly mode: WaterMode, private fallback: (mode: WaterMode) => void) {
     const phone = matchMedia("(any-pointer: coarse)").matches || Math.min(screen.width, screen.height) < 700;
     this.budget = new WaveBudget(mode === "gpu" ? phone ? 1 : 2 : 0);
-    this.paused = this.media.matches;
     if (mode === "gpu") this.renderer = new BatchedWaterRenderer(canvas);
     else if (mode !== "worker") {
       const ctx = canvas.getContext("2d", { willReadFrequently: true });
@@ -85,7 +84,7 @@ export class PoolController {
     canvas.addEventListener("webglcontextlost", this.contextLost);
     this.requestResize();
   }
-  private preference = () => this.setPaused(this.media.matches);
+  private preference = () => this.restart();
   private contextLost = (event: Event) => { event.preventDefault(); if (!this.disposed) this.fallback("worker"); };
   private restart = () => {
     cancelAnimationFrame(this.raf); this.raf = 0; this.lastPaint = 0; this.lastRenderedAt = 0;
@@ -152,7 +151,7 @@ export class PoolController {
       this.anchor = this.pendingPoint; this.pendingPoint = null;
     }
     const simulate = Boolean(this.input) || (this.active && !this.paused && !this.resting);
-    const renderOnly = this.mode === "worker" && (this.dirty || (this.resting && performance.now() - this.lastInput < 2100));
+    const renderOnly = this.mode === "worker" && (this.dirty || !this.paused);
     if (!simulate && !renderOnly) return;
     const input = this.input; this.input = null;
     const buffer = this.buffer; this.buffer = new ArrayBuffer(0);
@@ -169,7 +168,7 @@ export class PoolController {
         // Judge worker rendering by completed-frame cadence, not by its CPU
         // work: that work no longer occupies the page's input thread.
         if (this.lastRenderedAt && !this.paused && !this.resting && this.visible && !document.hidden) {
-          this.adjust(this.budget.observe(start, start - this.lastRenderedAt, this.uploadWork, 1000 / WAVE_BUDGETS[this.budget.tier].fps), start);
+          this.adjust(this.budget.observe(start, start - this.lastRenderedAt, this.uploadWork, this.lastInterval || 1000 / WAVE_BUDGETS[this.budget.tier].fps), start);
         }
         this.lastRenderedAt = start;
       }
@@ -181,15 +180,15 @@ export class PoolController {
     if (!this.visible || document.hidden || !this.layout || this.disposed) return;
     const budget = WAVE_BUDGETS[this.budget.tier], recent = now - this.lastInput < 2000;
     const interval = 1000 / (this.resting ? 8 : this.active || this.input || recent ? budget.fps : budget.idleFps);
-    // A quiet renderer intentionally paints infrequently (or sleeps). Its
-    // first interactive frame is not evidence of a missed rendering deadline.
+    // Quiet currents keep drawing while the physical solver sleeps. Switching
+    // cadence must not count as a missed interactive frame deadline.
     if (interval !== this.lastInterval) {
-      this.lastInterval = interval; this.lastPaint = 0; this.budget.reset(now);
+      this.lastInterval = interval; this.lastPaint = 0; this.lastRenderedAt = 0; this.budget.reset(now);
     }
     const elapsed = this.lastPaint ? now - this.lastPaint : interval;
     if ((elapsed >= interval - 0.5 || (this.paused && this.dirty)) && (this.mode !== "worker" || !this.busy)) {
       const start = performance.now();
-      if (!this.paused) this.time += Math.min(elapsed / 1000, 0.12);
+      if (!this.paused) this.time += Math.min(elapsed / 1000, 0.15) * (this.media.matches ? 0.5 : 1);
       this.flush(true);
       try { if (this.renderer) this.dirty = !this.renderer.draw(this.time, this.cursor, this.resting ? Math.max(0, 1 - (now - this.lastInput) / 1600) : 1); }
       catch { this.fallback(this.mode === "gpu" ? "worker" : "local"); return; }
@@ -198,7 +197,7 @@ export class PoolController {
         this.adjust(this.budget.observe(now, elapsed, work, interval), now);
       }
     }
-    if (this.dirty || this.input || this.pendingPoint || (!this.paused && (this.resting ? recent : this.mode === "gpu" || this.active))) this.schedule();
+    if (this.dirty || this.input || this.pendingPoint || !this.paused) this.schedule();
   };
   private adjust(decision: "keep" | "reduce" | "rest", now: number) {
     if (decision === "reduce") this.requestResize();
