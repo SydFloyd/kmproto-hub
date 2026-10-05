@@ -1,8 +1,8 @@
 # Continuous hero motion and softer KM
 
 Updated: 2026-10-05
-Status: implementation, interaction and sustained performance checks pass;
-publication verification is pending.
+Status: verified preview; production release awaits explicit approval after
+automatic approval review rejected the production push.
 
 The user reports that the Samsung waves are substantially more performant,
 but stop without pointer input, and the desktop marble remains stationary.
@@ -43,6 +43,20 @@ movement under both motion preferences. A fully revealed letter measures at
 most 100/255 alpha in the software renderer. The hardware shader links and
 draws with no GL errors. Screenshots were inspected. Evidence: ignored
 `outputs/continuous-motion-visuals.json` and corresponding screenshots.
+
+Source e8bd9dcd633c7ba0d90e271236651f75a359be60 deployed successfully as
+Vercel preview 6863231674 at 2026-10-05T15:36:58Z:
+https://kmproto-qwmy2qttu-kyle-millers-projects-456dcebb.vercel.app
+All nine homepage/theme/worker assets match the tested local build. Live checks
+verify tap-driven water, moving marble, and automatic desktop motion under
+reduced-motion settings with no pointer input. No page errors or overflow.
+Evidence: ignored `outputs/continuous-preview-verification.json`.
+
+Automatic approval review rejected the attempted main push because it could
+not establish authorization for this exact production release or completion of
+the previously pending device check. Only the preview branch was pushed.
+Production main remains c0f62132018144d6c48724fb3ec68db35c8847de. An explicit
+release approval is required before retrying the production push.
 
 ---
 
