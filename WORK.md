@@ -1,7 +1,15 @@
 # Denser KM lettering with a bounded draw budget
 
 Updated: 2026-10-05
-Status: local checks passed; publishing to kmproto.com.
+Status: published and verified at https://www.kmproto.com.
+
+Production source: 538a3ee8647b5db86531fc2796717054aa04c311, pushed to main.
+Vercel production deployment 6851781215 reports success at
+2026-10-05T05:08:20Z. The live application bundle matches the verified local
+build byte for byte. Live shape checks at 1440px desktop, 390px mobile and
+390px phone emulation with 980px/1024px desktop layouts confirm the finer
+letter nodes, square K ends and combined draw cap. No page errors or overflow.
+Evidence: ignored outputs/ripple-density-shape-live.json and screenshots.
 
 Separated the reflected KM lettering from the background punctuation grid.
 The letters use finer spacing and proportional edge opacity, computed from
@@ -36,7 +44,6 @@ intervals are 55.3/77.6ms under that synthetic throttle. At 1440×1000 full
 screen without CPU throttling, median/p90 paint intervals are 33.4/36.3ms.
 These are software-browser measurements, not physical-phone benchmarks.
 Evidence: ignored outputs/ripple-density-performance-final.json.
-Publication verification follows.
 
 ## Earlier release: Square K upright in mobile desktop view
 
