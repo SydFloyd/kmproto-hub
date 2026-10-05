@@ -22,6 +22,15 @@ with matching entries for the Lab and games (served via `cleanUrls`).
 `public/og.png` is the 1200×630 social card. Typography uses
 system fonts; the site does not fetch external fonts.
 
+The homepage's ASCII ripple tank lives in `app/components/ripple-tank/`.
+Its fixed-step damped wave field reflects from a hidden KM monogram, revealing
+the letters only while waves pass. The water uses only `· , : ~ ≈`; pointer
+movement leaves a wake, clicking or tapping drops a pebble, and arrow keys plus
+Space/Enter provide keyboard interaction. Controls pause, clear and expand the
+tank. Full screen uses the browser API with an immersive viewport fallback.
+Reduced-motion users start with a still surface; rendering stops offscreen.
+Run `npm run test:ripple-tank` for reflection, reveal, damping and stability.
+
 Browser games have their own Vite entry points, so their engines are loaded only
 on game pages. `app/lab/games/catalog.ts` supplies the Games portal's cards;
 add future games there and register their HTML entry in `vite.vercel.config.ts`.

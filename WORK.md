@@ -1,4 +1,28 @@
-# Pricing removal
+# ASCII ripple tank
+
+Updated: 2026-10-04
+Status: implemented and locally verified; publication pending.
+
+Added an interactive punctuation-only ripple tank beside the homepage hero.
+The shallow-water field has fixed-step propagation, damping, smooth currents,
+directional pointer wakes and pebble impulses. A submerged KM mask reflects
+waves and briefly lights the letters as wave fronts pass, fading back into
+the quiet surface. The instrument has pause, still water and full-screen
+controls, with an immersive fallback for browsers without native full screen.
+Touch dragging and keyboard interaction are supported; reduced-motion users
+start paused, and rendering stops when the tank is offscreen or the tab hidden.
+
+Four wave-field tests pass: hidden idle mask, reflection/contact reveal, decay
+back to stillness, and wake/stability/clear behavior. Browser checks at
+1440/768/390/320px pass pointer/touch, keyboard, pebble, pause, clearing and
+native full screen; fallback/Escape, offscreen rendering and reduced motion
+also pass. Landscape full screen at 568×320 remains usable. No page errors,
+horizontal overflow or automated WCAG A/AA violations. Screenshots reviewed.
+Evidence: ignored outputs/ripple-tank-local.json, accessibility results and
+desktop/mobile/full-screen screenshots. The production Vercel build, lint,
+TypeScript and git diff checks pass.
+
+## Earlier release: Pricing removal
 
 Updated: 2026-10-04
 Status: published and verified at https://www.kmproto.com.
