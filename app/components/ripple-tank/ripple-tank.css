@@ -5,7 +5,7 @@
 .ripple-instrument { position: relative; min-width: 0; background: transparent; }
 .ripple-instrument canvas { display: block; width: 100%; height: clamp(380px, 34vw, 490px); cursor: crosshair; touch-action: none; mask-image: radial-gradient(ellipse at center, #000 44%, #0008 72%, transparent 100%); }
 .ripple-instrument canvas:focus-visible { outline: 2px solid var(--link); outline-offset: 4px; mask-image: none; }
-.ripple-fullscreen { position: absolute; right: 0; bottom: 0; display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 0; color: #586674; background: transparent; }
+.ripple-fullscreen { position: absolute; right: 0; bottom: 0; display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 0; color: var(--muted); background: transparent; }
 .ripple-fullscreen:hover { color: var(--ink); }
 .ripple-fullscreen:focus-visible { outline: 2px solid var(--link); outline-offset: 0; }
 .ripple-instrument:fullscreen, .ripple-immersive { width: 100%; height: 100dvh; background: var(--tint); }

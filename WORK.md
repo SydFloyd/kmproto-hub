@@ -1,4 +1,22 @@
-# Seamless ripple tank
+# Design contrast
+
+Updated: 2026-10-04
+Status: implemented and locally verified; publication pending.
+
+Deepened the shared navy/slate palette for headings, body copy, secondary
+labels, links and buttons. Strengthened dividers and the contrast between
+white sections and the cool-tinted hero. The contact section has brighter
+light text on deeper navy. Ripple glyphs use darker ink with a stronger tonal
+curve; the transparent surface, soft edges and single full-screen icon remain.
+
+Production build, lint, TypeScript and diff checks pass. Browser checks of
+the homepage, Lab and Games portal at 1440/390px pass with no page errors,
+overflow or automated WCAG A/AA violations. Full screen uses the updated
+palette and remains icon-only. Body contrast against the hero rises from
+9.28:1 to 10.44:1; secondary text rises from 5.39:1 to 6.81:1. Screenshots
+reviewed. Evidence: ignored outputs/contrast-local.json and screenshots.
+
+## Earlier release: Seamless ripple tank
 
 Updated: 2026-10-04
 Status: published and verified at https://www.kmproto.com.

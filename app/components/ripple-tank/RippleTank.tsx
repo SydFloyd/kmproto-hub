@@ -56,7 +56,7 @@ export default function RippleTank() {
       }
       if (keyboard.current.visible) {
         context.font = `${12 * ratio}px monospace`;
-        context.fillStyle = "#234e70";
+        context.fillStyle = "#12466e";
         const x = keyboard.current.x * width * ratio, y = keyboard.current.y * height * ratio;
         for (const [dx, dy] of [[-12, 0], [12, 0], [0, -12], [0, 12]]) context.fillText(":", x + dx * ratio, y + dy * ratio);
       }
@@ -90,8 +90,8 @@ export default function RippleTank() {
       ink.font = `${Math.min(12, cell * 1.38) * ratio}px "Courier New", monospace`;
       ink.textAlign = "center"; ink.textBaseline = "middle";
       for (let shade = 0; shade < 16; shade++) {
-        const mix = shade / 15;
-        ink.fillStyle = `rgb(${Math.round(173 - mix * 142)}, ${Math.round(186 - mix * 134)}, ${Math.round(196 - mix * 126)})`;
+        const mix = (shade / 15) ** 0.8;
+        ink.fillStyle = `rgb(${Math.round(134 - mix * 118)}, ${Math.round(151 - mix * 113)}, ${Math.round(165 - mix * 109)})`;
         for (const [glyph, mark] of ["·", ",", ":", "~", "≈"].entries()) ink.fillText(mark, (glyph + 0.5) * tile, (shade + 0.5) * tile);
       }
       draw();

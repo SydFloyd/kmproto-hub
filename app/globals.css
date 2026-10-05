@@ -1,11 +1,11 @@
 :root {
-  --ink: #1f3446;
-  --text: #354350;
-  --muted: #586674;
-  --link: #234e70;
-  --line: #d5dde3;
+  --ink: #102638;
+  --text: #293947;
+  --muted: #405567;
+  --link: #12466e;
+  --line: #b3c0ca;
   --paper: #ffffff;
-  --tint: #f3f5f7;
+  --tint: #edf1f4;
   --sans: Arial, Helvetica, sans-serif;
   --serif: Georgia, "Times New Roman", serif;
   --shell: 1140px;
@@ -46,11 +46,11 @@ ul, ol { margin: 0; padding: 0; }
 .button { display: inline-flex; align-items: center; justify-content: center; gap: 12px; min-height: 46px; padding: 10px 20px; border: 1px solid var(--ink); border-radius: 2px; font-size: 14px; font-weight: 700; line-height: 1.45; text-align: center; text-decoration: none; }
 .button:hover { text-decoration: none; }
 .button-primary { color: #fff; background: var(--ink); }
-.button-primary:hover { background: #2c4a63; border-color: #2c4a63; }
+.button-primary:hover { background: #214760; border-color: #214760; }
 .button-secondary { color: var(--ink); background: transparent; }
-.button-secondary:hover { background: #e8edf1; }
+.button-secondary:hover { background: #dce5ec; }
 .button-light { color: var(--ink); background: #fff; border-color: #fff; }
-.button-light:hover { background: #e8edf1; }
+.button-light:hover { background: #dce5ec; }
 .text-link { display: inline-flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 700; }
 
 .hero { padding: 80px 0; background: var(--tint); border-bottom: 1px solid var(--line); }
@@ -91,14 +91,14 @@ ul, ol { margin: 0; padding: 0; }
 .project-links strong { color: var(--ink); font-size: 15px; }
 .project-category { display: block; color: var(--muted); font-size: 13px; }
 
-.contact { padding: 64px 0; background: var(--ink); color: #e1e8ef; }
+.contact { padding: 64px 0; background: var(--ink); color: #edf2f6; }
 .contact-inner { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; gap: 100px; }
-.contact .eyebrow { color: #bdcbd7; }
+.contact .eyebrow { color: #d7e1e8; }
 .contact h2 { color: #fff; }
 .contact h2 + p { margin-top: 18px; }
 .contact-email { display: inline-block; color: #fff; font-size: clamp(17px, 2vw, 23px); overflow-wrap: anywhere; }
-.contact .button-secondary { color: #fff; border-color: #9fb2c2; }
-.contact .button-secondary:hover { background: #2c4a63; }
+.contact .button-secondary { color: #fff; border-color: #b9ccd9; }
+.contact .button-secondary:hover { background: #214760; }
 
 .site-footer { padding: 48px 0 28px; border-top: 1px solid var(--line); }
 .footer-inner { display: grid; grid-template-columns: 1fr auto; gap: 24px 48px; }
