@@ -9,8 +9,9 @@ const distanceToSegment = (x: number, y: number, ax: number, ay: number, bx: num
 };
 
 export type Monogram = { columns: number; rows: number; mask: Uint8Array; coverage: Float32Array };
+export type MonogramPlacement = { x: number; y: number; size: number };
 
-export function createMonogram(columns: number, rows: number, size = Math.min(columns * 0.56, rows * 1.02)): Monogram {
+export function createMonogram(columns: number, rows: number, size = Math.min(columns * 0.56, rows * 1.02), center = { x: columns / 2, y: rows / 2 }): Monogram {
   const mask = new Uint8Array(columns * rows);
   const coverage = new Float32Array(columns * rows);
   const strokeRadius = 0.038;
@@ -20,7 +21,7 @@ export function createMonogram(columns: number, rows: number, size = Math.min(co
     [0.24, 0.03, 0.46, -0.28], [0.46, -0.28, 0.46, 0.28],
   ];
   for (let y = 1; y < rows - 1; y++) for (let x = 1; x < columns - 1; x++) {
-    const nx = (x - columns / 2) / size, ny = (y - rows / 2) / size;
+    const nx = (x - center.x) / size, ny = (y - center.y) / size;
     // Signed distance preserves the square K stem and gives partial edge
     // nodes proportional brightness instead of rounding each stroke's width.
     const kx = Math.abs(nx + 0.51) - strokeRadius;
@@ -47,15 +48,16 @@ export class RippleField {
   private next: Float32Array;
   private readonly contacts: number[][];
   time = 0;
+  active = false;
 
-  constructor(columns: number, rows: number) {
+  constructor(columns: number, rows: number, placement?: MonogramPlacement) {
     this.columns = columns;
     this.rows = rows;
     const count = columns * rows;
     this.height = new Float32Array(count);
     this.previous = new Float32Array(count);
     this.next = new Float32Array(count);
-    const monogram = createMonogram(columns, rows);
+    const monogram = createMonogram(columns, rows, placement?.size, placement);
     this.mask = monogram.mask;
     this.coverage = monogram.coverage;
     this.reveal = new Float32Array(count);
@@ -78,6 +80,7 @@ export class RippleField {
 
   clear() {
     this.height.fill(0); this.previous.fill(0); this.next.fill(0); this.reveal.fill(0);
+    this.active = false;
   }
 
   drop(x: number, y: number, strength = 1) {
@@ -103,6 +106,7 @@ export class RippleField {
         const r2 = ((x - cx) ** 2 + (y - cy) ** 2) / (sigma * sigma);
         const impulse = strength * Math.exp(-r2 / 2) * (pebble ? 1 - r2 / 2 : 1);
         this.previous[i] = Math.max(-2, Math.min(2, this.previous[i] - impulse));
+        this.active = true;
       }
     }
   }
@@ -112,6 +116,9 @@ export class RippleField {
     const coefficient = 0.16; // c*dt/dx = 0.4, safely below the 2D CFL limit.
     const damping = 0.006;
     this.time += STEP;
+    // Idle water needs only the slow current's clock, not a full PDE solve.
+    if (!this.active) return;
+    let motion = 0;
     for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
       const i = y * w + x;
       if (coverage[i]) {
@@ -124,6 +131,7 @@ export class RippleField {
         reveal[i] = target > reveal[i]
           ? reveal[i] + (target - reveal[i]) * 0.14
           : reveal[i] * 0.989;
+        motion = Math.max(motion, reveal[i]);
       }
       if (mask[i]) { next[i] = 0; continue; }
       const center = current[i];
@@ -135,14 +143,19 @@ export class RippleField {
       const edge = Math.min(x, y, w - x - 1, h - y - 1);
       const rim = edge < 5 ? 1 - (5 - edge) * 0.012 : 1;
       next[i] = Math.max(-2, Math.min(2, (2 * center - (1 - damping) * previous[i] + coefficient * (l + r + t + b - 4 * center)) / (1 + damping))) * rim;
+      motion = Math.max(motion, Math.abs(next[i]), Math.abs(next[i] - center));
     }
     this.previous = current; this.height = next; this.next = previous;
+    if (motion < 0.00002) this.clear();
   }
 
   ambient(x: number, y: number) {
+    // Start as an undisturbed pool. A very slow current emerges without
+    // injecting a wave or lighting any of the submerged lettering.
+    const calm = 1 - Math.exp(-this.time / 8);
     const bend = Math.sin(x * 0.025 - y * 0.032 + this.time * 0.09) * 2.2;
     const radius = Math.hypot(x - this.columns * 0.67, (y - this.rows * 0.43) * 1.12);
-    return 0.019 * Math.sin(x * 0.082 + y * 0.12 + bend - this.time * 0.31)
-      + 0.011 * Math.sin(radius * 0.15 - this.time * 0.24 + bend * 0.45);
+    return calm * (0.006 * Math.sin(x * 0.082 + y * 0.12 + bend - this.time * 0.31)
+      + 0.003 * Math.sin(radius * 0.15 - this.time * 0.24 + bend * 0.45));
   }
 }

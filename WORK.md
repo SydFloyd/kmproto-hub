@@ -1,4 +1,64 @@
-# Obliging marble machine and three equally likely themes
+# Calm water across the full hero ribbon
+
+Updated: 2026-10-05
+Status: locally verified; publication to https://www.kmproto.com in progress.
+
+The waves now cover the entire hero section, including its padding and the
+area behind the business copy. One continuous field carries pointer wakes
+and pebble ripples across the ribbon. A soft, cached alpha mask keeps the
+water at approximately 12% ink behind the text and full strength in open
+water. Text selection, quote/service links, wheel scrolling and native
+touch panning stay available. The small full-screen icon sits in the
+ribbon's corner. The other two themes and equal one-third selection remain.
+
+Removed the automatic startup pebble. The first paint is an even, still
+field of dots; slow, quieter currents gradually emerge. The hidden KM
+reflector remains beside the copy on desktop and below it on mobile,
+with the same square K stem and fine, equally weighted lettering. Full
+screen centers the KM and removes text protection. Native and viewport
+fallback modes use the existing shared full-screen hook.
+
+Touch devices use at most 2,600 background nodes and 3,200 solver nodes;
+desktop retains the 4,400/5,600 limits. Lettering remains independent,
+with up to 1,200 finer nodes. Cached glyph atlases, a text mask of at most
+512 by 384 pixels, a three-million-pixel backing cap, DPR 2 and 30 fps
+painting bound the rendering work. The solver sleeps at rest, wakes on
+interaction, and sleeps again after ripples settle. Offscreen and hidden
+pages stop painting. No dependency, external asset or network request added.
+
+Production build, lint, TypeScript and diff checks pass. All eight wave,
+six blueprint and six marble model tests pass. Wave tests cover flat
+startup, coherent quiet currents, translated reflection/letter geometry,
+equal stroke weights, wave decay and solver sleep/wake behavior. The other
+two themes pass their desktop/mobile interaction checks, and all six exact
+one-third boundary cases pass. Evidence: ignored outputs/blueprint-thirds-local.json,
+outputs/marble-local.json and outputs/hero-thirds-selection-local.json.
+
+Final wave browser checks pass at 1440/768/390/320px, plus phone desktop
+layouts at 980px and 1024px. The first paint contains only dots, with zero
+wave height, velocity or letter reveal. Canvas bounds match the entire hero.
+Even deliberately saturated water stays at 31/255 alpha behind the copy;
+the open water stays fully visible. Real mouse clicks and touch taps reveal
+the KM, pointer wakes continue over text, text remains selectable, service
+links work, and wheel/touch scrolling remains native. Keyboard pause,
+reduced motion, native/fallback full screen, focus trapping/restoration,
+landscape, square K corners and fine lettering pass. No page errors or
+horizontal overflow; desktop automated WCAG A/AA checks find no violations.
+Screenshots reviewed. Hidden/offscreen suspension and print also pass.
+Evidence: ignored outputs/ripple-ribbon-local.json,
+outputs/ripple-ribbon-shape-local.json, outputs/ripple-ribbon-lifecycle-local.json
+and matching screenshots.
+
+Synthetic Chromium profiles, with fully disturbed water and illuminated
+letters, show mobile/phone desktop median paint intervals of 33.7/33.3ms
+at normal speed, with p90 callback work of 7.3/6.2ms. Four-times CPU
+throttling gives p90 callback work of 32.7ms and median paint intervals of
+94.5/111.0ms; idle mobile p90 work is 20.6ms. Full screen at 1440 by 1000
+has a 33.0ms median paint interval and 49.4ms p90 in the software renderer.
+These are browser simulations, not physical-phone benchmarks. Evidence:
+ignored outputs/ripple-ribbon-performance-final.json.
+
+## Earlier release: Obliging marble machine and three equally likely themes
 
 Updated: 2026-10-05
 Status: published and verified at https://www.kmproto.com.

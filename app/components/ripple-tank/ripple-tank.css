@@ -20,7 +20,17 @@
 .ripple-immersive { position: fixed; inset: 0; z-index: 1000; }
 .ripple-instrument:fullscreen canvas, .ripple-immersive canvas { height: 100%; mask-image: none; }
 .ripple-instrument:fullscreen .ripple-fullscreen, .ripple-immersive .ripple-fullscreen { right: max(12px, env(safe-area-inset-right)); bottom: max(12px, env(safe-area-inset-bottom)); }
+.hero:has(.ripple-ribbon) { position: relative; isolation: isolate; }
+.hero:has(.ripple-ribbon) .hero-copy { position: relative; z-index: 1; }
+.ripple-stage { min-width: 0; height: clamp(400px, 37vw, 540px); pointer-events: none; }
+.ripple-ribbon { position: absolute; inset: 0; z-index: 0; pointer-events: auto; }
+.ripple-ribbon canvas { height: 100%; mask-image: none; mask-size: 100% 100%; mask-repeat: no-repeat; touch-action: pan-y pinch-zoom; }
+.ripple-ribbon canvas:focus-visible { outline-offset: -4px; }
+.ripple-ribbon .ripple-fullscreen { right: max(12px, env(safe-area-inset-right)); bottom: max(12px, env(safe-area-inset-bottom)); }
+.ripple-ribbon.ripple-immersive { position: fixed; z-index: 1000; }
+.hero:has(.ripple-ribbon.ripple-immersive) { z-index: 1000; }
+.ripple-ribbon:fullscreen canvas, .ripple-ribbon.ripple-immersive canvas { touch-action: none; }
 @media (max-width: 1100px) { .hero > .shell { gap: 30px; } }
-@media (max-width: 900px) { .hero.hero-water { padding-block: 64px; } .hero > .shell { grid-template-columns: 1fr; gap: 32px; } .hero-copy { max-width: 640px; } .hero.hero-water h1 { font-size: 48px; } .ripple-instrument canvas { height: 420px; } }
-@media (max-width: 480px) { .hero.hero-water { padding-block: 48px; } .hero > .shell { gap: 22px; } .hero.hero-water h1 { font-size: clamp(38px, 10vw, 44px); } .ripple-instrument canvas { height: 360px; } }
-@media print { .ripple-instrument { display: none; } .hero > .shell { display: block; } .hero.hero-water { background: #fff; } .hero.hero-water h1, .hero-water .hero-lede, .hero-water .eyebrow, .hero-water .page-note { color: #111; } }
+@media (max-width: 900px) { .hero.hero-water { padding-block: 64px; } .hero > .shell { grid-template-columns: 1fr; gap: 32px; } .hero-copy { max-width: 640px; } .hero.hero-water h1 { font-size: 48px; } .ripple-instrument:where(:not(.ripple-ribbon)) canvas, .ripple-stage { height: 420px; } }
+@media (max-width: 480px) { .hero.hero-water { padding-block: 48px; } .hero > .shell { gap: 22px; } .hero.hero-water h1 { font-size: clamp(38px, 10vw, 44px); } .ripple-instrument:where(:not(.ripple-ribbon)) canvas, .ripple-stage { height: 360px; } }
+@media print { .ripple-instrument, .ripple-stage { display: none; } .hero > .shell { display: block; } .hero.hero-water { background: #fff; } .hero.hero-water h1, .hero-water .hero-lede, .hero-water .eyebrow, .hero-water .page-note { color: #111; } }
