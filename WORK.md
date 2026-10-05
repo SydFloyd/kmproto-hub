@@ -1,7 +1,15 @@
 # ASCII ripple tank
 
 Updated: 2026-10-04
-Status: implemented and locally verified; publication pending.
+Status: published and verified at https://www.kmproto.com.
+
+Production source: 033eb6f6a584355ec128e7f3d5e51e9b105657ad, pushed to main.
+Vercel production deployment 6849521217 reports success at
+2026-10-05T01:34:35Z (October 4 in America/New_York). Live browser checks at
+1440/768/390/320px pass pointer/touch, pebble, pause, clearing, keyboard and
+full screen. Native full screen, immersive fallback/Escape, reduced motion
+and 568×320 landscape pass. No page errors or horizontal overflow.
+Live evidence: ignored outputs/ripple-tank-live.json and screenshots.
 
 Added an interactive punctuation-only ripple tank beside the homepage hero.
 The shallow-water field has fixed-step propagation, damping, smooth currents,
