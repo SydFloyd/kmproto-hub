@@ -1,7 +1,15 @@
 # Square K upright in mobile desktop view
 
 Updated: 2026-10-05
-Status: local checks passed; publishing to kmproto.com.
+Status: published and verified at https://www.kmproto.com.
+
+Production source: 7b3d70d6c253ca9296356f3e8881289a0b68101d, pushed to main.
+Vercel production deployment 6851336414 reports success at
+2026-10-05T04:25:46Z. The live application bundle matches the verified local
+build byte for byte. Focused live shape checks pass at 1440px desktop, 390px
+mobile and 390px phone emulation with 980px/1024px desktop layouts. Both ends
+of the K upright retain matching full-width corners. No page errors or
+horizontal overflow. Evidence: ignored outputs/k-stem-live.json and screenshots.
 
 Reproduced the tapered K stem in a 390px phone viewport with desktop layouts
 of 980px and 1024px at device pixel ratio 3. The 980px view used a 52×44 wave
@@ -20,7 +28,7 @@ outputs/k-stem-local.json and matching screenshots. Interaction checks at
 1440/768/390/320px pass pointer/touch, keyboard, native and fallback full screen,
 Escape/focus, reduced motion and landscape, with no page errors, horizontal
 overflow or automated WCAG A/AA violations. Evidence: ignored
-outputs/ripple-square-k-local.json and screenshots. Publication verification follows.
+outputs/ripple-square-k-local.json and screenshots.
 
 ## Earlier release: Fuller KM and softer reflections
 
