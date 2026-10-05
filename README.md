@@ -36,17 +36,20 @@ move a cursor, Space/Enter drops a pebble, and P pauses or resumes. Scrolling,
 text selection and links stay native. The corner icon offers native full screen
 or a viewport fallback. Reduced motion starts still and responds to input.
 
-The solver runs in a request-driven worker with one transferable buffer and one
+The solver runs in a request-driven worker with one reusable frame buffer and one
 pending pointer segment. A tick has at most 12 solver steps and 16 wake samples.
 WebGL draws the punctuation and fine, square KM lettering in one batch. Phone
 budgets are 1,600 water nodes, 900 letter nodes, 1,100 solver cells and 650,000
 backing pixels; desktop ceilings are 2,600 / 1,200 / 1,800 / 1,000,000. Quality
 reduces under sustained pressure, including texture-upload and presentation
-cost. An overloaded, unavailable or software-emulated GPU uses a software renderer with cached
-punctuation stamps and one pixel upload: at most 450 water nodes, 360 letter
-nodes, 360 solver cells and 160,000 pixels. Blocked or stalled workers use that
-same small field locally. Continued overload switches to input-driven snapshots
-that fade to stillness. Normal interaction targets 30 fps; quiet GPU currents
+cost. An overloaded, unavailable or software-emulated GPU uses cached punctuation
+stamps on a transferred OffscreenCanvas: both simulation and drawing stay in the
+worker, with only a small completion message sent to the page. This path caps
+water nodes at 450, letter nodes at 360, solver cells at 360 and pixels at 160,000.
+Browsers without canvas transfer draw the same small surface on the page;
+blocked or stalled workers also use the small field locally. Continued overload
+switches to input-driven snapshots that fade to stillness. Normal interaction
+targets 30 fps; quiet GPU currents
 paint at 8–12 fps, while quiet software rendering sleeps. Hidden and offscreen
 views stop scheduling work. Run `npm run test:ripple-tank` for field physics,
 flat startup, node/pixel limits, bounded input, transfer reuse and quality control.

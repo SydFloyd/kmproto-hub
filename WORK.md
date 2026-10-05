@@ -1,7 +1,7 @@
 # Mobile animation repair — preview verification
 
 Updated: 2026-10-05
-Status: implementation ready for preview; Samsung device verification and
+Status: sustained performance gate passes; Samsung device verification and
 production promotion remain pending.
 
 The user's Samsung froze on the previous wave implementation. Earlier desktop
@@ -13,13 +13,16 @@ Blueprint and its tests are removed. Startup is now exactly 50/50 waves/marble;
 the unselected engine is not fetched. Direct verification links use
 `?animation=waves` and `?animation=marble`.
 
-Waves now use a bounded worker field, one transferable frame buffer, coalesced
+Waves now use a bounded worker field, one reusable frame buffer, coalesced
 pointer input, capped catch-up, and one WebGL punctuation batch. Fine KM nodes
 remain independent of the solver grid. Startup is flat, water covers the full
 ribbon, and shader opacity protects the copy. Node/pixel ceilings and automatic
 quality reduction cover ordinary and zoomed-out phone views. GPU loss/overload
-uses a software punctuation buffer; blocked/stalled workers use the small field
-locally. Further overload fades to interactive still snapshots. Idle, hidden,
+or software-emulated WebGL uses a transferred OffscreenCanvas: the worker owns
+the software punctuation drawing as well as the field, and replies with a small
+completion message. Browsers without canvas transfer retain the small main-thread
+renderer; blocked/stalled workers also use the small field locally. Further
+overload fades to interactive still snapshots. Idle, hidden,
 offscreen and reduced-motion scheduling are bounded. Waking from deliberate
 idle must not count as a missed frame deadline.
 
@@ -34,46 +37,41 @@ Validation: production build, TypeScript, lint and 23 physics/runtime checks
 pass. Browser checks cover 1440/390/320/1024 px, visible marble pixels and actual
 phase progression, lazy loading, untouched scrolling, native/fallback full
 screen, rotation, offscreen/hidden suspension, reduced-motion opt-in, lost GPU
-contexts and stalled workers. No page errors. The refined software fallback
-sustained 30 fps at 4x CPU throttling, p95 draw 6.6 ms, no long tasks, 159,210
-backing pixels. Earlier fallback/profile failures were investigated and fixed;
-they are not counted as passing release evidence.
+contexts and stalled workers. Missing or failed canvas transfer falls back to
+main-thread drawing, and blocked worker construction falls back to the local
+solver; each path remains interactive. No page errors. The final five-minute stress run
+uses 4x CPU throttling, continuous pointer input and pebbles, full screen and
+rotation. Actual completed worker frames average 29.7–30.0 fps in every minute,
+with zero long tasks, no emergency fallback and no overlapping worker jobs.
+Main-thread p95 work is 0.3–0.4 ms in portrait and 1.8 ms during the landscape
+minute. Worker p95 work is 1.1–1.2 ms in portrait and 6.8 ms in landscape. Backing
+pixels remain below 160,000. Retained main-thread heap growth is 260,998 bytes;
+garbage collection is forced only outside the timing window. This passes the
+sustained performance gate on this host. It is not a physical Samsung benchmark.
 
-The first five-minute stress test on this host's SwiftShader software WebGL
-backend did not meet the sustained 30 fps/no-long-task gate: it automatically
-fell back and then held a responsive 7.5 fps snapshot mode, with no long tasks
-in minutes 2–5 and bounded memory. This is not claimed as a passing smoothness
-result. Hardware-backend detection now skips software WebGL entirely and starts
-with the small pixel renderer. Sparse glyph stamps then removed transparent
-pixel work, and the governor now requires repeated overload rather than treating
-one resize hitch as permanent pressure. Full-screen finger dragging also leaves
-a wake, while normal page gestures still scroll.
-
-Final five-minute stress result (4x CPU throttling, continuous pointer input and
-pebbles, full screen and rotation): the first minute held 30 fps with p95 draw
-3.3 ms. Sustained full-screen load still activated the deliberately quiet
-snapshot fallback, averaging about 7.5 fps afterward. Three long tasks were
-observed during minute 2; minutes 3–5 had none. Retained heap growth after the
-run was 342,978 bytes. The harness now forces garbage collection only outside
-the timing window. This run does NOT pass the strict sustained-30-fps gate;
-that limitation remains explicit, and production is not being promoted.
-An isolated, fully lit fallback drawing test held 30 fps in full screen with
-p95 draw 4.7 ms. Device feedback is required to judge actual Samsung behavior.
+Earlier five-minute runs are retained as failed evidence: software WebGL and
+then main-thread software drawing triggered the 7.5 fps snapshot fallback under
+sustained load. Hardware-backend detection, sparse glyph stamps and a governor
+that tolerates isolated resize hitches helped short tests, but moving software
+painting into the worker resolved the prolonged test. Full-screen finger
+dragging leaves a wake while normal page gestures still scroll.
 
 Final interaction checks pass for full-screen touch wakes without a tap and
 exact 50/50 startup boundaries. Normal touch scrolling and accessibility checks
 also pass. The remaining release gate is the actual Samsung/browser check;
 a concise question with direct theme previews has been sent to the user.
 
-Preview source d90999e6b99dc5284311c907811701fb6cb31294 deployed successfully as
-Vercel preview 6859839779. All nine homepage/theme/worker assets match the local
-build. The concrete preview was shared for the Samsung check. Follow-ups add
-the software-backend bypass and final fallback optimizations; production remains
+Earlier preview source 0a17b7485bb2fc48f495f9128e6b03e31e197f8b deployed
+successfully as Vercel preview 6860806528. All nine homepage/theme/worker assets
+matched that local build. The current follow-up adds worker-owned software
+drawing and will replace that preview for the Samsung check; production remains
 unchanged pending device feedback.
 Final phone and zoomed-out desktop-phone screenshots were inspected; native
 swiping and automated WCAG A/AA checks pass without overflow or page errors.
 
-Evidence is in ignored `outputs/animation-behavior.json`,
+Current evidence is in ignored `outputs/worker-paint-soak.json`,
+`outputs/check-worker-behavior.cjs`, `outputs/check-worker-touch.cjs`, and
+the worker-paint screenshots. Historical evidence is in `outputs/animation-behavior.json`,
 `outputs/animation-fallback-profile.json`, `outputs/animation-soak.json`,
 `outputs/animation-soak-final.json` and `outputs/animation-final-visuals.json`.
 Private pricing documents are excluded from staging and deployment.

@@ -20,7 +20,7 @@ export default function RippleTank() {
     try { pool = new PoolController(surface, instrument, zone, mode, setMode); }
     catch (error) {
       if (mode === "local") return;
-      const retry = requestAnimationFrame(() => setMode(error instanceof Error && error.message === "worker" ? "local" : mode === "gpu" ? "canvas" : "local"));
+      const retry = requestAnimationFrame(() => setMode(error instanceof Error && error.message === "worker" ? "local" : mode === "gpu" ? "worker" : mode === "worker" ? "canvas" : "local"));
       return () => cancelAnimationFrame(retry);
     }
     controller.current = pool;

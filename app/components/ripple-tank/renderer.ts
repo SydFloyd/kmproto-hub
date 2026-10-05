@@ -202,7 +202,7 @@ export class QuietWaterRenderer implements WaterRenderer {
   private nodes: { x: number; y: number; size: number; alpha: number; letter: number; u: number; v: number }[] = [];
   private stamps = new Map<number, Uint16Array[]>();
   private colors: number[][] = [];
-  constructor(private canvas: HTMLCanvasElement, private ctx: CanvasRenderingContext2D) {
+  constructor(private canvas: HTMLCanvasElement | OffscreenCanvas, private ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D) {
     for (const [base, peak] of [[[29, 60, 80], [102, 173, 190]], [[41, 86, 104], [196, 244, 226]], [[42, 100, 112], [249, 231, 198]]]) {
       for (let i = 0; i < 8; i++) this.colors.push(base.map((value, j) => Math.round(value + (peak[j] - value) * (i / 7) ** 0.75)));
     }
@@ -215,8 +215,9 @@ export class QuietWaterRenderer implements WaterRenderer {
     for (let i = 0; i < layout.points.length; i += 6) {
       const x = layout.points[i], y = layout.points[i + 1], size = Math.max(2, Math.round(layout.points[i + 4] * layout.ratio));
       if (!this.stamps.has(size)) {
-        const sheet = document.createElement("canvas"); sheet.width = size * 5; sheet.height = size;
-        const ink = sheet.getContext("2d", { willReadFrequently: true })!;
+        const sheet = typeof document === "undefined" ? new OffscreenCanvas(size * 5, size) : document.createElement("canvas");
+        sheet.width = size * 5; sheet.height = size;
+        const ink = sheet.getContext("2d", { willReadFrequently: true }) as CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D;
         ink.fillStyle = "white"; ink.font = `${size * 26 / 32}px "Courier New", monospace`; ink.textAlign = "center"; ink.textBaseline = "middle";
         ["·", ",", ":", "~", "≈"].forEach((mark, j) => ink.fillText(mark, (j + 0.5) * size, size / 2));
         this.stamps.set(size, Array.from({ length: 5 }, (_, j) => {

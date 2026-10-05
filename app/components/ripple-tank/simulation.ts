@@ -1,12 +1,16 @@
 import { RippleField } from "./field.ts";
 import type { MonogramPlacement } from "./field.ts";
+import type { PoolLayout } from "./geometry.ts";
 
 export type PoolInput = { x: number; y: number; fromX?: number; fromY?: number; drop?: boolean };
-export type PoolConfig = { generation: number; columns: number; rows: number; placement: MonogramPlacement };
+export type PoolConfig = { generation: number; columns: number; rows: number; placement: MonogramPlacement; layout?: PoolLayout };
+export type PoolDraw = { time: number; cursor: { x: number; y: number; visible: boolean }; energy: number };
 export type PoolRequest =
-  | { type: "configure"; config: PoolConfig }
-  | { type: "tick"; generation: number; steps: number; input: PoolInput | null; buffer: ArrayBuffer; reset?: boolean };
-export type PoolFrame = { generation: number; columns: number; rows: number; active: boolean; time: number; buffer: ArrayBuffer };
+  | { type: "surface"; canvas: OffscreenCanvas }
+  | { type: "configure"; config: PoolConfig; draw?: PoolDraw }
+  | { type: "tick"; generation: number; steps: number; input: PoolInput | null; buffer: ArrayBuffer; reset?: boolean; draw?: PoolDraw };
+export type PoolJob = Exclude<PoolRequest, { type: "surface" }>;
+export type PoolFrame = { generation: number; columns: number; rows: number; active: boolean; time: number; buffer: ArrayBuffer; rendered?: boolean; workMs?: number };
 
 export class WaveSimulation {
   water: RippleField | null = null;
