@@ -1,7 +1,24 @@
 # Calm water across the full hero ribbon
 
 Updated: 2026-10-05
-Status: locally verified; publication to https://www.kmproto.com in progress.
+Status: published and verified at https://www.kmproto.com.
+
+Production source: 9664e9883bf02b3816e73c84a719117c5c493180, pushed to main.
+Vercel production deployment 6853325161 reports success at
+2026-10-05T07:11:15Z. All homepage JavaScript and CSS assets match the
+verified production build byte for byte. Evidence: ignored
+outputs/ripple-ribbon-live-bundle.json.
+
+Public wave checks pass at 1440/768/390/320px and phone desktop layouts
+of 980px/1024px: flat startup, full ribbon bounds, protected copy, pointer
+wakes over text, actual click/tap KM reveals, selection, working service
+links, native wheel/touch scrolling, native/fallback full screen, reduced
+motion and landscape. Fine-letter checks confirm square K corners and the
+same node limits. Offscreen/hidden suspension, print and exact one-third
+startup boundaries also pass. No page errors, overflow or desktop automated
+WCAG A/AA violations. Evidence: ignored outputs/ripple-ribbon-live.json,
+outputs/ripple-ribbon-shape-live.json, outputs/ripple-ribbon-lifecycle-live.json,
+outputs/hero-thirds-selection-live.json and corresponding screenshots.
 
 The waves now cover the entire hero section, including its padding and the
 area behind the business copy. One continuous field carries pointer wakes
