@@ -22,59 +22,48 @@ with matching entries for the Lab and games (served via `cleanUrls`).
 `public/og.png` is the 1200×630 social card. Typography uses
 system fonts; the site does not fetch external fonts.
 
-The homepage chooses the ASCII ripple tank, infinite blueprint or obliging
-marble machine with a one-third chance each on startup. `app/components/HeroAnimation.tsx` keeps
-that choice stable during interaction and mounts only the selected engine.
+The homepage chooses the ASCII ripple tank or obliging marble machine with an
+equal chance on each startup. `app/components/HeroAnimation.tsx` lazy-loads only
+the selected engine. For device verification, `?animation=waves` and
+`?animation=marble` select a specific theme. Blueprint has been removed.
 
-The ASCII ripple tank lives in `app/components/ripple-tank/`.
-Its fixed-step damped wave field reflects from a hidden KM monogram, revealing
-the letters only while waves pass. The water uses only `· , : ~ ≈`; pointer
-movement leaves a wake, clicking or tapping drops a pebble, and arrow keys plus
-Space/Enter provide keyboard interaction; P pauses or resumes the water.
-Transparent rendering and softly fading edges blend the water into the hero,
-with no frame or visible text. A small corner icon expands the tank using the
-browser full-screen API with an immersive viewport fallback. Reduced-motion
-users start with a still surface that responds to input; rendering stops offscreen.
-The hero uses a deep ocean palette with curved cyan currents and warm gold
-glints when ripples reach KM. Its strokes emerge in a soft champagne
-reflection that gathers gently and fades back into the water. Punctuation
-uses a finer grid for KM, with partial edge brightness to keep the strokes
-even on mobile. The letter nodes sample the existing wave field and draw
-only during a reveal. Cached glyphs and a shared ceiling of 4,400 water
-points plus 1,200 letter points bound the rendering work. The display paints
-at 30 fps while the solver retains its fixed timestep.
-Run `npm run test:ripple-tank` for reflection, reveal, damping and stability.
+The ASCII ripple tank lives in `app/components/ripple-tank/`. A damped wave
+field reflects from the hidden KM and reveals it only during wave contact.
+It starts flat, fills the entire hero ribbon, and attenuates beneath the copy.
+Pointer movement leaves a wake; clicking or tapping drops a pebble. Arrow keys
+move a cursor, Space/Enter drops a pebble, and P pauses or resumes. Scrolling,
+text selection and links stay native. The corner icon offers native full screen
+or a viewport fallback. Reduced motion starts still and responds to input.
 
-The infinite blueprint lives in `app/components/blueprint/`. Circuits contain
-street plans, buildings contain machines, and machines contain circuits.
-Each component already displays its child's actual layout; seeded geometry,
-shared entrances and matching camera transforms preserve it through the dive.
-Click or tap a component to explore, and use the small Surface control to return
-to the root. Arrow keys select, Enter/Space dives, Backspace returns one level,
-and P pauses the quiet signal and construction-mark animation. Normal wheel,
-touch scrolling and pinch zoom remain native. It shares the corner full-screen
-icon and immersive fallback, with instant navigation for reduced-motion users.
-Static detail is cached; only the current sheet and an incoming sheet are kept.
-The backing canvas is capped at 3 million pixels and each sheet at 2 million;
-painting is limited to 30 fps and suspended offscreen or in a hidden tab.
-Run `npm run test:blueprint` for inheritance, seamless camera alignment,
-deterministic return paths, deep exploration and navigation.
+The solver runs in a request-driven worker with one transferable buffer and one
+pending pointer segment. A tick has at most 12 solver steps and 16 wake samples.
+WebGL draws the punctuation and fine, square KM lettering in one batch. Phone
+budgets are 1,600 water nodes, 900 letter nodes, 1,100 solver cells and 650,000
+backing pixels; desktop ceilings are 2,600 / 1,200 / 1,800 / 1,000,000. Quality
+reduces under sustained pressure, including texture-upload and presentation
+cost. An overloaded or unavailable GPU uses a software renderer with cached
+punctuation stamps and one pixel upload: at most 450 water nodes, 360 letter
+nodes, 360 solver cells and 160,000 pixels. Blocked or stalled workers use that
+same small field locally. Continued overload switches to input-driven snapshots
+that fade to stillness. Normal interaction targets 30 fps; quiet GPU currents
+paint at 8–12 fps, while quiet software rendering sleeps. Hidden and offscreen
+views stop scheduling work. Run `npm run test:ripple-tank` for field physics,
+flat startup, node/pixel limits, bounded input, transfer reuse and quality control.
 
-The obliging marble machine lives in `app/components/marble-machine/`.
-One engraved marble rolls around a continuous monochrome rail loop, with a
-powered return lift and a brief release at the top. An approaching pointer
-opens a local detour: the upper rail becomes a bridge, the lower platform
-telescopes, and a falling counterweight opens the hinged passage. The marble
-waits for clearance when necessary. Critically damped joints follow the pointer
-and fold back to the exact original rail when it leaves. A touch tap holds the
-obstruction briefly; vertical swipes and pinch zoom remain native. Arrow keys
-move an imaginary obstruction, Space/Enter places it, Escape clears it, and P
-pauses the marble. Reduced motion uses still, immediately responsive poses.
-The static chassis is cached, the rail has 180 nodes at every screen size,
-and the 30 fps display stops painting offscreen or in hidden tabs. The
-full-screen icon uses native expansion and a focused viewport fallback.
-Run `npm run test:marble-machine` for loop continuity, clearance, courtesy
-waiting, exact folding, reduced-motion poses and stability under rapid input.
+The obliging marble machine lives in `app/components/marble-machine/`. One
+solid ivory marble, at least 11 screen pixels across, rolls around a continuous
+monochrome rail loop with a return lift and a brief release at the top. The
+upper rail bends into a bridge, the lower platform extends, and a counterweight
+opens the hinged passage around a pointer. The marble waits for clearance and
+resumes after the joints make room. Moving away folds the original rail back.
+Touch taps briefly hold an obstruction; swipes and pinch zoom stay native.
+Arrow keys place an imaginary pointer, Space/Enter engages it, Escape clears it,
+and P or the small playback icon pauses/resumes. The play control explicitly
+opts into animation when reduced motion is enabled. Chassis and settled
+mechanisms are cached, the rail has 180 nodes, the backing surface is capped at
+650,000 pixels, and the 30 fps loop sleeps while paused, hidden or offscreen.
+Run `npm run test:marble-machine` for continuity, clearance, stationary-obstacle
+recovery, folding, reduced-motion poses and minimum marble visibility.
 
 Browser games have their own Vite entry points, so their engines are loaded only
 on game pages. `app/lab/games/catalog.ts` supplies the Games portal's cards;

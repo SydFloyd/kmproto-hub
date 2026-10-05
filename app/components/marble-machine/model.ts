@@ -1,6 +1,8 @@
 export type Point = { x: number; y: number };
 export type RailNode = Point & { nx: number; ny: number; arc: number };
 export const WIDTH = 960, HEIGHT = 700, NODE_COUNT = 180, MARBLE_RADIUS = 8;
+// Keep the sphere legible even in a phone’s zoomed-out desktop viewport.
+export const visibleRadius = (scale: number, viewportScale = 1) => Math.max(MARBLE_RADIUS, 5.5 / Math.max(0.01, scale * viewportScale));
 const clamp = (n: number, a: number, b: number) => Math.max(a, Math.min(b, n));
 const smooth = (n: number) => { n = clamp(n, 0, 1); return n * n * (3 - 2 * n); };
 const distance = (a: Point, b: Point) => Math.hypot(a.x - b.x, a.y - b.y);
@@ -48,6 +50,7 @@ export class MarbleMachine {
   private readonly arcs = new Float64Array(NODE_COUNT + 1);
   pointer: Point | null = null;
   clearance = 58;
+  revision = 0;
   phase = 0.075;
   time = 0;
   laps = 0;
@@ -125,6 +128,7 @@ export class MarbleMachine {
   }
 
   private updateRail() {
+    this.revision++;
     this.bridge = 0; this.platform = 0; this.gate = 0;
     for (let i = 0; i < NODE_COUNT; i++) {
       const base = this.base[i], offset = this.offsets[i];

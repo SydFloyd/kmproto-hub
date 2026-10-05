@@ -50,7 +50,7 @@ export class RippleField {
   time = 0;
   active = false;
 
-  constructor(columns: number, rows: number, placement?: MonogramPlacement) {
+  constructor(columns: number, rows: number, placement?: MonogramPlacement, solidCoverage = 0.5) {
     this.columns = columns;
     this.rows = rows;
     const count = columns * rows;
@@ -60,6 +60,7 @@ export class RippleField {
     const monogram = createMonogram(columns, rows, placement?.size, placement);
     this.mask = monogram.mask;
     this.coverage = monogram.coverage;
+    if (solidCoverage < 0.5) for (let i = 0; i < count; i++) this.mask[i] = Number(this.coverage[i] >= solidCoverage);
     this.reveal = new Float32Array(count);
     this.contacts = Array.from({ length: count }, () => []);
     // Letter nodes sample adjacent water, including partial edges and the inner

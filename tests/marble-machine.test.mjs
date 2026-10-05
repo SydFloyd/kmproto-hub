@@ -89,3 +89,20 @@ test('rapid input, frame stalls and paused interaction keep the mechanism finite
   assert.ok(machine.offsets.every(Number.isFinite)); assert.ok(machine.points.every(p => Number.isFinite(p.x) && Number.isFinite(p.y)));
   machine.setPointer(null); settle(machine); assert.ok(machine.offsets.every(n => n === 0));
 });
+
+test('a stationary visitor anywhere along the loop cannot permanently strand the marble', () => {
+  for (const index of [0, 12, 24, 40, 61, 73, 91, 111, 137, 159, 171]) {
+    const machine = new MarbleMachine(); machine.clearance = 76;
+    machine.phase = index / NODE_COUNT;
+    machine.setPointer(BASE_RAIL[index]);
+    for (let i = 0; i < 30 * 90; i++) machine.advance(1 / 30);
+    assert.ok(machine.laps >= 1, `no full lap around obstruction at ${index}`);
+  }
+});
+
+test('the visible marble stays at least eleven screen pixels across on phone and desktop views', async () => {
+  const { visibleRadius } = await import('../app/components/marble-machine/model.ts');
+  for (const [scale, viewport] of [[.32, 1], [.53, .38], [.6, 1], [1.3, 1]]) {
+    assert.ok(visibleRadius(scale, viewport) * scale * viewport * 2 >= 10.999);
+  }
+});

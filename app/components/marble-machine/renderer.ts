@@ -1,4 +1,4 @@
-import { HEIGHT, MARBLE_RADIUS, NODE_COUNT, WIDTH } from "./model";
+import { HEIGHT, NODE_COUNT, WIDTH, visibleRadius } from "./model";
 import type { MarbleMachine, Point } from "./model";
 
 const COLOR = "#dce7e0";
@@ -32,6 +32,11 @@ export class MarbleRenderer {
   scale = 1;
   ratio = 1;
   private plate: HTMLCanvasElement | null = null;
+  private mechanism: HTMLCanvasElement | null = null;
+  private mechanismRevision = -1;
+  pageX = 0;
+  pageY = 0;
+  radius = 8;
   keyboard: Point | null = null;
   constructor(readonly canvas: HTMLCanvasElement, readonly ctx: CanvasRenderingContext2D,
     readonly model: MarbleMachine) {}
@@ -39,11 +44,14 @@ export class MarbleRenderer {
   resize() {
     const bounds = this.canvas.getBoundingClientRect(); this.width = bounds.width; this.height = bounds.height;
     if (!this.width || !this.height) return;
-    this.ratio = Math.min(window.devicePixelRatio || 1, 2, Math.sqrt(3_000_000 / (this.width * this.height)));
+    this.pageX = bounds.left + scrollX; this.pageY = bounds.top + scrollY;
+    const density = (devicePixelRatio || 1) * Math.min(1, visualViewport?.scale || 1);
+    this.ratio = Math.min(density, 1.5, Math.sqrt(650_000 / (this.width * this.height)));
     this.scale = Math.min(this.width / WIDTH, this.height / HEIGHT) * 0.96;
+    this.radius = visibleRadius(this.scale, visualViewport?.scale || 1);
     this.canvas.width = Math.floor(this.width * this.ratio); this.canvas.height = Math.floor(this.height * this.ratio);
     this.model.clearance = Math.min(76, Math.max(48, 23 / this.scale));
-    this.model.setPointer(null, true); this.plate = null; this.draw();
+    this.model.setPointer(null, true); this.plate = null; this.mechanism = null; this.draw();
   }
   point(x: number, y: number): Point {
     return { x: (x - this.width / 2) / this.scale + WIDTH / 2, y: (y - this.height / 2) / this.scale + HEIGHT / 2 };
@@ -85,13 +93,13 @@ export class MarbleRenderer {
     for (const x of [380, 580]) path(ctx, [{ x, y: 585 }, { x: x + 8, y: 585 }]);
     this.plate = plate; return plate;
   }
-  draw() {
-    if (!this.width || !this.height) return;
-    const ctx = this.ctx, model = this.model, marble = model.marble();
-    ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    ctx.setTransform(this.ratio, 0, 0, this.ratio, 0, 0);
-    ctx.translate(this.width / 2 - WIDTH / 2 * this.scale, this.height / 2 - HEIGHT / 2 * this.scale); ctx.scale(this.scale, this.scale);
-    ctx.drawImage(this.background(), 0, 0, WIDTH, HEIGHT);
+  private mechanismLayer() {
+    if (this.mechanism && this.mechanismRevision === this.model.revision) return this.mechanism;
+    const layer = this.mechanism || document.createElement("canvas"), scale = Math.min(this.scale * this.ratio, 1.5);
+    if (!this.mechanism) { layer.width = Math.ceil(WIDTH * scale); layer.height = Math.ceil(HEIGHT * scale); }
+    const ctx = layer.getContext("2d")!, model = this.model;
+    ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, layer.width, layer.height);
+    ctx.setTransform(layer.width / WIDTH, 0, 0, layer.height / HEIGHT, 0, 0);
     ctx.strokeStyle = COLOR; ctx.fillStyle = COLOR; ctx.lineWidth = 1.5; ctx.lineJoin = "round"; ctx.lineCap = "round";
     // Two continuous rail edges. Their joints actually carry the moving marble.
     for (const side of [-1, 1]) {
@@ -128,6 +136,19 @@ export class MarbleRenderer {
     rod(ctx, hinge, { x: gate.x + 17, y: gate.y + 13 }, 7); circle(ctx, hinge.x, hinge.y, 7);
     ctx.strokeRect(840, weightY, 26, 38);
     for (let y = 8; y < 36; y += 7) path(ctx, [{ x: 845, y: weightY + y }, { x: 861, y: weightY + y }]);
+    this.mechanism = layer; this.mechanismRevision = model.revision;
+    return layer;
+  }
+  draw() {
+    if (!this.width || !this.height) return;
+    const ctx = this.ctx, model = this.model, marble = model.marble();
+    ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    ctx.setTransform(this.ratio, 0, 0, this.ratio, 0, 0);
+    ctx.translate(this.width / 2 - WIDTH / 2 * this.scale, this.height / 2 - HEIGHT / 2 * this.scale); ctx.scale(this.scale, this.scale);
+    ctx.drawImage(this.background(), 0, 0, WIDTH, HEIGHT);
+    ctx.drawImage(this.mechanismLayer(), 0, 0, WIDTH, HEIGHT);
+    ctx.strokeStyle = COLOR; ctx.fillStyle = COLOR; ctx.lineWidth = 1.5; ctx.lineJoin = "round"; ctx.lineCap = "round";
+    const courtesy = Math.max(model.gate, model.bridge * 0.25, model.platform * 0.35);
     ctx.globalAlpha = 0.42; bearing(ctx, 839, 230, 19, courtesy * 2 + model.time * 0.08);
     // A linked cradle carries the marble up the return lift, then quietly releases it.
     const onLift = marble.x < 211 && marble.ty < -0.25;
@@ -143,11 +164,15 @@ export class MarbleRenderer {
     const release = Math.max(0, 1 - Math.min(model.phase, 1 - model.phase) * 40);
     ctx.save(); ctx.translate(214, 193); ctx.rotate(-0.22 - release * 0.45 - model.bridge * 0.25);
     path(ctx, [{ x: 0, y: 0 }, { x: 24, y: 0 }, { x: 24, y: 5 }]); circle(ctx, 0, 0, 3); ctx.restore();
-    // A single, unadorned sphere. A rotating engraved arc makes its roll legible.
-    ctx.globalAlpha = 1; ctx.fillStyle = "#0a2832"; ctx.beginPath(); ctx.arc(marble.x, marble.y, MARBLE_RADIUS, 0, Math.PI * 2); ctx.fill();
-    ctx.lineWidth = 2; circle(ctx, marble.x, marble.y, MARBLE_RADIUS);
-    ctx.lineWidth = 1; ctx.globalAlpha = 0.55;
-    ctx.beginPath(); ctx.arc(marble.x, marble.y, MARBLE_RADIUS * 0.56, model.rotation, model.rotation + Math.PI * 0.7); ctx.stroke();
+    // Solid ivory reads as the one moving object, with a turning dark engraving.
+    const radius = this.radius;
+    ctx.globalAlpha = 1; ctx.fillStyle = "#f5f4df"; ctx.strokeStyle = "#071a24";
+    ctx.beginPath(); ctx.arc(marble.x, marble.y, radius, 0, Math.PI * 2); ctx.fill();
+    ctx.lineWidth = Math.max(1.5, 0.8 / this.scale); ctx.stroke();
+    ctx.strokeStyle = "#476165"; ctx.lineWidth = Math.max(1.2, 0.7 / this.scale);
+    ctx.beginPath(); ctx.arc(marble.x, marble.y, radius * 0.55, model.rotation, model.rotation + Math.PI * 0.8); ctx.stroke();
+    ctx.fillStyle = "#fffef3"; ctx.beginPath(); ctx.arc(marble.x - radius * 0.27, marble.y - radius * 0.29, radius * 0.2, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = COLOR;
     if (this.keyboard) {
       ctx.globalAlpha = 0.42; ctx.setLineDash([3, 6]); circle(ctx, this.keyboard.x, this.keyboard.y, model.clearance - 8); ctx.setLineDash([]);
     }

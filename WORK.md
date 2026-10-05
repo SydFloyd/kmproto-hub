@@ -1,3 +1,50 @@
+# Mobile animation repair — preview verification
+
+Updated: 2026-10-05
+Status: implementation ready for preview; Samsung device verification and
+production promotion remain pending.
+
+The user's Samsung froze on the previous wave implementation. Earlier desktop
+and emulated-device checks did not establish acceptable performance on that
+phone, and the earlier 9–11 fps throttled result was insufficient. This repair
+replaces the expensive path rather than treating those checks as a release gate.
+
+Blueprint and its tests are removed. Startup is now exactly 50/50 waves/marble;
+the unselected engine is not fetched. Direct verification links use
+`?animation=waves` and `?animation=marble`.
+
+Waves now use a bounded worker field, one transferable frame buffer, coalesced
+pointer input, capped catch-up, and one WebGL punctuation batch. Fine KM nodes
+remain independent of the solver grid. Startup is flat, water covers the full
+ribbon, and shader opacity protects the copy. Node/pixel ceilings and automatic
+quality reduction cover ordinary and zoomed-out phone views. GPU loss/overload
+uses a software punctuation buffer; blocked/stalled workers use the small field
+locally. Further overload fades to interactive still snapshots. Idle, hidden,
+offscreen and reduced-motion scheduling are bounded. Waking from deliberate
+idle must not count as a missed frame deadline.
+
+The marble is solid ivory and at least 11 screen pixels in diameter, including
+phone desktop mode. Explicit play overrides reduced motion; keyboard P and the
+small playback button both pause/resume. Stationary railwork is cached by a
+geometry revision, moving parts stay live, pointer work is coalesced, and the
+loop stops scheduling when paused/hidden/offscreen. A stationary-obstruction
+sweep verifies that the marble resumes and completes its loop.
+
+Validation: production build, TypeScript, lint and 22 physics/runtime checks
+pass. Browser checks cover 1440/390/320/1024 px, visible marble pixels and actual
+phase progression, lazy loading, untouched scrolling, native/fallback full
+screen, rotation, offscreen/hidden suspension, reduced-motion opt-in, lost GPU
+contexts and stalled workers. No page errors. The refined software fallback
+sustained 30 fps at 4x CPU throttling, p95 draw 6.6 ms, no long tasks, 159,210
+backing pixels. Earlier fallback/profile failures were investigated and fixed;
+they are not counted as passing release evidence. A longer run is in progress.
+
+Evidence is in ignored `outputs/animation-behavior.json`,
+`outputs/animation-fallback-profile.json` and `outputs/animation-soak.json`.
+Private pricing documents are excluded from staging and deployment.
+
+---
+
 # Calm water across the full hero ribbon
 
 Updated: 2026-10-05

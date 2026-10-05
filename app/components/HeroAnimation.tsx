@@ -1,20 +1,31 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import Blueprint from "./blueprint/Blueprint";
-import RippleTank from "./ripple-tank/RippleTank";
-import MarbleMachine from "./marble-machine/MarbleMachine";
+import { Component, lazy, Suspense, useEffect, useState } from "react";
+import type { ReactNode } from "react";
+import "./ripple-tank/ripple-tank.css";
+
+const RippleTank = lazy(() => import("./ripple-tank/RippleTank"));
+const MarbleMachine = lazy(() => import("./marble-machine/MarbleMachine"));
+const placeholder = <div className="hero-animation-placeholder" aria-hidden="true" />;
+
+class AnimationBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
+  state = { failed: false };
+  static getDerivedStateFromError() { return { failed: true }; }
+  render() { return this.state.failed ? placeholder : this.props.children; }
+}
 
 export default function HeroAnimation() {
-  const [theme, setTheme] = useState<"waves" | "blueprint" | "marble" | null>(null);
+  const [theme, setTheme] = useState<"waves" | "marble" | null>(null);
   useEffect(() => {
     // Choose once per page load; only the selected canvas engine is mounted.
     const frame = requestAnimationFrame(() => {
-      const roll = Math.random();
-      setTheme(roll < 1 / 3 ? "waves" : roll < 2 / 3 ? "blueprint" : "marble");
+      const preview = new URLSearchParams(location.search).get("animation");
+      setTheme(preview === "waves" || preview === "marble" ? preview : Math.random() < 0.5 ? "waves" : "marble");
     });
     return () => cancelAnimationFrame(frame);
   }, []);
-  if (!theme) return <div className="hero-animation-placeholder" aria-hidden="true" />;
-  return theme === "waves" ? <RippleTank /> : theme === "blueprint" ? <Blueprint /> : <MarbleMachine />;
+  if (!theme) return placeholder;
+  return <AnimationBoundary><Suspense fallback={placeholder}>
+    {theme === "waves" ? <RippleTank /> : <MarbleMachine />}
+  </Suspense></AnimationBoundary>;
 }
