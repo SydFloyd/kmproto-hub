@@ -61,15 +61,19 @@ exact 50/50 startup boundaries. Normal touch scrolling and accessibility checks
 also pass. The remaining release gate is the actual Samsung/browser check;
 a concise question with direct theme previews has been sent to the user.
 
-Earlier preview source 0a17b7485bb2fc48f495f9128e6b03e31e197f8b deployed
-successfully as Vercel preview 6860806528. All nine homepage/theme/worker assets
-matched that local build. The current follow-up adds worker-owned software
-drawing and will replace that preview for the Samsung check; production remains
-unchanged pending device feedback.
+Preview source 26f6618814f35cc9beaae27a3353ba241ae32914 deployed successfully
+as Vercel preview 6861886459 at 2026-10-05T14:38:25Z:
+https://kmproto-zlzk9ie54-kyle-millers-projects-456dcebb.vercel.app
+All nine homepage/theme/worker assets match the tested local build. Public HTTP
+200 and live phone-layout checks pass: flat water startup, tap-driven visible
+ripples, worker-owned painting, moving marble, selected-engine-only loading,
+no overflow and no page errors. Both screenshots were inspected. Production
+remains unchanged pending actual Samsung feedback.
 Final phone and zoomed-out desktop-phone screenshots were inspected; native
 swiping and automated WCAG A/AA checks pass without overflow or page errors.
 
-Current evidence is in ignored `outputs/worker-paint-soak.json`,
+Current evidence is in ignored `outputs/worker-preview-verification.json`,
+`outputs/worker-paint-soak.json`,
 `outputs/check-worker-behavior.cjs`, `outputs/check-worker-touch.cjs`, and
 the worker-paint screenshots. Historical evidence is in `outputs/animation-behavior.json`,
 `outputs/animation-fallback-profile.json`, `outputs/animation-soak.json`,
