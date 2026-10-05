@@ -1,7 +1,18 @@
 # Infinite blueprint and equally likely waves
 
 Updated: 2026-10-05
-Status: implementation verified locally; production publication follows.
+Status: published and verified at https://www.kmproto.com.
+
+Production source: cc6d422d0e2b165c0ded4a90f2140debcedb78b5, pushed to main.
+Vercel production deployment 6852285535 reports success at
+2026-10-05T05:52:33Z. Every homepage JavaScript and CSS asset matches the
+verified local build byte for byte. Live selection checks confirm the exact
+50/50 boundary and stable choice. Both themes pass the full interaction
+checks at 1440/768/390/320px; blueprint also passes touch scrolling, Surface,
+nested dives, landscape and phone desktop mode. No page errors, overflow or
+automated WCAG A/AA issues. Evidence: ignored outputs/blueprint-live.json,
+outputs/hero-selection-live.json, outputs/ripple-blueprint-pair-live.json,
+outputs/blueprint-live-bundle.json and corresponding screenshots.
 
 The homepage chooses waves or the infinite blueprint with equal probability
 on each page load. The choice persists through resize, full screen and
