@@ -30,7 +30,7 @@ geometry revision, moving parts stay live, pointer work is coalesced, and the
 loop stops scheduling when paused/hidden/offscreen. A stationary-obstruction
 sweep verifies that the marble resumes and completes its loop.
 
-Validation: production build, TypeScript, lint and 22 physics/runtime checks
+Validation: production build, TypeScript, lint and 23 physics/runtime checks
 pass. Browser checks cover 1440/390/320/1024 px, visible marble pixels and actual
 phase progression, lazy loading, untouched scrolling, native/fallback full
 screen, rotation, offscreen/hidden suspension, reduced-motion opt-in, lost GPU
@@ -44,12 +44,32 @@ backend did not meet the sustained 30 fps/no-long-task gate: it automatically
 fell back and then held a responsive 7.5 fps snapshot mode, with no long tasks
 in minutes 2–5 and bounded memory. This is not claimed as a passing smoothness
 result. Hardware-backend detection now skips software WebGL entirely and starts
-with the small pixel renderer; its final sustained check is in progress.
+with the small pixel renderer. Sparse glyph stamps then removed transparent
+pixel work, and the governor now requires repeated overload rather than treating
+one resize hitch as permanent pressure. Full-screen finger dragging also leaves
+a wake, while normal page gestures still scroll.
+
+Final five-minute stress result (4x CPU throttling, continuous pointer input and
+pebbles, full screen and rotation): the first minute held 30 fps with p95 draw
+3.3 ms. Sustained full-screen load still activated the deliberately quiet
+snapshot fallback, averaging about 7.5 fps afterward. Three long tasks were
+observed during minute 2; minutes 3–5 had none. Retained heap growth after the
+run was 342,978 bytes. The harness now forces garbage collection only outside
+the timing window. This run does NOT pass the strict sustained-30-fps gate;
+that limitation remains explicit, and production is not being promoted.
+An isolated, fully lit fallback drawing test held 30 fps in full screen with
+p95 draw 4.7 ms. Device feedback is required to judge actual Samsung behavior.
+
+Final interaction checks pass for full-screen touch wakes without a tap and
+exact 50/50 startup boundaries. Normal touch scrolling and accessibility checks
+also pass. The remaining release gate is the actual Samsung/browser check;
+a concise question with direct theme previews has been sent to the user.
 
 Preview source d90999e6b99dc5284311c907811701fb6cb31294 deployed successfully as
 Vercel preview 6859839779. All nine homepage/theme/worker assets match the local
-build. The concrete preview was shared for the Samsung check. A follow-up adds
-the software-backend bypass; production remains unchanged pending device feedback.
+build. The concrete preview was shared for the Samsung check. Follow-ups add
+the software-backend bypass and final fallback optimizations; production remains
+unchanged pending device feedback.
 Final phone and zoomed-out desktop-phone screenshots were inspected; native
 swiping and automated WCAG A/AA checks pass without overflow or page errors.
 

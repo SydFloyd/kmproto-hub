@@ -75,3 +75,12 @@ test('text protection attenuates only the copy and feathers continuously into th
   const edge = copyOpacity(481, 100, copy, 1440);
   assert.ok(edge > .1 && edge < .101);
 });
+
+test('a renderer meeting its frame budget survives isolated resize hitches', () => {
+  const budget = new WaveBudget(0); budget.reset(0);
+  let now = 1000;
+  for (let i = 0; i < 120; i++) {
+    now += 34;
+    assert.equal(budget.observe(now, i === 40 ? 105 : 33, i === 40 ? 41 : 14, 33.34), 'keep');
+  }
+});

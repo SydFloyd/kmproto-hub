@@ -30,7 +30,8 @@ the selected engine. For device verification, `?animation=waves` and
 The ASCII ripple tank lives in `app/components/ripple-tank/`. A damped wave
 field reflects from the hidden KM and reveals it only during wave contact.
 It starts flat, fills the entire hero ribbon, and attenuates beneath the copy.
-Pointer movement leaves a wake; clicking or tapping drops a pebble. Arrow keys
+Pointer movement leaves a wake; clicking or tapping drops a pebble. Full-screen
+touch dragging leaves a wake while ordinary page swipes remain native. Arrow keys
 move a cursor, Space/Enter drops a pebble, and P pauses or resumes. Scrolling,
 text selection and links stay native. The corner icon offers native full screen
 or a viewport fallback. Reduced motion starts still and responds to input.

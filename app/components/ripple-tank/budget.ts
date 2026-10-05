@@ -17,8 +17,11 @@ export class WaveBudget {
   observe(now: number, interval: number, work: number, target: number): "keep" | "reduce" | "rest" {
     if (now < this.settleUntil) return "keep";
     this.samples++;
-    if (interval > target * 3 || work > 24) this.slow += 6;
-    else if (interval > target * 1.6 || work > 8) this.slow++;
+    // A 30 Hz paint can use half its frame interval while leaving the other
+    // half for page input. Require repeated severe stalls; a single resize or
+    // compilation hiccup must not strand an otherwise smooth renderer at rest.
+    if (interval > target * 3 || work > 40) this.slow += 3;
+    else if (interval > target * 1.6 || work > Math.min(16, target / 2)) this.slow++;
     if (this.samples < 18 && this.slow < 6) return "keep";
     const overloaded = this.slow >= 6;
     this.reset(now);

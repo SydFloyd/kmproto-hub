@@ -31,7 +31,9 @@ export default function RippleTank() {
       const e = event as PointerEvent;
       if (!e.isPrimary) return;
       if (press && Math.hypot(e.clientX - press.x, e.clientY - press.y) > 10) press.moved = true;
-      if (e.pointerType === "mouse" || e.pointerType === "pen") pool.move(pool.point(e.clientX, e.clientY));
+      const touchWake = e.pointerType === "touch" && press?.id === e.pointerId
+        && (document.fullscreenElement === instrument || instrument.classList.contains("ripple-immersive"));
+      if (e.pointerType === "mouse" || e.pointerType === "pen" || touchWake) pool.move(pool.point(e.clientX, e.clientY));
     };
     const down = (event: Event) => {
       const e = event as PointerEvent;
@@ -39,6 +41,7 @@ export default function RippleTank() {
       press = { id: e.pointerId, x: e.clientX, y: e.clientY, time: performance.now(), moved: false };
       pool.cursor.visible = false;
       if (e.pointerType !== "touch") pool.drop(pool.point(e.clientX, e.clientY));
+      else if (document.fullscreenElement === instrument || instrument.classList.contains("ripple-immersive")) pool.move(pool.point(e.clientX, e.clientY));
     };
     const up = (event: Event) => {
       const e = event as PointerEvent;

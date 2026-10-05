@@ -200,7 +200,7 @@ export class QuietWaterRenderer implements WaterRenderer {
   private frame: ImageData | null = null;
   private base = new Uint8ClampedArray(0);
   private nodes: { x: number; y: number; size: number; alpha: number; letter: number; u: number; v: number }[] = [];
-  private stamps = new Map<number, Uint8ClampedArray[]>();
+  private stamps = new Map<number, Uint16Array[]>();
   private colors: number[][] = [];
   constructor(private canvas: HTMLCanvasElement, private ctx: CanvasRenderingContext2D) {
     for (const [base, peak] of [[[29, 60, 80], [102, 173, 190]], [[41, 86, 104], [196, 244, 226]], [[42, 100, 112], [249, 231, 198]]]) {
@@ -219,7 +219,11 @@ export class QuietWaterRenderer implements WaterRenderer {
         const ink = sheet.getContext("2d", { willReadFrequently: true })!;
         ink.fillStyle = "white"; ink.font = `${size * 26 / 32}px "Courier New", monospace`; ink.textAlign = "center"; ink.textBaseline = "middle";
         ["·", ",", ":", "~", "≈"].forEach((mark, j) => ink.fillText(mark, (j + 0.5) * size, size / 2));
-        this.stamps.set(size, Array.from({ length: 5 }, (_, j) => ink.getImageData(j * size, 0, size, size).data));
+        this.stamps.set(size, Array.from({ length: 5 }, (_, j) => {
+          const rgba = ink.getImageData(j * size, 0, size, size).data, points: number[] = [];
+          for (let p = 0; p < size * size; p++) if (rgba[p * 4 + 3]) points.push(p % size, Math.floor(p / size), rgba[p * 4 + 3]);
+          return new Uint16Array(points);
+        }));
       }
       const node = { x: Math.round(x * layout.ratio - size / 2), y: Math.round(y * layout.ratio - size / 2), size,
         alpha: copyOpacity(x, y, layout.copy, layout.width), letter: layout.points[i + 5], u: layout.points[i + 2], v: layout.points[i + 3] };
@@ -229,15 +233,18 @@ export class QuietWaterRenderer implements WaterRenderer {
   }
   private stamp(data: Uint8ClampedArray, x: number, y: number, size: number, glyph: number, color: number[], opacity: number) {
     const pixels = this.stamps.get(size)![glyph], width = this.canvas.width, height = this.canvas.height;
-    for (let dy = Math.max(0, -y); dy < Math.min(size, height - y); dy++) {
-      for (let dx = Math.max(0, -x); dx < Math.min(size, width - x); dx++) {
-        const alpha = pixels[(dy * size + dx) * 4 + 3] * opacity;
-        if (alpha < 1) continue;
-        const j = ((y + dy) * width + x + dx) * 4;
-        data[j] = color[0]; data[j + 1] = color[1]; data[j + 2] = color[2]; data[j + 3] = alpha;
-      }
+    const red = color[0], green = color[1], blue = color[2];
+    const clipped = x < 0 || y < 0 || x + size > width || y + size > height;
+    for (let p = 0; p < pixels.length; p += 3) {
+      const xx = x + pixels[p], yy = y + pixels[p + 1];
+      if (clipped && (xx < 0 || xx >= width || yy < 0 || yy >= height)) continue;
+      const alpha = pixels[p + 2] * opacity;
+      if (alpha < 1) continue;
+      const j = (yy * width + xx) * 4;
+      data[j] = red; data[j + 1] = green; data[j + 2] = blue; data[j + 3] = alpha;
     }
   }
+
   update(frame: PoolFrame) {
     if (this.values.length !== frame.buffer.byteLength) this.values = new Uint8Array(frame.buffer.byteLength);
     this.values.set(new Uint8Array(frame.buffer)); this.columns = frame.columns; this.rows = frame.rows;
@@ -252,7 +259,7 @@ export class QuietWaterRenderer implements WaterRenderer {
       const j = (sy * this.columns + sx) * 4;
       const value = (this.values[j] * 256 + this.values[j + 1] - 32768) / 32767 * scale;
       let glint = 0;
-      if (node.letter) for (const dy of [-1, 0, 1]) for (const dx of [-1, 0, 1]) {
+      if (node.letter) for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
         const xx = Math.max(0, Math.min(this.columns - 1, sx + dx)), yy = Math.max(0, Math.min(this.rows - 1, sy + dy));
         glint = Math.max(glint, this.values[(yy * this.columns + xx) * 4 + 2] / 255 * scale);
       }
