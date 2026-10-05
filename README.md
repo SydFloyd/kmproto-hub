@@ -31,6 +31,9 @@ Transparent rendering and softly fading edges blend the water into the hero,
 with no frame or visible text. A small corner icon expands the tank using the
 browser full-screen API with an immersive viewport fallback. Reduced-motion
 users start with a still surface that responds to input; rendering stops offscreen.
+The hero uses a deep ocean palette with curved cyan currents and warm gold
+glints when ripples reach KM. Punctuation stays crisp and grows on larger
+screens; the render grid is capped to keep full-screen motion fluid.
 Run `npm run test:ripple-tank` for reflection, reveal, damping and stability.
 
 Browser games have their own Vite entry points, so their engines are loaded only

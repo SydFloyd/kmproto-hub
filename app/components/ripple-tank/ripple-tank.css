@@ -1,18 +1,26 @@
-.hero > .shell { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.12fr); align-items: center; gap: 54px; }
+.hero.hero-water { --water-background: radial-gradient(ellipse at 82% 46%, #103944 0%, #092530 42%, #071a24 80%); padding-block: 88px; background: var(--water-background); border-bottom: 0; }
+.hero > .shell { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); align-items: center; gap: 44px; }
 .hero-copy { min-width: 0; }
-.hero h1 { font-size: clamp(34px, 3.3vw, 48px); }
-.hero .hero-lede { font-size: 17px; }
-.ripple-instrument { position: relative; min-width: 0; background: transparent; }
-.ripple-instrument canvas { display: block; width: 100%; height: clamp(380px, 34vw, 490px); cursor: crosshair; touch-action: none; mask-image: radial-gradient(ellipse at center, #000 44%, #0008 72%, transparent 100%); }
-.ripple-instrument canvas:focus-visible { outline: 2px solid var(--link); outline-offset: 4px; mask-image: none; }
-.ripple-fullscreen { position: absolute; right: 0; bottom: 0; display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 0; color: var(--muted); background: transparent; }
-.ripple-fullscreen:hover { color: var(--ink); }
-.ripple-fullscreen:focus-visible { outline: 2px solid var(--link); outline-offset: 0; }
-.ripple-instrument:fullscreen, .ripple-immersive { width: 100%; height: 100dvh; background: var(--tint); }
+.hero.hero-water h1 { color: #f2f0e7; font-size: clamp(40px, 3.8vw, 54px); letter-spacing: -0.035em; }
+.hero-water .hero-lede { max-width: 480px; color: #d1e0e3; font-size: 17px; line-height: 1.75; }
+.hero-water .eyebrow { color: #a6c4c6; letter-spacing: 0.1em; }
+.hero-water .page-note { color: #b2c6cd; }
+.hero-water .button-primary { color: #102631; background: #f2e4c5; border-color: #f2e4c5; }
+.hero-water .button-primary:hover { background: #fff2d5; border-color: #fff2d5; }
+.hero-water .button-secondary { color: #e1eded; border-color: #779398; }
+.hero-water .button-secondary:hover { background: #173d46; border-color: #b8d3d3; }
+.hero-water ::selection { color: #071a24; background: #b8e8dc; }
+.ripple-instrument { --water-background: radial-gradient(ellipse at 74% 44%, #103944 0%, #092530 42%, #071a24 80%); position: relative; min-width: 0; background: transparent; }
+.ripple-instrument canvas { display: block; width: 100%; height: clamp(400px, 37vw, 540px); cursor: crosshair; touch-action: none; mask-image: radial-gradient(ellipse at center, #000 54%, #000a 80%, transparent 100%); }
+.ripple-instrument canvas:focus-visible { outline: 2px solid #b8e8dc; outline-offset: 4px; mask-image: none; }
+.ripple-fullscreen { position: absolute; right: 0; bottom: 0; display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 0; color: #c2dedc; background: transparent; }
+.ripple-fullscreen:hover { color: #fff2d5; }
+.ripple-fullscreen:focus-visible { outline: 2px solid #b8e8dc; outline-offset: 0; }
+.ripple-instrument:fullscreen, .ripple-immersive { width: 100%; height: 100dvh; background: var(--water-background); }
 .ripple-immersive { position: fixed; inset: 0; z-index: 1000; }
 .ripple-instrument:fullscreen canvas, .ripple-immersive canvas { height: 100%; mask-image: none; }
 .ripple-instrument:fullscreen .ripple-fullscreen, .ripple-immersive .ripple-fullscreen { right: max(12px, env(safe-area-inset-right)); bottom: max(12px, env(safe-area-inset-bottom)); }
 @media (max-width: 1100px) { .hero > .shell { gap: 30px; } }
-@media (max-width: 900px) { .hero > .shell { grid-template-columns: 1fr; gap: 24px; } .hero-copy { max-width: 640px; } .hero h1 { font-size: 44px; } .ripple-instrument canvas { height: 360px; } }
-@media (max-width: 480px) { .hero > .shell { gap: 20px; } .hero h1 { font-size: clamp(34px, 9vw, 42px); } .ripple-instrument canvas { height: 330px; } }
-@media print { .ripple-instrument { display: none; } .hero > .shell { display: block; } }
+@media (max-width: 900px) { .hero.hero-water { padding-block: 64px; } .hero > .shell { grid-template-columns: 1fr; gap: 32px; } .hero-copy { max-width: 640px; } .hero.hero-water h1 { font-size: 48px; } .ripple-instrument canvas { height: 420px; } }
+@media (max-width: 480px) { .hero.hero-water { padding-block: 48px; } .hero > .shell { gap: 22px; } .hero.hero-water h1 { font-size: clamp(38px, 10vw, 44px); } .ripple-instrument canvas { height: 360px; } }
+@media print { .ripple-instrument { display: none; } .hero > .shell { display: block; } .hero.hero-water { background: #fff; } .hero.hero-water h1, .hero-water .hero-lede, .hero-water .eyebrow, .hero-water .page-note { color: #111; } }

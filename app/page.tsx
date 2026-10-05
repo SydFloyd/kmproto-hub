@@ -9,7 +9,7 @@ export default function Home() {
       <a className="skip-link" href="#main">Skip to content</a>
       <Header current="home" />
       <main id="main" tabIndex={-1}>
-        <section className="hero" aria-labelledby="hero-title">
+        <section className="hero hero-water" aria-labelledby="hero-title">
           <div className="shell">
             <div className="hero-copy">
               <p className="eyebrow">Independent web &amp; software development</p>

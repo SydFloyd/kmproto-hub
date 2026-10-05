@@ -121,7 +121,9 @@ export class RippleField {
   }
 
   ambient(x: number, y: number) {
-    return 0.014 * Math.sin(x * 0.075 + y * 0.11 - this.time * 0.34)
-      + 0.009 * Math.sin(x * -0.045 + y * 0.09 - this.time * 0.23 + 1.3);
+    const bend = Math.sin(x * 0.025 - y * 0.032 + this.time * 0.09) * 2.2;
+    const radius = Math.hypot(x - this.columns * 0.67, (y - this.rows * 0.43) * 1.12);
+    return 0.019 * Math.sin(x * 0.082 + y * 0.12 + bend - this.time * 0.31)
+      + 0.011 * Math.sin(radius * 0.15 - this.time * 0.24 + bend * 0.45);
   }
 }

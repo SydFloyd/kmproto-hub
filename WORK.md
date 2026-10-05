@@ -1,4 +1,29 @@
-# Design contrast
+# Ocean hero and luminous ripples
+
+Updated: 2026-10-04
+Status: implemented and locally verified; publication pending.
+
+Reworked the homepage hero around a deep ocean backdrop, pale serif headlines
+and warm ivory actions. The frameless water blends into that backdrop, with
+cyan crests, blue troughs and gold contact glints around the submerged KM.
+Curved interference currents and coherent punctuation drift give the surface
+more depth. The pool still uses only · , : ~ ≈ and one corner full-screen icon.
+At rest the monogram remains hidden; the reflecting wave field is preserved.
+
+Larger punctuation and a 5,600-cell render cap keep the richer full-screen
+surface legible and fluid. Atlas placement uses whole device pixels for crisp
+marks. Headless Chromium at 1440×1000 measured 33.3ms median and 33.4ms p90
+frame intervals over 80 samples. No external imagery or fonts were added.
+
+Production build, lint, TypeScript, diff checks and all four wave-field tests
+pass. Browser checks at 1440/768/390/320px pass transparency, no visible tank
+text, the single icon, pointer/touch, keyboard, full screen, fallback/Escape,
+focus handling and reduced motion. Landscape at 568×320 remains usable.
+No page errors, overflow or automated WCAG A/AA violations. Screenshots
+reviewed. Evidence: ignored outputs/ripple-ocean-local.json, performance
+results and desktop/mobile/full-screen screenshots.
+
+## Earlier release: Design contrast
 
 Updated: 2026-10-04
 Status: published and verified at https://www.kmproto.com.

@@ -48,15 +48,19 @@ export default function RippleTank() {
         const i = y * water.columns + x;
         const tide = water.ambient(x, y);
         const value = water.mask[i] ? tide : water.height[i] + tide;
-        const energy = Math.abs(value) + water.reveal[i] * 1.1;
-        const glyph = energy < 0.013 ? 0 : energy < 0.035 ? 1 : energy < 0.09 ? 2 : energy < 0.23 ? 3 : 4;
-        const ink = Math.min(15, Math.floor(energy * 18 + 1.2 + water.reveal[i] * 8));
-        context.drawImage(atlas, glyph * tile, ink * tile, tile, tile,
-          (offsetX + x * cell - cell * 0.4) * ratio, (offsetY + y * cell - cell * 0.4) * ratio, tile, tile);
+        const energy = Math.abs(value) * 2 + water.reveal[i] * 1.8;
+        const glyph = energy < 0.016 ? 0 : energy < 0.04 ? 1 : energy < 0.11 ? 2 : energy < 0.28 ? 3 : 4;
+        const ink = Math.min(15, Math.floor(energy * 24 + 2 + water.reveal[i] * 8));
+        const family = water.reveal[i] > 0.025 ? 2 : value >= 0 ? 1 : 0;
+        // A coherent drift loosens the letter grid without introducing noise.
+        const driftX = Math.sin(y * 0.095 + x * 0.028 - water.time * 0.12) * cell * 0.18;
+        const driftY = Math.cos(x * 0.065 - y * 0.035 - water.time * 0.1) * cell * 0.16;
+        context.drawImage(atlas, glyph * tile, (family * 16 + ink) * tile, tile, tile,
+          Math.round((offsetX + x * cell + driftX - cell * 0.4) * ratio), Math.round((offsetY + y * cell + driftY - cell * 0.4) * ratio), tile, tile);
       }
       if (keyboard.current.visible) {
         context.font = `${12 * ratio}px monospace`;
-        context.fillStyle = "#12466e";
+        context.fillStyle = "#f2e4c5";
         const x = keyboard.current.x * width * ratio, y = keyboard.current.y * height * ratio;
         for (const [dx, dy] of [[-12, 0], [12, 0], [0, -12], [0, 12]]) context.fillText(":", x + dx * ratio, y + dy * ratio);
       }
@@ -69,7 +73,9 @@ export default function RippleTank() {
       width = bounds.width; height = bounds.height;
       ratio = Math.min(window.devicePixelRatio || 1, 2);
       surface.width = Math.round(width * ratio); surface.height = Math.round(height * ratio);
-      cell = Math.max(7.6, Math.sqrt(width * height / 15500));
+      context.imageSmoothingEnabled = false;
+      // Keep the surface fluid on large screens, with larger, legible marks.
+      cell = Math.max(9, Math.sqrt(width * height / 5600));
       const columns = Math.floor(width / cell), rows = Math.floor(height / cell);
       const old = field.current;
       const water = new RippleField(columns, rows);
@@ -85,14 +91,23 @@ export default function RippleTank() {
       } else if (!media.matches) water.drop(0.24, 0.56, 0.45);
       field.current = water;
       const tile = Math.ceil(cell * ratio * 1.8);
-      atlas = document.createElement("canvas"); atlas.width = tile * 5; atlas.height = tile * 16;
+      atlas = document.createElement("canvas"); atlas.width = tile * 5; atlas.height = tile * 48;
       const ink = atlas.getContext("2d")!;
-      ink.font = `${Math.min(12, cell * 1.38) * ratio}px "Courier New", monospace`;
+      ink.font = `${Math.min(17, cell * 1.45) * ratio}px "Courier New", monospace`;
       ink.textAlign = "center"; ink.textBaseline = "middle";
-      for (let shade = 0; shade < 16; shade++) {
-        const mix = (shade / 15) ** 0.8;
-        ink.fillStyle = `rgb(${Math.round(134 - mix * 118)}, ${Math.round(151 - mix * 113)}, ${Math.round(165 - mix * 109)})`;
-        for (const [glyph, mark] of ["·", ",", ":", "~", "≈"].entries()) ink.fillText(mark, (glyph + 0.5) * tile, (shade + 0.5) * tile);
+      const palettes = [
+        [[29, 60, 80], [102, 173, 190]],
+        [[41, 86, 104], [196, 244, 226]],
+        [[42, 100, 112], [252, 222, 172]],
+      ];
+      for (let family = 0; family < palettes.length; family++) for (let shade = 0; shade < 16; shade++) {
+        const mix = (shade / 15) ** 0.75;
+        const [base, peak] = palettes[family];
+        const color = base.map((value, i) => Math.round(value + (peak[i] - value) * mix));
+        ink.fillStyle = `rgb(${color.join(",")})`;
+        ink.shadowColor = `rgba(${color.join(",")},0.35)`;
+        ink.shadowBlur = shade >= 8 ? 2 * ratio : 0;
+        for (const [glyph, mark] of ["·", ",", ":", "~", "≈"].entries()) ink.fillText(mark, (glyph + 0.5) * tile, (family * 16 + shade + 0.5) * tile);
       }
       draw();
     };
