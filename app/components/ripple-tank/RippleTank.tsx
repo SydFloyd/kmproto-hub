@@ -98,15 +98,15 @@ export default function RippleTank() {
       const palettes = [
         [[29, 60, 80], [102, 173, 190]],
         [[41, 86, 104], [196, 244, 226]],
-        [[42, 100, 112], [252, 222, 172]],
+        [[42, 100, 112], [249, 231, 198]],
       ];
       for (let family = 0; family < palettes.length; family++) for (let shade = 0; shade < 16; shade++) {
         const mix = (shade / 15) ** 0.75;
         const [base, peak] = palettes[family];
         const color = base.map((value, i) => Math.round(value + (peak[i] - value) * mix));
         ink.fillStyle = `rgb(${color.join(",")})`;
-        ink.shadowColor = `rgba(${color.join(",")},0.35)`;
-        ink.shadowBlur = shade >= 8 ? 2 * ratio : 0;
+        ink.shadowColor = `rgba(${color.join(",")},${family === 2 ? 0.28 : 0.35})`;
+        ink.shadowBlur = shade >= 8 ? (family === 2 ? 3 : 2) * ratio : 0;
         for (const [glyph, mark] of ["·", ",", ":", "~", "≈"].entries()) ink.fillText(mark, (glyph + 0.5) * tile, (family * 16 + shade + 0.5) * tile);
       }
       draw();

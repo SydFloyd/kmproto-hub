@@ -39,7 +39,7 @@ export class RippleField {
     for (let y = 1; y < rows - 1; y++) {
       for (let x = 1; x < columns - 1; x++) {
         const nx = (x - columns / 2) / size, ny = (y - rows / 2) / size;
-        if (strokes.some(([ax, ay, bx, by]) => distanceToSegment(nx, ny, ax, ay, bx, by) < 0.032)) {
+        if (strokes.some(([ax, ay, bx, by]) => distanceToSegment(nx, ny, ax, ay, bx, by) < 0.038)) {
           this.mask[y * columns + x] = 1;
         }
       }
@@ -104,7 +104,11 @@ export class RippleField {
         for (const j of this.contacts[i]) {
           energy = Math.max(energy, Math.abs(current[j]) + 3 * Math.abs(current[j] - previous[j]));
         }
-        reveal[i] = Math.max(reveal[i] * 0.984, Math.min(1, Math.max(0, energy - 0.045) * 1.7));
+        // Reflections gather gently, then linger as the wave passes the letters.
+        const target = Math.min(1, Math.max(0, energy - 0.045) * 1.7);
+        reveal[i] = target > reveal[i]
+          ? reveal[i] + (target - reveal[i]) * 0.14
+          : reveal[i] * 0.989;
         continue;
       }
       const center = current[i];

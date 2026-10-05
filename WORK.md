@@ -1,4 +1,23 @@
-# Ocean hero and luminous ripples
+# Fuller KM and softer reflections
+
+Updated: 2026-10-04
+Status: local checks passed; publishing to kmproto.com.
+
+Increased the submerged KM stroke radius from 0.032 to 0.038 (about 19%).
+Its reflected light now gathers over a brief, smooth attack and decays more
+slowly. A pale champagne highlight with a softer glow gives the fuller
+letters a gentler reveal while retaining the cyan currents and deep ocean
+hero. Still water hides the monogram, and the punctuation-only surface,
+frameless layout and single full-screen icon remain.
+
+Production build, lint, TypeScript, diff checks and all four wave-field tests
+pass. Browser checks at 1440/768/390/320px pass pointer/touch, keyboard, native
+and fallback full screen, reduced motion and landscape. No page errors,
+horizontal overflow or automated WCAG A/AA violations. Desktop, phone and
+full-screen screenshots reviewed. Evidence: ignored outputs/ripple-km-local.json
+and matching screenshots. Publication evidence follows.
+
+## Earlier release: Ocean hero and luminous ripples
 
 Updated: 2026-10-04
 Status: published and verified at https://www.kmproto.com.
