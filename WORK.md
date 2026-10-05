@@ -1,7 +1,20 @@
 # Obliging marble machine and three equally likely themes
 
 Updated: 2026-10-05
-Status: implementation verified locally; production publication follows.
+Status: published and verified at https://www.kmproto.com.
+
+Production source: 1e0ef2a90e87004a22f5e887d15defc5ee31685f, pushed to main.
+Vercel production deployment 6852770995 reports success at
+2026-10-05T06:31:06Z. All homepage JavaScript and CSS assets match the
+verified local build byte for byte. Live checks confirm all three startup
+choices, exact one-third boundaries, a single mounted engine and stable
+selection. The marble machine passes all three mechanical responses,
+folding, keyboard, mouse/touch, native/fallback full screen, reduced motion,
+page scrolling and focus restoration at 1440/768/390/320px. Landscape and
+980px phone desktop mode pass. No page errors, overflow or automated WCAG
+A/AA issues. Evidence: ignored outputs/marble-live.json,
+outputs/hero-thirds-selection-live.json, outputs/hero-thirds-live-bundle.json
+and corresponding screenshots.
 
 The homepage selects waves, blueprint or the obliging marble machine with a
 one-third chance each on startup. Selection stays fixed through interaction,
