@@ -1,7 +1,16 @@
 # Fuller KM and softer reflections
 
 Updated: 2026-10-04
-Status: local checks passed; publishing to kmproto.com.
+Status: published and verified at https://www.kmproto.com.
+
+Production source: 112bad89c6bfc05ec1960dfef948398d65822363, pushed to main.
+Vercel production deployment 6851035600 reports success at
+2026-10-05T03:58:06Z (October 4 in America/New_York). The public application
+bundle matches the verified local build byte for byte. Live checks at
+1440/768/390/320px pass pointer/touch, keyboard, full screen, reduced motion,
+fallback/Escape and landscape with no page errors, horizontal overflow or
+automated WCAG A/AA violations. Evidence: ignored outputs/ripple-km-live.json
+and matching screenshots.
 
 Increased the submerged KM stroke radius from 0.032 to 0.038 (about 19%).
 Its reflected light now gathers over a brief, smooth attack and decays more
@@ -15,7 +24,7 @@ pass. Browser checks at 1440/768/390/320px pass pointer/touch, keyboard, native
 and fallback full screen, reduced motion and landscape. No page errors,
 horizontal overflow or automated WCAG A/AA violations. Desktop, phone and
 full-screen screenshots reviewed. Evidence: ignored outputs/ripple-km-local.json
-and matching screenshots. Publication evidence follows.
+and matching screenshots.
 
 ## Earlier release: Ocean hero and luminous ripples
 
