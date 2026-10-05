@@ -32,7 +32,7 @@ with no frame or visible text. A small corner icon expands the tank using the
 browser full-screen API with an immersive viewport fallback. Reduced-motion
 users start with a still surface that responds to input; rendering stops offscreen.
 The hero uses a deep ocean palette with curved cyan currents and warm gold
-glints when ripples reach KM. The rounded strokes emerge in a soft champagne
+glints when ripples reach KM. Its strokes emerge in a soft champagne
 reflection that gathers gently and fades back into the water. Punctuation
 stays crisp and grows on larger
 screens; the render grid is capped to keep full-screen motion fluid.

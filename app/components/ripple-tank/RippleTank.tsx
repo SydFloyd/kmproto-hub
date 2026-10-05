@@ -52,9 +52,10 @@ export default function RippleTank() {
         const glyph = energy < 0.016 ? 0 : energy < 0.04 ? 1 : energy < 0.11 ? 2 : energy < 0.28 ? 3 : 4;
         const ink = Math.min(15, Math.floor(energy * 24 + 2 + water.reveal[i] * 8));
         const family = water.reveal[i] > 0.025 ? 2 : value >= 0 ? 1 : 0;
-        // A coherent drift loosens the letter grid without introducing noise.
-        const driftX = Math.sin(y * 0.095 + x * 0.028 - water.time * 0.12) * cell * 0.18;
-        const driftY = Math.cos(x * 0.065 - y * 0.035 - water.time * 0.1) * cell * 0.16;
+        // The water drifts, while reflections settle onto the fixed monogram.
+        const drift = 1 - Math.min(1, water.reveal[i] / 0.08);
+        const driftX = Math.sin(y * 0.095 + x * 0.028 - water.time * 0.12) * cell * 0.18 * drift;
+        const driftY = Math.cos(x * 0.065 - y * 0.035 - water.time * 0.1) * cell * 0.16 * drift;
         context.drawImage(atlas, glyph * tile, (family * 16 + ink) * tile, tile, tile,
           Math.round((offsetX + x * cell + driftX - cell * 0.4) * ratio), Math.round((offsetY + y * cell + driftY - cell * 0.4) * ratio), tile, tile);
       }

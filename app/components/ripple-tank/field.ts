@@ -30,16 +30,19 @@ export class RippleField {
     this.reveal = new Float32Array(count);
     this.contacts = Array.from({ length: count }, () => []);
     const size = Math.min(columns * 0.56, rows * 1.02);
+    const strokeRadius = 0.038;
     // Normalized, geometric monogram: K on the left; M on the right.
     const strokes = [
-      [-0.51, -0.28, -0.51, 0.28], [-0.50, 0.02, -0.23, -0.28], [-0.42, -0.06, -0.20, 0.28],
+      [-0.50, 0.02, -0.23, -0.28], [-0.42, -0.06, -0.20, 0.28],
       [0.02, 0.28, 0.02, -0.28], [0.02, -0.28, 0.24, 0.03],
       [0.24, 0.03, 0.46, -0.28], [0.46, -0.28, 0.46, 0.28],
     ];
     for (let y = 1; y < rows - 1; y++) {
       for (let x = 1; x < columns - 1; x++) {
         const nx = (x - columns / 2) / size, ny = (y - rows / 2) / size;
-        if (strokes.some(([ax, ay, bx, by]) => distanceToSegment(nx, ny, ax, ay, bx, by) < 0.038)) {
+        // A rectangular upright keeps K's corners square on small desktop grids.
+        const kStem = Math.abs(nx + 0.51) < strokeRadius && Math.abs(ny) < 0.28 + strokeRadius;
+        if (kStem || strokes.some(([ax, ay, bx, by]) => distanceToSegment(nx, ny, ax, ay, bx, by) < strokeRadius)) {
           this.mask[y * columns + x] = 1;
         }
       }

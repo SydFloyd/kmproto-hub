@@ -1,4 +1,28 @@
-# Fuller KM and softer reflections
+# Square K upright in mobile desktop view
+
+Updated: 2026-10-05
+Status: local checks passed; publishing to kmproto.com.
+
+Reproduced the tapered K stem in a 390px phone viewport with desktop layouts
+of 980px and 1024px at device pixel ratio 3. The 980px view used a 52×44 wave
+grid: its rounded tips narrowed from two columns to one. K now has a
+rectangular upright with flat ends at the same stroke width and outer height.
+Revealed monogram marks gently settle onto the fixed grid, preserving straight
+edges while ambient water continues to drift. At rest the same ambient motion
+still conceals the monogram.
+
+Production build, lint, TypeScript, diff checks and all four wave-field tests
+pass. Focused browser shape checks at desktop, mobile and both phone desktop
+layouts confirm matching full-width top and bottom corners. Geometry snapshots
+force full reveal only within the browser check so all corners can be inspected.
+Before/after screenshots reviewed: ignored outputs/k-stem-before.json,
+outputs/k-stem-local.json and matching screenshots. Interaction checks at
+1440/768/390/320px pass pointer/touch, keyboard, native and fallback full screen,
+Escape/focus, reduced motion and landscape, with no page errors, horizontal
+overflow or automated WCAG A/AA violations. Evidence: ignored
+outputs/ripple-square-k-local.json and screenshots. Publication verification follows.
+
+## Earlier release: Fuller KM and softer reflections
 
 Updated: 2026-10-04
 Status: published and verified at https://www.kmproto.com.
