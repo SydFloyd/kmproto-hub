@@ -22,7 +22,11 @@ with matching entries for the Lab and games (served via `cleanUrls`).
 `public/og.png` is the 1200×630 social card. Typography uses
 system fonts; the site does not fetch external fonts.
 
-The homepage's ASCII ripple tank lives in `app/components/ripple-tank/`.
+The homepage chooses between the ASCII ripple tank and infinite blueprint with
+equal probability on each page load. `app/components/HeroAnimation.tsx` keeps
+that choice stable during interaction and mounts only the selected engine.
+
+The ASCII ripple tank lives in `app/components/ripple-tank/`.
 Its fixed-step damped wave field reflects from a hidden KM monogram, revealing
 the letters only while waves pass. The water uses only `· , : ~ ≈`; pointer
 movement leaves a wake, clicking or tapping drops a pebble, and arrow keys plus
@@ -40,6 +44,21 @@ only during a reveal. Cached glyphs and a shared ceiling of 4,400 water
 points plus 1,200 letter points bound the rendering work. The display paints
 at 30 fps while the solver retains its fixed timestep.
 Run `npm run test:ripple-tank` for reflection, reveal, damping and stability.
+
+The infinite blueprint lives in `app/components/blueprint/`. Circuits contain
+street plans, buildings contain machines, and machines contain circuits.
+Each component already displays its child's actual layout; seeded geometry,
+shared entrances and matching camera transforms preserve it through the dive.
+Click or tap a component to explore, and use the small Surface control to return
+to the root. Arrow keys select, Enter/Space dives, Backspace returns one level,
+and P pauses the quiet signal and construction-mark animation. Normal wheel,
+touch scrolling and pinch zoom remain native. It shares the corner full-screen
+icon and immersive fallback, with instant navigation for reduced-motion users.
+Static detail is cached; only the current sheet and an incoming sheet are kept.
+The backing canvas is capped at 3 million pixels and each sheet at 2 million;
+painting is limited to 30 fps and suspended offscreen or in a hidden tab.
+Run `npm run test:blueprint` for inheritance, seamless camera alignment,
+deterministic return paths, deep exploration and navigation.
 
 Browser games have their own Vite entry points, so their engines are loaded only
 on game pages. `app/lab/games/catalog.ts` supplies the Games portal's cards;

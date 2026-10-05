@@ -1,4 +1,52 @@
-# Denser KM lettering with a bounded draw budget
+# Infinite blueprint and equally likely waves
+
+Updated: 2026-10-05
+Status: implementation verified locally; production publication follows.
+
+The homepage chooses waves or the infinite blueprint with equal probability
+on each page load. The choice persists through resize, full screen and
+interaction; only the chosen canvas engine is mounted. Existing ripple
+physics, finer KM nodes, palette and controls are preserved.
+
+Blueprint components contain previews of their actual child worlds. Circuits
+open into street plans, buildings into mechanisms, and mechanisms into new
+circuits. Deterministic layouts and inherited entrances connect each layer;
+camera transforms match the preview exactly at the end of every dive.
+Fine cyan linework, warm junctions, delicate dimensions and slow signals,
+construction marks and turning spokes give the drawing quiet movement.
+The small Surface control returns to the root; keyboard Backspace returns
+one level. The corner icon supports native full screen and a focused,
+scroll-locked viewport fallback. Wheel/touch scrolling and pinch zoom remain
+native in the blueprint. Reduced-motion navigation completes immediately.
+
+Static detail is cached with roughly 2-million-pixel sheets and a
+3-million-pixel backing surface, capped DPR and 30 fps painting. The current
+world and transition world are the only cached sheets. Offscreen and hidden
+pages stop painting; exploration retains only a path of component IDs.
+No new runtime dependency, font, image or external request is introduced.
+
+Production build, lint, TypeScript and diff checks pass. All six blueprint
+model tests and five ripple-field tests pass. Inheritance, exact camera
+alignment, stable return paths and bounded geometry at 500 levels are covered.
+Browser checks for both themes at 1440/768/390/320px pass interaction,
+keyboard, native/fallback full screen, reduced motion, landscape and focus
+restoration. Blueprint touch swipes scroll normally without accidental dives;
+Surface does not change the page position. Phone desktop mode at 980px also
+passes. No page errors, horizontal overflow or automated WCAG A/AA issues.
+Selection checks verify both sides of the exact 0.5 boundary and a single
+engine that stays selected on resize. Screenshots reviewed. Evidence:
+ignored outputs/blueprint-local.json, outputs/hero-selection-local.json,
+outputs/ripple-blueprint-pair-local.json and matching screenshots.
+
+All three blueprint layers were profiled in a software Chromium browser.
+With 4× CPU throttling, p90 callback work is 0.3–0.7ms in the mobile and
+phone desktop layouts; median paint intervals are 33.2–33.4ms. Full-screen
+1440×1000 at DPR 2 remains within the pixel budgets, with median paint
+intervals of 33.3–33.4ms. These are synthetic browser measurements, not
+physical-phone benchmarks. Offscreen painting stops. Evidence: ignored
+outputs/blueprint-performance-local.json.
+
+## Earlier release: Denser KM lettering with a bounded draw budget
 
 Updated: 2026-10-05
 Status: published and verified at https://www.kmproto.com.

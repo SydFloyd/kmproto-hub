@@ -1,5 +1,5 @@
 import CopyEmail from "./components/CopyEmail";
-import RippleTank from "./components/ripple-tank/RippleTank";
+import HeroAnimation from "./components/HeroAnimation";
 import { Arrow, Footer, Header } from "./components/chrome";
 import { EMAIL, mailto, process, projects, services } from "./data";
 
@@ -21,7 +21,7 @@ export default function Home() {
                 <a className="button button-secondary" href="#services">Explore services</a>
               </div>
             </div>
-            <RippleTank />
+            <HeroAnimation />
           </div>
         </section>
 
