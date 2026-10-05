@@ -1,7 +1,16 @@
 # Seamless ripple tank
 
 Updated: 2026-10-04
-Status: implemented and locally verified; publication pending.
+Status: published and verified at https://www.kmproto.com.
+
+Production source: b2b454e3218a53d5cea68efe83be5ed16355f3ef, pushed to main.
+Vercel production deployment 6849661336 reports success at
+2026-10-05T01:47:50Z (October 4 in America/New_York). Live checks at
+1440/768/390/320px pass transparent/no-frame rendering, no visible tank text,
+the single corner icon, pointer/touch, keyboard and full screen. Reduced
+motion, fallback/Escape/focus, 568×320 landscape and accessibility pass;
+there are no page errors or horizontal overflow.
+Live evidence: ignored outputs/ripple-seamless-live.json and screenshots.
 
 Removed the tank frame, dark backing, heading, scales, instructions and text
 controls. The punctuation now renders transparently in the homepage palette,
