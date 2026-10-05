@@ -1,7 +1,15 @@
 # Design contrast
 
 Updated: 2026-10-04
-Status: implemented and locally verified; publication pending.
+Status: published and verified at https://www.kmproto.com.
+
+Production source: 70c5a95549913eb421c74a9476eeacc41bc20882, pushed to main.
+Vercel production deployment 6850441961 reports success at
+2026-10-05T03:01:23Z (October 4 in America/New_York). Live homepage, Lab and
+Games checks at 1440/390px confirm the stronger palette and no page errors,
+horizontal overflow or automated WCAG A/AA violations. Ripple full screen
+uses the new palette and remains icon-only.
+Live evidence: ignored outputs/contrast-live.json and screenshots.
 
 Deepened the shared navy/slate palette for headings, body copy, secondary
 labels, links and buttons. Strengthened dividers and the contrast between
