@@ -1,7 +1,16 @@
 # Ocean hero and luminous ripples
 
 Updated: 2026-10-04
-Status: implemented and locally verified; publication pending.
+Status: published and verified at https://www.kmproto.com.
+
+Production source: 99d451ff70137246e0b701200eab452d43412880, pushed to main.
+Vercel production deployment 6850846043 reports success at
+2026-10-05T03:39:30Z (October 4 in America/New_York). Live checks at
+1440/768/390/320px pass transparent rendering, no visible tank text, the
+single corner icon, pointer/touch, keyboard and full screen. Native and
+fallback full screen, Escape/focus, reduced motion and 568×320 landscape
+pass. No page errors, horizontal overflow or automated WCAG A/AA violations.
+Live evidence: ignored outputs/ripple-ocean-live.json and screenshots.
 
 Reworked the homepage hero around a deep ocean backdrop, pale serif headlines
 and warm ivory actions. The frameless water blends into that backdrop, with
