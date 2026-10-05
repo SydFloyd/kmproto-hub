@@ -13,6 +13,22 @@ test('the submerged KM is invisible in still water', () => {
   assert.equal(maximum(water.reveal), 0);
 });
 
+test('uprights keep equal visual weight across mobile and desktop grids', () => {
+  for (const [columns, rows] of [[38, 40], [52, 44], [55, 44], [73, 75], [66, 59], [100, 70], [89, 62]]) {
+    const water = new RippleField(columns, rows);
+    const size = Math.min(columns * 0.56, rows * 1.02);
+    const y = Math.round(rows / 2 + size * 0.17);
+    const weights = [-0.51, 0.02, 0.46].map(position => {
+      const center = Math.round(columns / 2 + position * size), radius = Math.ceil(size * 0.08);
+      let weight = 0;
+      for (let x = center - radius; x <= center + radius; x++) weight += water.coverage[y * columns + x];
+      return weight;
+    });
+    assert.ok(Math.max(...weights) - Math.min(...weights) < 0.02,
+      `${columns}×${rows}: upright weights ${weights.join(', ')}`);
+  }
+});
+
 test('a pebble spreads across water and reflects from the monogram', () => {
   const tank = new RippleField(100, 70), open = new RippleField(100, 70);
   open.mask.fill(0);

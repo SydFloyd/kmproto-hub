@@ -1,4 +1,44 @@
-# Square K upright in mobile desktop view
+# Denser KM lettering with a bounded draw budget
+
+Updated: 2026-10-05
+Status: local checks passed; publishing to kmproto.com.
+
+Separated the reflected KM lettering from the background punctuation grid.
+The letters use finer spacing and proportional edge opacity, computed from
+shared signed-distance geometry. The K retains square corners. Letter light
+samples wave contacts from the existing, coarser solver; its fixed timestep,
+reflecting boundaries and physical grid sizes are preserved. At rest the
+letter pass draws nothing.
+
+The total draw ceiling remains 5,600 points: at most 4,400 water points and
+1,200 letter points. The letter grid refines by up to three times per axis.
+Mobile shape checks render 896 letter points versus the previous 111 solid
+letter nodes; phone desktop layouts render 970/1,046 versus 207/234. The
+background remains at 1,520/2,288/2,420 points in those layouts. Large views
+reserve part of the previous background budget for lettering. Cached glyph
+atlases, static sampling maps, 30 fps painting, and offscreen/hidden-tab
+suspension bound the work without additional wave-solving steps.
+
+Production build, lint, TypeScript, diff checks and all five wave-field tests
+pass. The new regression check confirms equal integrated upright weights
+across seven mobile/desktop grids. Browser checks at 1440/768/390/320px pass
+pointer/touch, keyboard, native and fallback full screen, Escape/focus,
+reduced motion and landscape. No page errors, overflow or automated WCAG
+A/AA violations. Focused shape checks at 390px with 980px/1024px desktop
+layouts confirm the extra letter points and the combined draw cap.
+Screenshots reviewed. Evidence: ignored outputs/ripple-density-local.json,
+outputs/ripple-density-shape-local.json and matching screenshots.
+
+Worst-case headless Chromium checks hold every letter node fully lit over
+90 samples. With 4× CPU throttling, median/p90 animation callback work is
+17.0/17.8ms on mobile and 23.1/24.8ms in phone desktop mode; median paint
+intervals are 55.3/77.6ms under that synthetic throttle. At 1440×1000 full
+screen without CPU throttling, median/p90 paint intervals are 33.4/36.3ms.
+These are software-browser measurements, not physical-phone benchmarks.
+Evidence: ignored outputs/ripple-density-performance-final.json.
+Publication verification follows.
+
+## Earlier release: Square K upright in mobile desktop view
 
 Updated: 2026-10-05
 Status: published and verified at https://www.kmproto.com.

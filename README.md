@@ -34,8 +34,11 @@ users start with a still surface that responds to input; rendering stops offscre
 The hero uses a deep ocean palette with curved cyan currents and warm gold
 glints when ripples reach KM. Its strokes emerge in a soft champagne
 reflection that gathers gently and fades back into the water. Punctuation
-stays crisp and grows on larger
-screens; the render grid is capped to keep full-screen motion fluid.
+uses a finer grid for KM, with partial edge brightness to keep the strokes
+even on mobile. The letter nodes sample the existing wave field and draw
+only during a reveal. Cached glyphs and a shared ceiling of 4,400 water
+points plus 1,200 letter points bound the rendering work. The display paints
+at 30 fps while the solver retains its fixed timestep.
 Run `npm run test:ripple-tank` for reflection, reveal, damping and stability.
 
 Browser games have their own Vite entry points, so their engines are loaded only

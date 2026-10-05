@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { KeyboardEvent, PointerEvent } from "react";
-import { RippleField, STEP } from "./field";
+import { createMonogram, RippleField, STEP } from "./field";
 import "./ripple-tank.css";
 
 function ExpandIcon({ expanded }: { expanded: boolean }) {
@@ -27,8 +27,14 @@ export default function RippleTank() {
     if (!surface || !instrument) return;
     const context = surface.getContext("2d");
     if (!context) return;
-    let animation = 0, last = 0, accumulator = 0, visible = true, width = 0, height = 0;
+    let animation = 0, last = 0, lastPaint = 0, accumulator = 0, visible = true, width = 0, height = 0;
     let atlas: HTMLCanvasElement | null = null;
+    let letterAtlas: HTMLCanvasElement | null = null, letterTile = 0;
+    let letterPoints: { x: number; y: number; sample: number; coverage: number }[] = [];
+    let detail: ReturnType<typeof createMonogram> | null = null;
+    let resample = false;
+    let samples = new Int32Array(0), mixX = new Float32Array(0), mixY = new Float32Array(0);
+    let tides = new Float32Array(0), driftXs = new Float32Array(0), driftYs = new Float32Array(0);
     let cell = 8, ratio = 1;
     const media = window.matchMedia("(prefers-reduced-motion: reduce)");
     const setReduced = () => {
@@ -39,26 +45,51 @@ export default function RippleTank() {
 
     const draw = () => {
       const water = field.current;
-      if (!water || !atlas) return;
+      if (!water || !atlas || !detail) return;
       context.clearRect(0, 0, surface.width, surface.height);
       const tile = Math.ceil(cell * ratio * 1.8);
-      const offsetX = (width - water.columns * cell) / 2;
-      const offsetY = (height - water.rows * cell) / 2;
-      for (let y = 0; y < water.rows; y++) for (let x = 0; x < water.columns; x++) {
+      const offsetX = (width - detail.columns * cell) / 2;
+      const offsetY = (height - detail.rows * cell) / 2;
+      // Cache moving currents on the physics grid, then smoothly sample them
+      // for the displayed water grid. No extra wave-solving steps.
+      if (resample) for (let y = 0; y < water.rows; y++) for (let x = 0; x < water.columns; x++) {
         const i = y * water.columns + x;
-        const tide = water.ambient(x, y);
-        const value = water.mask[i] ? tide : water.height[i] + tide;
-        const energy = Math.abs(value) * 2 + water.reveal[i] * 1.8;
+        tides[i] = water.ambient(x, y);
+        driftXs[i] = Math.sin(y * 0.095 + x * 0.028 - water.time * 0.12) * cell * 0.18;
+        driftYs[i] = Math.cos(x * 0.065 - y * 0.035 - water.time * 0.1) * cell * 0.16;
+      }
+      const sample = (values: Float32Array, i: number) => {
+        const j = samples[i], u = mixX[i], v = mixY[i];
+        const top = values[j] + (values[j + 1] - values[j]) * u;
+        const bottom = values[j + water.columns] + (values[j + water.columns + 1] - values[j + water.columns]) * u;
+        return top + (bottom - top) * v;
+      };
+      for (let y = 0; y < detail.rows; y++) for (let x = 0; x < detail.columns; x++) {
+        const i = y * detail.columns + x;
+        const tide = resample ? sample(tides, i) : water.ambient(x, y);
+        const value = detail.mask[i] ? tide : (resample ? sample(water.height, i) : water.height[i]) + tide;
+        const energy = Math.abs(value) * 2;
         const glyph = energy < 0.016 ? 0 : energy < 0.04 ? 1 : energy < 0.11 ? 2 : energy < 0.28 ? 3 : 4;
-        const ink = Math.min(15, Math.floor(energy * 24 + 2 + water.reveal[i] * 8));
-        const family = water.reveal[i] > 0.025 ? 2 : value >= 0 ? 1 : 0;
-        // The water drifts, while reflections settle onto the fixed monogram.
-        const drift = 1 - Math.min(1, water.reveal[i] / 0.08);
-        const driftX = Math.sin(y * 0.095 + x * 0.028 - water.time * 0.12) * cell * 0.18 * drift;
-        const driftY = Math.cos(x * 0.065 - y * 0.035 - water.time * 0.1) * cell * 0.16 * drift;
+        const ink = Math.min(15, Math.floor(energy * 24 + 2));
+        const family = value >= 0 ? 1 : 0;
+        const driftX = resample ? sample(driftXs, i) : Math.sin(y * 0.095 + x * 0.028 - water.time * 0.12) * cell * 0.18;
+        const driftY = resample ? sample(driftYs, i) : Math.cos(x * 0.065 - y * 0.035 - water.time * 0.1) * cell * 0.16;
         context.drawImage(atlas, glyph * tile, (family * 16 + ink) * tile, tile, tile,
           Math.round((offsetX + x * cell + driftX - cell * 0.4) * ratio), Math.round((offsetY + y * cell + driftY - cell * 0.4) * ratio), tile, tile);
       }
+      // Only wave contact lights the finer, fixed letter nodes. At rest this
+      // pass draws nothing; partial edge coverage evens out the stroke weights.
+      if (letterAtlas) for (const point of letterPoints) {
+        const j = point.sample;
+        const glint = Math.max(water.reveal[j], water.reveal[j + 1], water.reveal[j + water.columns], water.reveal[j + water.columns + 1]);
+        if (glint < 0.002) continue;
+        const energy = glint * 1.8;
+        const glyph = energy < 0.016 ? 0 : energy < 0.04 ? 1 : energy < 0.11 ? 2 : energy < 0.28 ? 3 : 4;
+        const ink = Math.min(15, Math.floor(energy * 24 + 2 + glint * 8));
+        context.globalAlpha = point.coverage * Math.min(1, glint / 0.04);
+        context.drawImage(letterAtlas, glyph * letterTile, ink * letterTile, letterTile, letterTile, point.x, point.y, letterTile, letterTile);
+      }
+      context.globalAlpha = 1;
       if (keyboard.current.visible) {
         context.font = `${12 * ratio}px monospace`;
         context.fillStyle = "#f2e4c5";
@@ -75,9 +106,10 @@ export default function RippleTank() {
       ratio = Math.min(window.devicePixelRatio || 1, 2);
       surface.width = Math.round(width * ratio); surface.height = Math.round(height * ratio);
       context.imageSmoothingEnabled = false;
-      // Keep the surface fluid on large screens, with larger, legible marks.
-      cell = Math.max(9, Math.sqrt(width * height / 5600));
-      const columns = Math.floor(width / cell), rows = Math.floor(height / cell);
+      // Reserve part of the 5,600-point draw budget for finer letter strokes.
+      cell = Math.max(9, Math.sqrt(width * height / 4400));
+      const physicsCell = Math.max(9, Math.sqrt(width * height / 5600));
+      const columns = Math.floor(width / physicsCell), rows = Math.floor(height / physicsCell);
       const old = field.current;
       const water = new RippleField(columns, rows);
       // Resizing or entering full screen carries the same water into its new grid.
@@ -86,30 +118,69 @@ export default function RippleTank() {
           const i = y * columns + x;
           const j = Math.min(old.rows - 1, Math.floor(y * old.rows / rows)) * old.columns + Math.min(old.columns - 1, Math.floor(x * old.columns / columns));
           if (!water.mask[i] && !old.mask[j]) { water.height[i] = old.height[j]; water.previous[i] = old.previous[j]; }
-          if (water.mask[i] && old.mask[j]) water.reveal[i] = old.reveal[j];
+          if (water.coverage[i] && old.coverage[j]) water.reveal[i] = old.reveal[j];
         }
         water.time = old.time;
       } else if (!media.matches) water.drop(0.24, 0.56, 0.45);
       field.current = water;
-      const tile = Math.ceil(cell * ratio * 1.8);
-      atlas = document.createElement("canvas"); atlas.width = tile * 5; atlas.height = tile * 48;
-      const ink = atlas.getContext("2d")!;
-      ink.font = `${Math.min(17, cell * 1.45) * ratio}px "Courier New", monospace`;
-      ink.textAlign = "center"; ink.textBaseline = "middle";
-      const palettes = [
-        [[29, 60, 80], [102, 173, 190]],
-        [[41, 86, 104], [196, 244, 226]],
-        [[42, 100, 112], [249, 231, 198]],
-      ];
-      for (let family = 0; family < palettes.length; family++) for (let shade = 0; shade < 16; shade++) {
-        const mix = (shade / 15) ** 0.75;
-        const [base, peak] = palettes[family];
-        const color = base.map((value, i) => Math.round(value + (peak[i] - value) * mix));
-        ink.fillStyle = `rgb(${color.join(",")})`;
-        ink.shadowColor = `rgba(${color.join(",")},${family === 2 ? 0.28 : 0.35})`;
-        ink.shadowBlur = shade >= 8 ? (family === 2 ? 3 : 2) * ratio : 0;
-        for (const [glyph, mark] of ["·", ",", ":", "~", "≈"].entries()) ink.fillText(mark, (glyph + 0.5) * tile, (family * 16 + shade + 0.5) * tile);
+      const detailColumns = Math.floor(width / cell), detailRows = Math.floor(height / cell);
+      resample = cell !== physicsCell;
+      detail = resample
+        ? createMonogram(detailColumns, detailRows, Math.min(columns * 0.56, rows * 1.02) * physicsCell / cell)
+        : { columns, rows, mask: water.mask, coverage: water.coverage };
+      if (resample) {
+        const count = detailColumns * detailRows;
+        samples = new Int32Array(count); mixX = new Float32Array(count); mixY = new Float32Array(count);
+        tides = new Float32Array(columns * rows); driftXs = new Float32Array(columns * rows); driftYs = new Float32Array(columns * rows);
+        for (let y = 0; y < detailRows; y++) for (let x = 0; x < detailColumns; x++) {
+          const i = y * detailColumns + x;
+          const px = Math.max(0, Math.min(columns - 1, columns / 2 + (x - detailColumns / 2) * cell / physicsCell));
+          const py = Math.max(0, Math.min(rows - 1, rows / 2 + (y - detailRows / 2) * cell / physicsCell));
+          const sx = Math.min(columns - 2, Math.floor(px)), sy = Math.min(rows - 2, Math.floor(py));
+          samples[i] = sy * columns + sx; mixX[i] = px - sx; mixY[i] = py - sy;
+        }
       }
+      const makeAtlas = (spacing: number, palettes: number[][][]) => {
+        const tile = Math.ceil(spacing * ratio * 1.8);
+        const sheet = document.createElement("canvas"); sheet.width = tile * 5; sheet.height = tile * palettes.length * 16;
+        const ink = sheet.getContext("2d")!;
+        ink.font = `${Math.min(17, spacing * 1.45) * ratio}px "Courier New", monospace`;
+        ink.textAlign = "center"; ink.textBaseline = "middle";
+        for (let family = 0; family < palettes.length; family++) for (let shade = 0; shade < 16; shade++) {
+          const mix = (shade / 15) ** 0.75;
+          const [base, peak] = palettes[family];
+          const color = base.map((value, i) => Math.round(value + (peak[i] - value) * mix));
+          ink.fillStyle = `rgb(${color.join(",")})`;
+          ink.shadowColor = `rgba(${color.join(",")},${palettes.length === 1 ? 0.28 : 0.35})`;
+          ink.shadowBlur = shade >= 8 ? Math.min(palettes.length === 1 ? 3 : 2, spacing * 0.24) * ratio : 0;
+          for (const [glyph, mark] of ["·", ",", ":", "~", "≈"].entries()) ink.fillText(mark, (glyph + 0.5) * tile, (family * 16 + shade + 0.5) * tile);
+        }
+        return { sheet, tile };
+      };
+      atlas = makeAtlas(cell, [[[29, 60, 80], [102, 173, 190]], [[41, 86, 104], [196, 244, 226]]]).sheet;
+      const shapeSize = Math.min(columns * 0.56, rows * 1.02) * physicsCell;
+      const occupied = water.coverage.reduce((count, value) => count + (value > 0 ? 1 : 0), 0);
+      let letterCell = physicsCell / Math.max(1, Math.min(3, Math.sqrt(1200 / occupied)));
+      let letters: ReturnType<typeof createMonogram>;
+      for (;;) {
+        const size = shapeSize / letterCell;
+        letters = createMonogram(Math.ceil(size * 1.14), Math.ceil(size * 0.72), size);
+        const count = letters.coverage.reduce((total, value) => total + (value > 0 ? 1 : 0), 0);
+        if (count <= 1200) break;
+        letterCell *= Math.sqrt(count / 1200) * 1.04;
+      }
+      letterPoints = [];
+      for (let y = 0; y < letters.rows; y++) for (let x = 0; x < letters.columns; x++) {
+        const coverage = letters.coverage[y * letters.columns + x];
+        if (!coverage) continue;
+        const px = (x - letters.columns / 2) * letterCell, py = (y - letters.rows / 2) * letterCell;
+        const sx = Math.max(0, Math.min(columns - 2, Math.floor(columns / 2 + px / physicsCell)));
+        const sy = Math.max(0, Math.min(rows - 2, Math.floor(rows / 2 + py / physicsCell)));
+        letterPoints.push({ sample: sy * columns + sx, coverage,
+          x: Math.round((width / 2 + px - letterCell * 0.4) * ratio), y: Math.round((height / 2 + py - letterCell * 0.4) * ratio) });
+      }
+      const lettering = makeAtlas(letterCell, [[[42, 100, 112], [249, 231, 198]]]);
+      letterAtlas = lettering.sheet; letterTile = lettering.tile;
       draw();
     };
     const observer = new ResizeObserver(resize); observer.observe(surface);
@@ -119,7 +190,9 @@ export default function RippleTank() {
       if (visible && !document.hidden && !pausedRef.current) {
         accumulator += last ? Math.min((now - last) / 1000, 0.05) : 0;
         while (accumulator >= STEP) { field.current?.step(); accumulator -= STEP; }
-        draw();
+        // The display paints at 30 fps; the wave solver retains its fixed timestep.
+        const paintInterval = 1000 / 30;
+        if (now - lastPaint >= paintInterval - 0.5) { draw(); lastPaint = now; }
       } else accumulator = 0;
       last = now;
       animation = requestAnimationFrame(frame);
