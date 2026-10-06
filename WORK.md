@@ -1,7 +1,7 @@
 # Smoker Control Lab
 
 Updated: 2026-10-05
-Status: implementation and local verification complete; publication follows.
+Status: published and verified at https://www.kmproto.com/lab/smoker.
 
 Added `/lab/smoker` as the ninth and last Lab entry, following Games. It has its
 own static Vite entry and loads no simulation code on the business site or Lab
@@ -46,6 +46,15 @@ No page errors, horizontal overflow or automated WCAG A/AA violations. Desktop
 and phone screenshots were inspected. Evidence: ignored outputs/smoker-browser.json,
 outputs/check-smoker.cjs and outputs/smoker-*.png. The older owner-private Sites
 publication and unrelated internal pricing files are unchanged.
+
+Source 2ca94f8aad41cbd0810a3c1385bebd0025d51f9e was pushed to main. Vercel
+production deployment 6874235472 reports success. Live browser checks repeat the
+full desktop/phone workflow at 1440/768/390/320 px, both 250 F default controllers,
+12-hour limits and final Lab position, with no errors, overflow or automated
+accessibility violations. All seven Lab/smoker script and stylesheet references
+match the tested local build byte for byte. Live phone screenshot inspected.
+Evidence: ignored outputs/smoker-live.json, outputs/smoker-live-assets.json and
+outputs/smoker-live-*.png.
 
 ---
 
