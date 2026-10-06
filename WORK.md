@@ -1,7 +1,7 @@
 # Hybrid smoker control
 
 Updated: 2026-10-05
-Status: implementation and local verification complete; publishing to the existing public Vercel destination.
+Status: published and verified at https://www.kmproto.com/lab/smoker.
 
 Added simultaneous wood/pellet Hybrid mode as the default in Smoker Control Lab,
 which remains ninth and last in the Lab directory. Hardware layout is undecided;
@@ -50,6 +50,16 @@ navigation. No page errors, horizontal overflow or automated WCAG A/AA violation
 desktop and phone screenshots were inspected. Evidence: ignored
 outputs/check-hybrid.cjs, outputs/hybrid-browser.json and outputs/hybrid-*.png.
 The older owner-private Sites publication and unrelated pricing files are unchanged.
+
+Source 8848396b228ff0984ae919bad1db2418baca14d0 was pushed to main. Vercel
+production deployment 6874676428 reports success. Live checks repeat the full
+three-fuel workflow at 1440/768/390/320 px, including hybrid heat allocation,
+manual/fixed-feed values, oversupply with zero feed, both refills, 12-hour limits
+and final Lab position. No page errors, overflow or automated accessibility
+violations. All seven Lab/smoker script and stylesheet references match the
+tested build byte for byte. Live phone screenshot inspected. Evidence: ignored
+outputs/hybrid-live.json, outputs/smoker-live-assets.json and
+outputs/hybrid-live-*.png.
 
 ---
 
