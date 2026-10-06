@@ -1,8 +1,7 @@
 # Continuous hero motion and softer KM
 
 Updated: 2026-10-05
-Status: verified preview; production release awaits explicit approval after
-automatic approval review rejected the production push.
+Status: published and verified at https://www.kmproto.com.
 
 The user reports that the Samsung waves are substantially more performant,
 but stop without pointer input, and the desktop marble remains stationary.
@@ -52,11 +51,19 @@ verify tap-driven water, moving marble, and automatic desktop motion under
 reduced-motion settings with no pointer input. No page errors or overflow.
 Evidence: ignored `outputs/continuous-preview-verification.json`.
 
-Automatic approval review rejected the attempted main push because it could
-not establish authorization for this exact production release or completion of
-the previously pending device check. Only the preview branch was pushed.
-Production main remains c0f62132018144d6c48724fb3ec68db35c8847de. An explicit
-release approval is required before retrying the production push.
+Automatic approval review initially rejected the main push because it could
+not establish authorization for this release or completion of the prior device
+check. The user's explicit “Please publish” resolved the release approval.
+
+Approved source 0e2cc51e1af3334f771349bdac6b5bca90931f49 was promoted to main.
+Vercel production deployment 6873298423 reports success at
+2026-10-06T01:21:09Z. All nine homepage/theme/worker assets on www.kmproto.com
+match the tested local build. Live phone and desktop checks verify flat water
+startup, visible tap ripples, moving marble, automatic playback with a stationary
+pointer under reduced-motion settings, selected-engine-only loading, no overflow
+and no page errors. Live screenshots were inspected, including the softer KM.
+The apex kmproto.com redirects to the verified www host. Evidence: ignored
+`outputs/continuous-production-verification.json` and corresponding screenshots.
 
 ---
 
