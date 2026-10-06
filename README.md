@@ -10,6 +10,7 @@ automation and custom software for small businesses and organizations.
 - `/lab/games/contra` — eight-zone run-and-gun recreation, with local two-player co-op
 - `/lab/games/bubble-bobble` — 100-round arcade recreation, with bubble riding and local co-op
 - `/lab/games/rc-pro-am` — NES isometric racing recreation, with weapons and vehicle upgrades
+- `/lab/smoker` — wood and pellet combustion, damper control and meat heating simulation
 
 Content lives in `app/data.ts` (email, services, process and Lab projects).
 The homepage keeps a single “Websites starting at $1,200” line. Package pricing,
@@ -130,6 +131,30 @@ served at `/bible-audio/`: the Vercel prebuild downloads the versioned public
 bundle, verifies its SHA-256 in `tools/bible-audio-release.json`, and extracts it
 to ignored `public/bible-audio/`. Voice models and installers are not committed
 to this repository. Isolation and cache headers apply only to the demo path.
+
+Smoker Control Lab is the last entry in the Lab. Its browser-local model lives in
+`app/lab/smoker/model.ts`, with a separate Vite entry at `lab/smoker.html`.
+The fixed one-second solver tracks drying, wood pyrolysis, charcoal oxidation,
+oxygen-limited combustion, a finite pellet hopper, smoker thermal inertia and
+losses, and an illustrative two-node meat temperature with evaporative cooling.
+Wood is a finite batch; pellets share its chemistry but use smaller-particle
+kinetics and metered feed. The automatic controller uses temperature feedback,
+trend anticipation, integral limits, a minimum exhaust opening and optional
+pellet feed control. Manual operation and fixed pellet feed demonstrate control
+limits. A shadow cook with fixed dampers receives matching fuel additions and
+weather/lid disturbances. Its temperature comparison samples every 15 seconds,
+excluding the first 20 simulated minutes; fuel exhaustion remains part of the
+comparison. Charts resize their coordinate system to keep phone labels readable.
+
+The page cites USDA combustion research and distinguishes those physical
+principles and fuel-energy values from assumed kinetics, geometry and tuning.
+This is a nominal controller demonstration, not a device-calibrated prediction
+or a doneness / food safety model. It starts with an established ember bed.
+Refueling a cold bed does not relight it; reset starts a new lit cook. Simulation
+starts paused, suspends in hidden tabs and stops at 12 simulated hours. No server,
+external assets, telemetry or hardware connection is involved. Run
+`npm run test:smoker` for mass/energy accounting, fuel phases, airflow, controller
+response, disturbances and finite fuel behavior.
 
 ## Local development
 

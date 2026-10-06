@@ -1,0 +1,155 @@
+.smoker-page { background: #f7f8f8; padding: 42px 0 64px; }
+.smoker-intro { padding-bottom: 32px; max-width: 760px; }
+.smoker-back { display: inline-block; margin-bottom: 30px; font-size: 13px; }
+.smoker-intro .eyebrow { margin-bottom: 12px; color: #9d4219; }
+.smoker-intro h1 { font-size: clamp(34px, 4vw, 48px); }
+.smoker-intro > p:last-child { margin-top: 16px; max-width: 640px; font-size: 17px; }
+.smoker-toolbar { display: flex; align-items: center; gap: 28px; padding: 18px 0; border-block: 1px solid var(--line); margin-bottom: 24px; }
+.smoker-segment { display: flex; border: 1px solid #aebbc4; border-radius: 4px; overflow: hidden; background: white; }
+.smoker-segment button { min-height: 43px; border: 0; background: transparent; color: var(--ink); font-size: 13px; font-weight: 700; padding: 8px 18px; }
+.smoker-segment button + button { border-left: 1px solid #aebbc4; }
+.smoker-segment button[aria-pressed="true"] { background: var(--ink); color: #fff; }
+.smoker-segment button:focus-visible { outline-offset: -4px; }
+.smoker-time { margin-left: auto; display: flex; align-items: baseline; gap: 12px; font-size: 12px; color: var(--muted); }
+.smoker-time strong { font-size: 22px; color: var(--ink); font-variant-numeric: tabular-nums; }
+.smoker-time small { font-size: 11px; font-weight: 400; }
+.smoker-page select { padding: 7px 8px; min-height: 38px; border: 1px solid #aebbc4; border-radius: 3px; background: #fff; color: var(--ink); font: inherit; font-size: 12px; max-width: 100%; }
+.smoker-unit { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+.smoker-workbench { display: grid; grid-template-columns: 278px minmax(0, 1fr); align-items: start; gap: 24px; }
+.smoker-controls { padding: 22px; background: white; border: 1px solid #c7d0d6; border-radius: 5px; }
+.smoker-control-title { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+.smoker-page h2 { font-family: var(--sans); font-size: 17px; font-weight: 700; letter-spacing: 0; line-height: 1.3; }
+.smoker-dot { width: 8px; height: 8px; border-radius: 50%; background: #75838c; }
+.smoker-dot.is-auto { background: #23777c; }
+.smoker-mode button { flex: 1; padding-inline: 12px; }
+.smoker-small { color: #405567; font-size: 12px; line-height: 1.7; }
+.smoker-mode + .smoker-small { margin: 13px 0 23px; }
+.smoker-range { margin-block: 19px; }
+.smoker-range label { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; color: var(--ink); font-size: 12px; }
+.smoker-range label strong { font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.smoker-range input { accent-color: #b95220; cursor: pointer; width: 100%; display: block; margin: 9px 0 0; min-height: 22px; }
+.smoker-range input:disabled { opacity: .8; cursor: default; accent-color: #7f8d96; }
+.smoker-range p { margin-top: 6px; font-size: 11px; color: #405567; line-height: 1.65; }
+.smoker-pellet-controls { padding-top: 14px; border-top: 1px solid #d7dfe4; }
+.smoker-pellet-controls > label { display: block; margin-bottom: 8px; font-size: 12px; font-weight: 700; }
+.smoker-pellet-controls select { width: 100%; }
+.smoker-settings { margin-top: 22px; padding-block: 13px; border-block: 1px solid #d7dfe4; font-size: 12px; }
+.smoker-page summary { cursor: pointer; color: var(--ink); font-weight: 700; min-height: 24px; }
+.smoker-playback { margin-top: 22px; }
+.smoker-playback > button { width: 100%; min-height: 44px; padding-inline: 8px; }
+.smoker-playback > label { margin-top: 15px; display: flex; align-items: center; justify-content: space-between; font-size: 12px; gap: 12px; }
+.smoker-step-row { display: flex; gap: 12px; margin-top: 13px; }
+.smoker-step-row button { flex: 1; border: 1px solid #b3c0ca; background: white; border-radius: 3px; min-height: 40px; font-size: 12px; color: var(--ink); }
+.smoker-page button:hover:not([aria-pressed="true"]):not(.button-primary) { background: #edf1f4; }
+.smoker-metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border: 1px solid #c7d0d6; background: white; border-radius: 5px; margin-bottom: 20px; }
+.smoker-metrics > div { padding: 16px 15px; display: flex; flex-direction: column; }
+.smoker-metrics > div + div { border-left: 1px solid #dce2e6; }
+.smoker-metrics span { color: var(--muted); font-size: 11px; }
+.smoker-metrics strong { font-size: clamp(21px, 2.3vw, 29px); color: var(--ink); font-weight: 500; line-height: 1.6; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.smoker-metrics > div:first-child strong { color: #a54518; }
+.smoker-metrics em { font-style: normal; font-size: 13px; }
+.smoker-metrics small { font-size: 10px; color: var(--muted); line-height: 1.5; }
+.smoker-panel { padding: 20px 22px; border: 1px solid #c7d0d6; border-radius: 5px; background: #fff; margin-bottom: 20px; min-width: 0; }
+.smoker-panel:last-child { margin-bottom: 0; }
+.smoker-panel-head { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 12px; }
+.smoker-status { background: #e8f3f0; color: #20554d; padding: 4px 9px; border-radius: 3px; font-size: 10px; line-height: 1.5; }
+.smoker-status.is-warning { background: #fff0df; color: #8b4312; }
+.smoker-panel-note { color: var(--muted); font-size: 11px; }
+.smoker-system figure { margin: 0; }
+.smoker-system figcaption { color: var(--muted); font-size: 11px; padding: 2px 0 10px; }
+.smoker-system svg { display: block; width: 100%; height: auto; }
+.smoker-energy { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 22px; padding-top: 12px; border-top: 1px solid #e1e5e8; font-size: 11px; color: var(--muted); }
+.smoker-energy strong { color: var(--ink); font-weight: 600; margin-left: 4px; }
+.smoker-disturbances { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
+.smoker-disturbances > span { font-size: 11px; color: var(--muted); margin-right: auto; }
+.smoker-disturbances button { background: #fff; color: var(--ink); border: 1px solid #b3c0ca; border-radius: 3px; padding: 7px 10px; font-size: 11px; min-height: 36px; }
+.smoker-check { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--muted); cursor: pointer; }
+.smoker-check input { accent-color: var(--ink); margin: 0; width: 15px; height: 15px; }
+.smoker-legend { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; font-size: 11px; color: var(--muted); margin-bottom: 12px; }
+.smoker-legend > span { display: flex; align-items: center; gap: 5px; }
+.smoker-legend > small { margin-left: auto; font-size: 10px; }
+.smoker-key { display: inline-block; width: 13px; height: 3px; background: var(--ink); vertical-align: middle; margin-right: 1px; }
+.smoker-key.pit { background: #c3531c; }
+.smoker-key.air { background: #23777c; }
+.smoker-key.target { background: repeating-linear-gradient(to right, #718393 0 2px, transparent 2px 4px); }
+.smoker-key.fixed { background: repeating-linear-gradient(to right, #74767b 0 5px, transparent 5px 8px); }
+.smoker-key.volatile { background: #b77615; }
+.smoker-key.coal { background: #102638; }
+.smoker-trace { display: block; width: 100%; height: auto; overflow: visible; }
+.smoker-trace text { fill: #405567; font-size: 11px; font-family: Arial, Helvetica, sans-serif; }
+.smoker-comparison { display: flex; align-items: center; gap: 24px; margin-top: 5px; padding: 14px 0 0; border-top: 1px solid #e1e5e8; }
+.smoker-comparison > div { flex: none; }
+.smoker-comparison span { display: block; color: var(--muted); font-size: 10px; margin-bottom: 5px; }
+.smoker-comparison strong { color: var(--ink); font-size: 21px; font-weight: 500; }
+.smoker-comparison small { font-size: 10px; color: var(--muted); }
+.smoker-comparison b { color: #b3c0ca; margin: 0 5px; font-weight: 400; }
+.smoker-comparison p { color: var(--muted); font-size: 10px; line-height: 1.6; max-width: 330px; }
+.smoker-chart-reading { margin-top: 10px; font-size: 10px; color: var(--muted); }
+.smoker-burn-copy { padding-top: 12px; border-top: 1px solid #e1e5e8; }
+.smoker-notice { margin-top: 16px; font-size: 12px; min-height: 20px; color: var(--muted); }
+.smoker-explainer { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; margin-top: 44px; padding: 36px 0; border-block: 1px solid #b3c0ca; }
+.smoker-explainer .eyebrow { margin-bottom: 16px; font-size: 10px; }
+.smoker-explainer h2 { font-family: var(--serif); font-weight: 400; font-size: 29px; line-height: 1.25; }
+.smoker-explainer h2 + p { margin-top: 20px; }
+.smoker-explainer p:not(.eyebrow) { font-size: 13px; }
+.smoker-explainer p + p { margin-top: 12px; }
+.smoker-model-details { margin-top: 24px; font-size: 13px; }
+.smoker-model-details > div { max-width: 850px; padding-top: 16px; }
+.smoker-model-details p + p { margin-top: 12px; }
+.smoker-model-details ul { margin: 14px 0; padding-left: 20px; }
+.smoker-model-details li { padding: 3px 0; }
+@media (min-width: 1100px) { .smoker-controls { position: sticky; top: 20px; } }
+@media (max-width: 1090px) {
+  .smoker-workbench { grid-template-columns: 250px minmax(0, 1fr); gap: 18px; }
+  .smoker-controls { padding: 18px; }
+  .smoker-panel { padding: 17px; }
+  .smoker-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .smoker-metrics > div { padding: 12px 15px; }
+  .smoker-metrics > div:nth-child(3) { border-left: 0; }
+  .smoker-metrics > div:nth-child(n+3) { border-top: 1px solid #dce2e6; }
+  .smoker-panel-head { align-items: flex-start; }
+  .smoker-comparison { align-items: flex-start; flex-direction: column; gap: 8px; }
+}
+@media (max-width: 760px) {
+  .smoker-page { padding-top: 26px; }
+  .smoker-back { margin-bottom: 24px; }
+  .smoker-toolbar { flex-wrap: wrap; gap: 14px; }
+  .smoker-toolbar > .smoker-segment { width: 100%; }
+  .smoker-toolbar > .smoker-segment button { flex: 1; padding-inline: 8px; }
+  .smoker-time { margin-left: 0; }
+  .smoker-unit { margin-left: auto; }
+  .smoker-workbench { grid-template-columns: minmax(0, 1fr); }
+  .smoker-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 0 24px; }
+  .smoker-control-title, .smoker-mode, .smoker-mode + p, .smoker-pellet-controls, .smoker-settings, .smoker-playback { grid-column: 1 / -1; }
+  .smoker-controls > .smoker-range:first-of-type { grid-column: 1 / -1; }
+  .smoker-range { margin-block: 12px; }
+  .smoker-settings { margin-top: 12px; }
+  .smoker-playback { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+  .smoker-playback > label { margin-top: 0; flex-direction: column; justify-content: center; align-items: flex-start; gap: 2px; }
+  .smoker-playback select { width: 100%; }
+  .smoker-step-row { grid-column: 1 / -1; margin-top: 0; }
+  .smoker-results { margin-top: 2px; }
+  .smoker-panel-head { flex-wrap: wrap; gap: 8px; }
+  .smoker-energy { gap: 6px 14px; }
+  .smoker-disturbances > span { width: 100%; }
+  .smoker-disturbances button { flex: 1; padding-inline: 5px; }
+  .smoker-explainer { grid-template-columns: 1fr; gap: 32px; margin-top: 28px; }
+  .smoker-explainer h2 { font-size: 27px; }
+}
+@media (max-width: 370px) {
+  .smoker-controls { padding: 15px; gap: 0 14px; }
+  .smoker-panel { padding: 13px; }
+  .smoker-time { gap: 6px; }
+  .smoker-time > span { font-size: 10px; }
+  .smoker-time strong { font-size: 19px; }
+  .smoker-metrics { gap: 0; }
+  .smoker-metrics > div { padding-inline: 13px; }
+  .smoker-playback { grid-template-columns: 1fr; }
+  .smoker-playback > label { flex-direction: row; align-items: center; }
+  .smoker-playback select { width: auto; }
+}
+@media print {
+  .smoker-controls, .smoker-toolbar, .smoker-disturbances, .smoker-notice { display: none; }
+  .smoker-workbench { display: block; }
+  .smoker-panel { break-inside: avoid; }
+}

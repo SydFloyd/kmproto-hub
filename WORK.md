@@ -1,3 +1,54 @@
+# Smoker Control Lab
+
+Updated: 2026-10-05
+Status: implementation and local verification complete; publication follows.
+
+Added `/lab/smoker` as the ninth and last Lab entry, following Games. It has its
+own static Vite entry and loads no simulation code on the business site or Lab
+directory. The original navy/white site branding is retained, with amber heat
+and teal airflow traces. Responsive SVG charts keep axis labels at their actual
+pixel size, including phone layouts; temperatures can be shown in F or C.
+
+The deterministic one-second model accounts for fuel water, dry wood, escaped
+volatiles and charcoal, with independent wet-mass and chemical-energy ledgers.
+A hardwood batch dries, devolatilizes and develops a coal-dominated tail. Pellets
+use the same energy basis with faster particle kinetics, a metered feed and a
+finite hopper. Both dampers constrain airflow in series. The lumped thermal
+nodes include firebox, chamber, walls and illustrative meat surface/core, with
+evaporation and boiling latent heat. USDA research supports burn-stage and
+fuel-energy principles; kinetics, geometry, heat transfer and gains are clearly
+identified as nominal assumptions. This is not calibrated to a specific cooker
+and does not predict food safety, doneness, particulate emissions or flavor.
+
+Automatic control uses temperature feedback, trend anticipation, bounded
+integration and a minimum exhaust opening. Pellet feed can be controlled along
+with air or held fixed to demonstrate damper-only limits. Lid openings freeze
+integral action; a cooled automatic pellet fire inhibits feed until a new lit
+cook is started. The simulation starts with an established ember bed; adding
+cold fuel cannot relight a cold fire. Manual controls, matching shadow cooks
+with fixed dampers, lid/wind disturbances, refueling and fuel/weather settings
+are functional. Changing moisture affects the next fuel addition and preserves
+existing water inventory; mixed pellet loads use weighted hopper moisture.
+
+Verification: all 14 model tests, production Vercel build, TypeScript, ESLint and
+diff checks pass. Tests cover mass/chemical-energy conservation, fixed-step
+batching, fuel phases, wet-fuel delay, both dampers, 225/250/275 F control,
+four-hour low-target pellet stability, lid recovery, colder/windier conditions,
+fixed-feed limitations, flameout inhibition, moisture blending, finite fuel,
+wet core boiling and extreme manual inputs. Default cooks hold approximately
+250 F at two hours, while the paired fixed-damper cooks read 134 F (wood) and
+330 F (pellets). These are model results, not measured device performance.
+
+Browser checks at 1440/768/390/320 px pass for both default controllers, manual
+actuators, pellet strategies, units, disturbances, refueling, playback, reset,
+hidden-tab suspension, 12-hour bounded sessions and last-position Lab navigation.
+No page errors, horizontal overflow or automated WCAG A/AA violations. Desktop
+and phone screenshots were inspected. Evidence: ignored outputs/smoker-browser.json,
+outputs/check-smoker.cjs and outputs/smoker-*.png. The older owner-private Sites
+publication and unrelated internal pricing files are unchanged.
+
+---
+
 # Waves only
 
 Updated: 2026-10-05

@@ -8,7 +8,7 @@ export default defineConfig({
   plugins: [react()],
   build: {
     rollupOptions: {
-      input: { main: page("./index.html"), lab: page("./lab.html"), games: page("./lab/games.html"), asteroids: page("./lab/games/asteroids.html"), contra: page("./lab/games/contra.html"), bubbleBobble: page("./lab/games/bubble-bobble.html"), rcProAm: page("./lab/games/rc-pro-am.html") },
+      input: { main: page("./index.html"), lab: page("./lab.html"), games: page("./lab/games.html"), asteroids: page("./lab/games/asteroids.html"), contra: page("./lab/games/contra.html"), bubbleBobble: page("./lab/games/bubble-bobble.html"), rcProAm: page("./lab/games/rc-pro-am.html"), smoker: page("./lab/smoker.html") },
     },
   },
 });
