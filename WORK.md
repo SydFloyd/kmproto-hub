@@ -1,7 +1,7 @@
 # Waves only
 
 Updated: 2026-10-05
-Status: source cleanup and verification pass; publication pending.
+Status: published and verified at https://www.kmproto.com.
 
 The homepage now always mounts the ripple tank. Random selection and theme query
 overrides are removed. Marble components, model, renderer, styles, tests and npm
@@ -17,6 +17,14 @@ startup and old theme URLs, continuous currents, mouse/tap ripples, full screen,
 keyboard pause/resume and no overflow or page errors. The worker bundle is
 identical to the previously verified production version. Evidence: ignored
 `outputs/waves-only-local.json` and screenshots.
+
+Source fdc057844ce7c8b7cff8aaa536437ff3732139b7 was pushed to main. Vercel
+production deployment 6873815704 reports success at 2026-10-06T02:00:55Z.
+All six homepage/water assets on www.kmproto.com match the tested build; none
+contains removed-theme code. Live checks at 1440/390/320 px pass for normal
+startup and old theme URLs, continuous currents, pointer/tap interaction, full
+screen, keyboard pause/resume, no overflow and no page errors. Evidence:
+ignored `outputs/waves-only-live.json` and screenshots.
 
 ---
 
