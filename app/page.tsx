@@ -12,9 +12,8 @@ export default function Home() {
         <section className="hero hero-water" aria-labelledby="hero-title">
           <div className="shell">
             <div className="hero-copy">
-              <p className="eyebrow">Independent web &amp; software development</p>
-              <h1 id="hero-title">Make your business<br />easier to find and run.</h1>
-              <p className="hero-lede">Websites, automation and custom software that help customers reach you and give your team a simpler way to work. Designed and built directly with Kyle.</p>
+              <h1 id="hero-title">Websites, Automation, and Custom Software</h1>
+              <p className="hero-lede">Help customers reach you and give your team a simpler way to work.</p>
               <p className="page-note">Websites starting at $1,200.<br />Serving lower Bucks County · In-person meetings by appointment</p>
               <div className="actions">
                 <a className="button button-primary" href={mailto("New project inquiry")}>Request a quote <Arrow /></a>
