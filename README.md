@@ -60,13 +60,18 @@ flat startup, node/pixel limits, bounded input, transfer reuse and quality contr
 
 CHROMA LOOP is a dedicated Lab project, separate from Arcade. Its static release
 is checked into `public/lab/chroma-loop/`, so the public build serves the complete
-game and assets directly on kmproto.com. This copy comes from
-`SydFloyd/chroma-loop` commit `ede9fb53c7b69d1a57e9cd16dd7b4cd2c1f5a6eb`;
-the host copy adapts canonical/share URLs and adds a return link to the Lab.
+game and assets directly on kmproto.com. The initial import came from
+`SydFloyd/chroma-loop` commit `ede9fb53c7b69d1a57e9cd16dd7b4cd2c1f5a6eb`.
+This repository maintains the kmproto.com metadata, Lab link, responsive layout
+and board motion. Survivor pieces retain their DOM identity and follow the engine's
+source-cell mapping through gravity; new dots enter from above. The game clock,
+Fever and combo window wait while pieces settle, and pause holds the animation.
 Rush, Daily, Zen, Expedition and Atlas retain the tested game rules. Scores and
 unlocks are local to this browser and origin; separate hosts keep separate records.
-For future releases, replace this directory with the tested source repository's
-`dist/`, retaining the kmproto.com metadata and Lab link.
+Port future source releases deliberately rather than replacing this directory,
+preserving these host changes. Run `node --test tests/chroma-motion.test.mjs` for
+gravity, refill, reshuffle and Nova identity checks, then exercise normal and
+reduced motion, pause/resume, resize/restart and touch input in the built preview.
 
 Arcade recreations have their own Vite entry points, so their engines are loaded only
 on game pages. `app/lab/games/catalog.ts` supplies the Arcade portal's cards;

@@ -354,7 +354,7 @@ body.play-focused .fever-label>span:last-child{font-size:11px}
 body.play-focused .fever-track{height:4px}
 body.play-focused .rhythm-section{margin-top:6px;min-height:14px;gap:10px}
 body.play-focused #rhythm-label{font-size:9px}
-body.play-focused .mission-strip{gap:9px;margin:9px 0 7px;padding:8px 0 0}
+body.play-focused .mission-strip{gap:9px;height:56px;margin:7px 0 5px;padding:4px 0 0}
 body.play-focused .mission-symbol{width:25px;height:25px;border-radius:8px}
 body.play-focused .mission-heading{font-size:10px;line-height:1.4}
 body.play-focused .mission-track{margin-top:5px;height:3px}
@@ -362,6 +362,15 @@ body.play-focused .mission-side{min-width:81px}
 body.play-focused .mission-side>span{font-size:9px}
 body.play-focused .mission-side #nova-countdown{font-size:8px;margin-top:4px;letter-spacing:0}
 body.play-focused .expedition-strip,body.play-focused .atlas-strip{margin:9px 0 7px;padding:8px 0 0}
+body.play-focused .expedition-strip{display:grid;grid-template-rows:16px 12px 3px 11px;row-gap:2px;height:56px;margin:7px 0 5px;padding:4px 0 0}
+body.play-focused .expedition-strip .stage-heading,body.play-focused .expedition-strip .stage-details,body.play-focused .expedition-strip .stage-bottom{min-width:0;margin:0;line-height:1.3}
+body.play-focused .expedition-strip .stage-heading{font-size:12px}
+body.play-focused .expedition-strip .stage-heading>span{font-size:10px;white-space:nowrap}
+body.play-focused .expedition-strip .stage-details{font-size:9px}
+body.play-focused .expedition-strip .stage-details>span:first-child{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+body.play-focused .expedition-strip .stage-track{height:3px;margin:0}
+body.play-focused .expedition-strip .stage-bottom{font-size:8px;letter-spacing:.7px}
+body.play-focused .expedition-strip .stage-bottom>span:last-child{font-size:8px}
 body.play-focused .stage-heading,body.play-focused .atlas-stage-heading{font-size:12px;line-height:1.4}
 body.play-focused .stage-heading>span,body.play-focused .atlas-stage-heading>span{font-size:10px}
 body.play-focused .stage-details,body.play-focused .atlas-stage-details{font-size:9px;margin-top:5px}
@@ -377,9 +386,10 @@ body.play-focused .feedback-dock{height:33px;margin-top:4px}
 body.play-focused .under-board{margin:7px 3px 0;min-height:20px;font-size:9px}
 body.play-focused #mode-description{display:none}
 body.play-focused .under-board .text-button{font-size:10px;min-height:20px}
-body.play-focused .build-tray{padding-top:6px;min-height:24px;gap:6px}
-body.play-focused .build-chip{font-size:9px;padding:5px 8px}
-body.play-focused .build-empty{font-size:9px}
+body.play-focused .build-tray{height:32px;min-height:32px;padding:6px 2px 0;gap:6px;flex-wrap:nowrap;justify-content:flex-start;overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;scrollbar-width:none}
+body.play-focused .build-tray::-webkit-scrollbar{display:none}
+body.play-focused .build-chip{flex:0 0 auto;font-size:9px;padding:5px 8px}
+body.play-focused .build-empty{font-size:9px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center;flex:1;line-height:1.5}
 body.play-focused .particle{animation-duration:.38s}
 
 /* Results and collections use the same console finishes, at a reading scale. */
@@ -455,14 +465,14 @@ body.play-focused .particle{animation-duration:.38s}
 
 @media(max-width:640px){
   body.play-focused .keyboard-shortcuts{display:none}
-  body.play-focused .site-shell{padding-left:13px;padding-right:13px}
+  body.play-focused .site-shell{padding-left:6px;padding-right:6px}
   body.play-focused .header-right{gap:5px}
   body.play-focused .header-right .icon-button{width:33px;height:33px}
   body.play-focused .brand{font-size:12px;gap:9px;letter-spacing:1.5px}
   body.play-focused .brand-secondary{letter-spacing:3.9px}
   body.play-focused .brand-mark{width:23px;height:23px}
   body.play-focused .game-layout{margin-top:9px}
-  body.play-focused .game-card{padding-left:13px;padding-right:13px;border-radius:20px}
+  body.play-focused .game-card{padding-left:8px;padding-right:8px;border-radius:20px}
   body.play-focused .board-wrap{--dot-size:27px}
   body.play-focused .mode-button{font-size:11px}
   body.play-focused .score-stat>span{font-size:8px;letter-spacing:.8px}
@@ -520,13 +530,18 @@ body.play-focused .particle{animation-duration:.38s}
   body.play-focused .fever-track{height:3px}
   body.play-focused .rhythm-section{margin-top:4px;min-height:12px;gap:7px}
   body.play-focused #rhythm-label{font-size:8px}
-  body.play-focused .mission-strip{margin:6px 0 4px;padding-top:5px}
+  body.play-focused .mission-strip{height:50px;margin:5px 0 4px;padding-top:4px}
   body.play-focused .mission-symbol{width:21px;height:21px}
   body.play-focused .mission-heading{font-size:9px}
   body.play-focused .mission-track{margin-top:4px;height:2px}
   body.play-focused .mission-side>span{font-size:8px}
   body.play-focused .mission-side #nova-countdown{font-size:8px;margin-top:3px}
   body.play-focused .expedition-strip,body.play-focused .atlas-strip{margin:6px 0 4px;padding-top:5px}
+  body.play-focused .expedition-strip{height:50px;grid-template-rows:14px 11px 2px 10px;row-gap:2px;margin:5px 0 4px;padding-top:4px}
+  body.play-focused .expedition-strip .stage-heading{font-size:10px}
+  body.play-focused .expedition-strip .stage-heading>span{font-size:9px}
+  body.play-focused .expedition-strip .stage-details{font-size:8px}
+  body.play-focused .expedition-strip .stage-track{height:2px}
   body.play-focused .stage-heading,body.play-focused .atlas-stage-heading{font-size:10px}
   body.play-focused .stage-heading>span,body.play-focused .atlas-stage-heading>span{font-size:9px}
   body.play-focused .stage-details,body.play-focused .atlas-stage-details{font-size:8px;margin-top:3px}
@@ -538,7 +553,7 @@ body.play-focused .particle{animation-duration:.38s}
   body.play-focused .feedback-dock{height:28px;margin-top:2px}
   body.play-focused .under-board{margin-top:4px;min-height:18px;font-size:8px}
   body.play-focused .under-board .text-button{font-size:9px;min-height:18px}
-  body.play-focused .build-tray{min-height:22px;padding-top:4px}
+  body.play-focused .build-tray{height:28px;min-height:28px;padding-top:4px}
   body.play-focused .build-chip{font-size:8px;padding:4px 7px}
   body.play-focused .build-empty{font-size:8px}
   .start-panel{padding:14px 17px 15px;border-radius:17px}
@@ -552,6 +567,7 @@ body.play-focused .particle{animation-duration:.38s}
   .start-panel>span{font-size:8px;margin-top:10px}
   .start-panel .primary-button{min-height:41px;padding:10px 17px;font-size:12px}
 }
+@media(max-width:640px) and (max-height:720px){body.play-focused .game-card{padding-left:8px;padding-right:8px}}
 @media(max-width:360px){
   body.play-focused .header-right{gap:4px}
   body.play-focused .header-right .icon-button{width:30px;height:30px;border-radius:9px}
@@ -579,3 +595,25 @@ body.play-focused .particle{animation-duration:.38s}
 
 /* Return to the host project directory without leaving the play controls. */
 .lab-return svg{width:12px;height:12px;transform:rotate(180deg)}
+
+/* Translation belongs to the piece; contact and birth belong to its gem. */
+.board{overflow:hidden}
+.dot.motion-piece{will-change:transform;z-index:1}
+.dot.motion-clearing{z-index:2}
+.dot.motion-piece .gem,.dot.motion-clearing .gem,.dot.motion-new .gem{animation:none;animation-delay:0s;transition:none;filter:none}
+.dot.motion-clearing.nova-detonating .gem{animation:none;transition:none;filter:none}
+.dot.motion-piece:hover .gem,.dot.motion-clearing:hover .gem,.dot.motion-new:hover .gem{transform:none}
+.dot.motion-piece .gem:before,.dot.motion-clearing .gem:before,.dot.motion-new .gem:before{animation:none}
+.dot.motion-clearing .gem:after{animation:none}
+.dot.motion-piece.forged-new .gem{animation:forge-birth .65s ease-out both;animation-delay:0s}
+.dot.motion-piece.forged-new .gem:before{animation:forge-ring .65s ease-out both;animation-delay:0s}
+.dot.motion-landed .gem{animation:piece-contact .17s ease-out both}
+.dot.motion-born .gem{animation:piece-birth .22s cubic-bezier(.22,.7,.3,1) both}
+@keyframes piece-contact{0%{transform:scaleX(1.1) scaleY(.9)}48%{transform:scaleX(.96) scaleY(1.04)}100%{transform:scale(1)}}
+@keyframes piece-birth{0%{transform:scale(.78);opacity:.5}65%{transform:scale(1.06);opacity:1}100%{transform:scale(1);opacity:1}}
+.dot.nova-arrived .gem{animation:forge-birth .55s ease-out}
+.dot.nova-arrived .gem:before{content:"";position:absolute;inset:-5px;border:1px solid #ead6ffcc;border-radius:50%;pointer-events:none;animation:forge-ring .55s ease-out forwards}
+@media(prefers-reduced-motion:reduce){
+  .dot.motion-piece,.dot.motion-clearing,.dot.motion-new{will-change:auto}
+  .dot.motion-landed .gem,.dot.motion-born .gem,.dot.motion-piece.forged-new .gem,.dot.motion-piece.forged-new .gem:before,.dot.nova-arrived .gem,.dot.nova-arrived .gem:before{animation:none}
+}

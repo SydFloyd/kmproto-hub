@@ -4,6 +4,7 @@ import { ACHIEVEMENTS, currentMission, advanceMission, findNewAchievements, rank
 import { PERKS, createExpedition, stageInfo, expeditionEffects, expeditionBonus, advanceExpedition, choosePerk, offerPerks } from './expedition.js';
 import { LEVELS as ATLAS_LEVELS, createAtlas, levelInfo, advanceAtlas, starsForRun, normalizeAtlasRecords, recordAtlasResult, isLevelUnlocked, atlasSummary, makeAtlasBoard } from './atlas.js';
 import { rhythmState, feverExtension, RHYTHM_WINDOW } from './flow.js';
+import { animateBoardMove } from './board-motion.js';
 
 const $ = id => document.getElementById(id);
 const format = value => Math.round(value).toLocaleString();
@@ -64,6 +65,8 @@ let pendingPointer = null;
 let layoutSignature = '';
 let fitQueued = false;
 let lastFrame = performance.now();
+let boardMotion = null;
+let pieceId = 0;
 
 function saveProgress() {
   if (canSave) {
@@ -136,9 +139,8 @@ function renderRecent() {
   }));
 }
 
-function renderBoard(animate = false, cleared = []) {
-  const cells = state.board.map((color, index) => {
-    const button = document.createElement('button');
+function updateDot(button, index) {
+    const color = state.board[index];
     button.className = 'dot'; button.dataset.index = index; button.dataset.color = color;
     const nova = state.novas.includes(index);
     button.classList.toggle('nova', nova); button.dataset.nova = String(nova);
@@ -148,12 +150,34 @@ function renderBoard(animate = false, cleared = []) {
     button.setAttribute('aria-label', `${nova ? 'Nova, ' : ''}${COLOR_NAMES[color]}, row ${Math.floor(index / 6) + 1}, column ${index % 6 + 1}`);
     button.setAttribute('aria-pressed', 'false');
     button.tabIndex = index === 0 ? 0 : -1;
-    const gem = document.createElement('span'); gem.className = 'gem'; button.append(gem);
-    if (animate && (cleared.length === 0 || cleared.some(i => i % 6 === index % 6))) button.classList.add('falling');
+}
+function createDot(index) {
+  const button = document.createElement('button');
+  button.dataset.piece = ++pieceId;
+  const gem = document.createElement('span'); gem.className = 'gem'; button.append(gem);
+  updateDot(button, index);
+  return button;
+}
+function renderBoard(animate = false) {
+  const cells = state.board.map((_, index) => {
+    const button = createDot(index);
+    if (animate && !reducedMotion) button.classList.add('falling');
     return button;
   });
   $('board').replaceChildren(...cells);
+  $('board').dataset.motion = 'idle';
+  $('board').setAttribute('aria-busy', 'false');
   updatePath();
+}
+function refreshBoard() {
+  Array.from($('board').children).forEach(updateDot);
+  updatePath();
+}
+function stopBoardMotion(settle = false) {
+  if (!boardMotion) return;
+  const motion = boardMotion; boardMotion = null;
+  if (settle) motion.finish(false); else motion.cancel();
+  state.locked = false;
 }
 
 function rhythm() { return rhythmState(state.combo, state.elapsed, state.rhythmReadyAt); }
@@ -232,7 +256,7 @@ function updateStats() {
   $('rhythm-section').hidden = !!state.atlas || !!state.expedition;
   $('rhythm-section').classList.toggle('cooling', rhythmInfo.next <= rhythmInfo.current && rhythmInfo.current < 5 && state.combo > 1);
   $('rhythm-fill').style.width = `${rhythmInfo.fill * 100}%`;
-  $('rhythm-label').textContent = state.combo ? `Next clear ×${rhythmInfo.next}` : 'Connect to build rhythm';
+  $('rhythm-label').textContent = state.locked ? 'Settling · clock held' : state.combo ? `Next clear ×${rhythmInfo.next}` : 'Connect to build rhythm';
   $('rhythm-section').setAttribute('aria-label', state.combo ? `Next clear multiplier ${rhythmInfo.next}. Rhythm loses one step per missed ${RHYTHM_WINDOW}-second window.` : 'Connect colors to build your rhythm multiplier.');
   $('shuffle-count').textContent = state.shuffles;
   $('shuffle-button').setAttribute('aria-label', state.atlas ? 'Shuffling is unavailable in Atlas. Every retry uses the same board.' : 'Shuffle board. Three shuffles per run.');
@@ -262,11 +286,27 @@ function fitPlayfield() {
   const shellStyle = getComputedStyle(shell);
   const maxWidth = Math.min(600, shell.clientWidth - parseFloat(shellStyle.paddingLeft) - parseFloat(shellStyle.paddingRight));
   column.style.setProperty('--play-width', `${maxWidth}px`);
+  // Phones use the available width. Extra build details may scroll vertically
+  // instead of making every dot and control smaller on a short display.
+  if (matchMedia('(max-width:640px)').matches) return;
   const viewportHeight = window.visualViewport?.height || window.innerHeight;
   for (let pass = 0; pass < 3; pass++) {
     const columnRect = column.getBoundingClientRect();
     const boardWidth = $('board-wrap').getBoundingClientRect().width;
-    const overhead = columnRect.height - boardWidth;
+    let overhead = columnRect.height - boardWidth;
+    if (!state.atlas) {
+      // Fit the shared arcade frame, so changing modes or adding upgrades never
+      // changes the board's scale. The upgrade tray can extend below the frame.
+      const outerHeight = element => {
+        const style = getComputedStyle(element);
+        return element.hidden ? 0 : element.getBoundingClientRect().height + parseFloat(style.marginTop) + parseFloat(style.marginBottom);
+      };
+      const goalStyle = getComputedStyle($('expedition-strip'));
+      const rhythmStyle = getComputedStyle($('rhythm-section'));
+      const goalSpace = parseFloat(goalStyle.height) + parseFloat(goalStyle.marginTop) + parseFloat(goalStyle.marginBottom);
+      const rhythmSpace = parseFloat(rhythmStyle.minHeight) + parseFloat(rhythmStyle.marginTop) + parseFloat(rhythmStyle.marginBottom);
+      overhead += goalSpace + rhythmSpace - outerHeight($('mission-strip')) - outerHeight($('expedition-strip')) - outerHeight($('rhythm-section')) - outerHeight($('build-tray'));
+    }
     const available = viewportHeight - columnRect.top - overhead - 10;
     const target = Math.min(boardWidth, Math.max(252, available));
     const width = Math.min(maxWidth, columnRect.width - boardWidth + target);
@@ -305,7 +345,7 @@ function renderExpedition() {
     tray.dataset.build = signature;
     const chosen = PERKS.filter(perk => run.perks[perk.id] > 0);
     if (!chosen.length) {
-      const hint = document.createElement('span'); hint.className = 'build-empty'; hint.textContent = 'Clear a stage. Choose an upgrade. Make the run your own.';
+      const hint = document.createElement('span'); hint.className = 'build-empty'; hint.textContent = 'Stage clears unlock your next upgrade.';
       tray.replaceChildren(hint);
     } else {
       tray.replaceChildren(...chosen.map(perk => {
@@ -416,7 +456,7 @@ function showPerkDraft() {
       progress.stats.maxBuild = Math.max(progress.stats.maxBuild || 0, buildSize());
       checkAchievements(); saveProgress(); renderProgress();
       modalResume = false; $('perk-dialog').close(); $('board-overlay').hidden = true;
-      lastFrame = performance.now(); renderBoard(); updateStats(); sound.reward();
+      lastFrame = performance.now(); refreshBoard(); updateStats(); sound.reward();
       notice(`Stage ${next.stage + 1}. ${perk.name} joins your build.`, 1800);
     });
     return button;
@@ -452,6 +492,7 @@ function checkAchievements(silent = false) {
 
 function prepare(mode = state.mode) {
   roundId++;
+  stopBoardMotion();
   clearPendingPointer();
   clearTimeout(toastTimer); clearTimeout(noticeTimer);
   clearTimeout(forgeReleaseTimer); $('board-wrap').classList.remove('forge-release');
@@ -514,6 +555,7 @@ function start() {
 function pause(showOverlay = true) {
   if (state.phase !== 'playing') return;
   state.phase = 'paused'; cancelPath();
+  boardMotion?.pause();
   if (showOverlay) {
     $('board-overlay').hidden = false; $('overlay-title').textContent = 'Right where you left it.';
     $('overlay-copy').innerHTML = 'Your board, build, and rhythm are safe.<br>Continue when you\'re ready.';
@@ -526,6 +568,7 @@ function pause(showOverlay = true) {
 function resume() {
   if (state.phase !== 'paused') return;
   state.phase = 'playing'; lastFrame = performance.now(); $('board-overlay').hidden = true;
+  boardMotion?.resume();
   $('chain-label').textContent = forgeEnabled() ? 'Connect 2+ dots · Forge at 5' : 'Drag to connect matching colors'; updateStats(); sound.unlock();
   announce('Game resumed.');
 }
@@ -598,7 +641,7 @@ function commitMove(focusAfter = null) {
   const expeditionStep = state.expedition ? advanceExpedition(state.expedition, result) : null;
   const atlasStep = state.atlas ? advanceAtlas(state.atlas, result) : null;
   const thisRound = roundId;
-  state.locked = true; state.board = result.board; state.novas = result.novas;
+  state.locked = true; state.board = result.board; state.novas = [...result.novas];
   state.combo = multiplier; state.maxCombo = Math.max(state.maxCombo, multiplier); state.lastMove = state.elapsed;
   state.rhythmReadyAt = Infinity;
   state.score += result.points + expeditionPoints; state.dots += result.cleared.length; state.moves++;
@@ -689,7 +732,6 @@ function commitMove(focusAfter = null) {
     if (!result.detonated.length && !result.forged && !mission.completion) notice('Past your personal best. Keep your rhythm.');
   }
   sound.clear(result.cleared.length, result.loop, multiplier);
-  result.cleared.forEach(index => $('board').children[index]?.classList.add('clearing'));
   burst(result.cleared, result.color);
   const rewardLabel = result.forged ? 'NOVA FORGED' : expeditionPoints ? `YOUR BUILD · +${format(expeditionPoints)} BONUS` : mission.completion ? `MISSION COMPLETE · +${format(bonus)} BONUS` : result.detonated.length > 1 ? 'CHAIN REACTION' : result.detonated.length ? 'SUPERNOVA' : result.loop ? 'FULL COLOR CLEAR' : multiplier > 1 ? `×${multiplier} RHYTHM${fever ? ' · DOUBLE POINTS' : ''}` : result.cleared.length > 4 ? 'NICE CONNECTION' : '';
   floatScore(result.points + bonus + expeditionPoints, `${rewardLabel}${feverExtra ? ' · +1s FEVER' : ''}`, result.color);
@@ -697,22 +739,25 @@ function commitMove(focusAfter = null) {
   $('connection-tip').classList.remove('forge-ready');
   $('chain-status').classList.remove('selecting'); $('chain-label').textContent = result.forged ? 'A star you shaped. Set up your next blast.' : result.detonated.length ? 'A little star. A beautiful ripple.' : result.loop ? 'That felt good. Find your next color.' : 'Keep the rhythm. Find your next connection.';
   updateStats(); announce(`${result.cleared.length} dots cleared. ${result.points + bonus + expeditionPoints} points. Score ${state.score}.${result.forged ? ' Nova forged at your chain endpoint.' : ''}${feverExtra ? ' One second of Fever earned.' : ''}${mission.completion ? ' Mission complete.' : ''}`);
-  setTimeout(() => {
+  boardMotion = animateBoardMove({ board: $('board'), result, createDot, updateDot, reducedMotion, onComplete: () => {
     if (roundId !== thisRound) return;
-    state.locked = false; state.rhythmReadyAt = state.elapsed; renderBoard(true, result.cleared); updateStats();
-    if (result.forged) {
-      const dot = $('board').children[result.forged.index]; dot?.classList.add('forged-new');
-      dot?.addEventListener('animationend', event => { if (event.animationName === 'forge-birth') dot.classList.remove('forged-new'); });
-      if (reducedMotion) dot?.classList.remove('forged-new');
+    boardMotion = null;
+    state.locked = false; state.rhythmReadyAt = state.elapsed; updatePath(); updateStats();
+    if (!reducedMotion) {
+      const arrivals = [...new Set([...(result.forged ? [result.forged.index] : []), ...state.novas.filter(index => !result.novas.includes(index))])];
+      for (const index of arrivals) $('board').children[index]?.classList.add('nova-arrived');
     }
-    if (expeditionStep?.status === 'upgrade' && state.phase === 'draft') { showPerkDraft(); return; }
+    if (expeditionStep?.status === 'upgrade' && state.phase === 'draft') {
+      if (document.querySelector('dialog[open]')) showDraftOverlay(); else showPerkDraft();
+      return;
+    }
     if (['won', 'lost'].includes(expeditionStep?.status) && ['playing', 'paused'].includes(state.phase)) { finish(); return; }
     if (['won', 'lost'].includes(atlasStep?.status) && ['playing', 'paused'].includes(state.phase)) { finish(); return; }
     if (Number.isInteger(focusAfter) && state.phase === 'playing') focusDot(focusAfter);
     beginHeldPointer();
     if (result.reshuffled) notice('Fresh connections. Board automatically shuffled.');
     else if ((novaSpawned || orbitNova) && !result.detonated.length && !result.forged && !mission.completion) notice('A fresh Nova. Follow the star.', 1300);
-  }, reducedMotion ? 35 : result.detonated.length > 1 ? 310 : result.forged ? 270 : result.detonated.length ? 240 : 210);
+  } });
 }
 
 function shuffle() {
@@ -729,6 +774,7 @@ function shuffle() {
 function finish() {
   if (!['playing', 'paused', 'draft'].includes(state.phase)) return;
   state.phase = 'finished'; cancelPath();
+  stopBoardMotion(true);
   document.querySelectorAll('dialog[open]').forEach(dialog => dialog.close());
   const previousBest = state.atlas ? state.atlasStartRecord.bestScore || 0 : getBest();
   const record = state.score > previousBest && (!state.atlas || state.atlas.won);
@@ -802,6 +848,7 @@ function finish() {
 function showDialog(id) {
   modalResume = state.phase === 'playing';
   if (modalResume) pause(false);
+  boardMotion?.pause();
   if (id === 'palette-dialog') renderPalettes();
   if (id === 'collection-dialog') renderCollection();
   if (id === 'atlas-dialog') renderAtlasMap();
@@ -947,13 +994,21 @@ document.querySelectorAll('dialog').forEach(dialog => {
     if (modalResume && state.phase === 'paused') resume();
     modalResume = false;
     if (state.phase === 'draft') {
+      if (boardMotion) { if (!document.querySelector('dialog[open]')) boardMotion.resume(); return; }
       if (dialog.id === 'perk-dialog') showDraftOverlay();
       else if (!document.querySelector('dialog[open]')) showPerkDraft();
     }
   });
 });
-document.addEventListener('visibilitychange', () => { if (document.hidden && state.phase === 'playing') pause(); });
-function handleViewportResize() { if (dragging || pendingPointer) cancelPath(); schedulePlayfieldFit(); }
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) { boardMotion?.pause(); if (state.phase === 'playing') pause(); }
+  else if (state.phase === 'draft' && !document.querySelector('dialog[open]')) boardMotion?.resume();
+});
+function handleViewportResize() {
+  if (dragging || pendingPointer) cancelPath();
+  boardMotion?.finish();
+  schedulePlayfieldFit();
+}
 window.addEventListener('resize', handleViewportResize);
 window.visualViewport?.addEventListener('resize', handleViewportResize);
 document.fonts?.ready.then(handleViewportResize);
@@ -961,8 +1016,10 @@ document.fonts?.ready.then(handleViewportResize);
 function frame(now) {
   const dt = Math.max(0, (now - lastFrame) / 1000); lastFrame = now;
   if (state.phase === 'playing') {
-    state.elapsed += dt;
-    if (timed()) state.time = Math.max(0, state.time - dt);
+    if (!state.locked) {
+      state.elapsed += dt;
+      if (timed()) state.time = Math.max(0, state.time - dt);
+    }
     updateStats();
     if (state.path.length >= 2) updatePath();
     if (timed() && state.time <= 0) finish();

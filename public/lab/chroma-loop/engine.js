@@ -66,10 +66,11 @@ function sanitizeNovas(novas) {
   return Array.isArray(novas) ? [...new Set(novas.filter(validIndex))].sort((a, b) => a - b) : [];
 }
 
-function ensureMoves(board, rng, novas = [], trackedIndex = null) {
+function ensureMoves(board, rng, novas = [], trackedIndex = null, origins = null) {
   const markers = new Set(novas);
   const swap = (index, other) => {
     [board[index], board[other]] = [board[other], board[index]];
+    if (origins) [origins[index], origins[other]] = [origins[other], origins[index]];
     if (trackedIndex === index) trackedIndex = other;
     else if (trackedIndex === other) trackedIndex = index;
     const marked = markers.has(index);
@@ -78,7 +79,7 @@ function ensureMoves(board, rng, novas = [], trackedIndex = null) {
     markers.delete(marked ? index : other);
     markers.add(marked ? other : index);
   };
-  const result = reshuffled => ({ board, reshuffled, novas: [...markers].sort((a, b) => a - b), trackedIndex });
+  const result = reshuffled => ({ board, reshuffled, novas: [...markers].sort((a, b) => a - b), trackedIndex, origins });
   if (hasMoves(board)) return result(false);
   // Keep the color counts intact while trying ordinary shuffles first.
   for (let attempt = 0; attempt < 16; attempt++) {
@@ -207,38 +208,48 @@ export function spawnNova(board, rng, existingNovas = []) {
   return candidates.length ? candidates[randomIndex(rng, candidates.length)] : null;
 }
 
-/** Resolve an entire move without mutating the caller's board, path, or power dots. */
+/**
+ * Resolve an entire move without mutating the caller's board, path, or power dots.
+ * `origins[destination]` identifies each piece's source in the old board. Refill
+ * pieces use unique negative indices in the same six-column grid above it:
+ * source row = Math.floor(origin / WIDTH), source column = (origin % WIDTH + WIDTH) % WIDTH.
+ * These identities follow the pieces through gravity and any safety reshuffle.
+ */
 export function resolveMove(board, path, rng = Math.random, { multiplier = 1, fever = false, novas = [], novaRadius = 1, forge = false } = {}) {
   const move = previewMove(board, path, { multiplier, fever, novas, novaRadius, forge });
   if (!move) return null;
   const removed = new Set(move.cleared);
   const markers = new Set(sanitizeNovas(novas));
   const next = new Array(CELLS);
+  const origins = new Array(CELLS);
   const nextNovas = [];
   for (let column = 0; column < WIDTH; column++) {
     const survivors = [];
     for (let row = 0; row < WIDTH; row++) {
       const index = row * WIDTH + column;
-      if (!removed.has(index)) survivors.push({ color: board[index], nova: markers.has(index) || index === move.forged?.from });
+      if (!removed.has(index)) survivors.push({ index, color: board[index], nova: markers.has(index) || index === move.forged?.from });
     }
     const empty = WIDTH - survivors.length;
     for (let row = 0; row < WIDTH; row++) {
       const index = row * WIDTH + column;
       if (row < empty) {
         next[index] = randomIndex(rng, COLORS);
+        origins[index] = (row - empty) * WIDTH + column;
       } else {
         const survivor = survivors[row - empty];
         next[index] = survivor.color;
+        origins[index] = survivor.index;
         if (survivor.nova) nextNovas.push(index);
       }
     }
   }
-  const playable = ensureMoves(next, rng, nextNovas, move.forged?.index ?? null);
+  const playable = ensureMoves(next, rng, nextNovas, move.forged?.index ?? null, origins);
   return {
     ...move,
     forged: move.forged ? { ...move.forged, index: playable.trackedIndex } : null,
     board: playable.board,
     reshuffled: playable.reshuffled,
     novas: playable.novas,
+    origins: playable.origins,
   };
 }
