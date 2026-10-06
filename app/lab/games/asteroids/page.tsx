@@ -20,7 +20,7 @@ export default function AsteroidsPage() {
         <section className="game-intro" aria-labelledby="game-title">
           <div className="shell">
             <p className="eyebrow">The Lab · Arcade · 1979</p>
-            <div className="game-title-row"><h1 id="game-title">Asteroids</h1><a href="/lab/games">Back to games</a></div>
+            <div className="game-title-row"><h1 id="game-title">Asteroids</h1><a href="/lab/games">Back to Arcade</a></div>
             <p className="game-description">An arcade classic, rebuilt for your browser. Rotate, thrust and shoot. Watch for the saucers.</p>
           </div>
         </section>

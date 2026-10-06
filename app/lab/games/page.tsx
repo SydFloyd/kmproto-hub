@@ -3,7 +3,7 @@ import { Arrow, Footer, Header } from "../../components/chrome";
 import { games } from "./catalog";
 import "./games.css";
 
-const title = "Games | The Lab | KM Proto";
+const title = "Arcade | The Lab | KM Proto";
 const description = "Play Asteroids, Contra, Bubble Bobble and R.C. Pro-Am in your browser. Explore KM Proto's arcade recreations with keyboard, touch controls and local co-op.";
 
 export const metadata: Metadata = {
@@ -21,12 +21,12 @@ export default function GamesPage() {
         <section className="page-intro" aria-labelledby="games-title">
           <div className="shell">
             <p className="eyebrow">The Lab</p>
-            <div className="games-title-row"><h1 id="games-title">Games</h1><a href="/lab">Back to the Lab</a></div>
-            <p className="hero-lede">Arcade classics, playable in your browser. Choose a game to begin.</p>
+            <div className="games-title-row"><h1 id="games-title">Arcade</h1><a href="/lab">Back to the Lab</a></div>
+            <p className="hero-lede">Classic arcade and console games, recreated for your browser. Choose a game to begin.</p>
             <p className="page-note">{games.length} games · Keyboard and touch controls</p>
           </div>
         </section>
-        <section className="section games-directory" aria-label="Game library">
+        <section className="section games-directory" aria-label="Arcade library">
           <div className="shell">
             <ul className="games-grid">
               {games.map(game => (

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64"><title>Chroma Loop</title><rect width="64" height="64" rx="15" fill="#11182a"/><g transform="rotate(-12 32 32)">
+    <rect x="19.5" y="19.5" width="25" height="25" rx="3.925" fill="none" stroke="#b8a4ff" stroke-width="3" opacity=".75"/>
+    <circle cx="19.5" cy="19.5" r="6" fill="#b8a4ff"/>
+    <circle cx="44.5" cy="19.5" r="6" fill="#ff8bb6"/>
+    <circle cx="44.5" cy="44.5" r="6" fill="#74dbb5"/>
+    <circle cx="19.5" cy="44.5" r="6" fill="#ffc879"/>
+  </g></svg>

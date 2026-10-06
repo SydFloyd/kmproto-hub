@@ -3,7 +3,7 @@ import { Arrow, Footer, Header } from "../components/chrome";
 import { labProjects, mailto } from "../data";
 
 const title = "The Lab | KM Proto";
-const description = "Independent applications from KM Proto for music, recipes, writing, Bible study and photography.";
+const description = "Independent applications, interactive experiments and browser games from KM Proto.";
 
 export const metadata: Metadata = {
   title,
@@ -23,7 +23,7 @@ export default function Lab() {
           <div className="shell">
             <p className="eyebrow">The Lab</p>
             <h1 id="lab-title">Independent projects</h1>
-            <p className="hero-lede">Applications I develop alongside client work, covering music, recipes, writing, Bible study and photography.</p>
+            <p className="hero-lede">Applications and experiments I develop alongside client work, from music and writing tools to simulations and browser games.</p>
             <p className="page-note">{labProjects.length} projects</p>
           </div>
         </section>

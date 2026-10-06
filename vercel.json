@@ -6,7 +6,8 @@
   "redirects": [
     { "source": "/pricing", "destination": "/#services", "permanent": true },
     { "source": "/pricing.html", "destination": "/#services", "permanent": true },
-    { "source": "/bible-audio", "destination": "/bible-audio/", "permanent": true }
+    { "source": "/bible-audio", "destination": "/bible-audio/", "permanent": true },
+    { "source": "/lab/chroma-loop", "destination": "/lab/chroma-loop/", "permanent": true }
   ],
   "headers": [{
     "source": "/bible-audio/(.*)",

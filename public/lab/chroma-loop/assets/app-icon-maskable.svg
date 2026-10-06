@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <title>Chroma Loop</title>
+  <defs>
+    <linearGradient id="ink" x2=".9" y2="1"><stop stop-color="#20213a"/><stop offset=".5" stop-color="#11182a"/><stop offset="1" stop-color="#080c17"/></linearGradient>
+    <radialGradient id="aura"><stop stop-color="#9680e5" stop-opacity=".25"/><stop offset="1" stop-color="#9680e5" stop-opacity="0"/></radialGradient>
+    <linearGradient id="rim" x2=".9" y2="1"><stop stop-color="#b8a4ff" stop-opacity=".35"/><stop offset="1" stop-color="#74dbb5" stop-opacity=".08"/></linearGradient>
+  </defs>
+  <rect width="512" height="512"  fill="url(#ink)"/>
+  <circle cx="232" cy="234" r="210" fill="url(#aura)"/>
+
+  <g transform="rotate(-12 256 256)">
+    <rect x="170" y="170" width="172" height="172" rx="27.004" fill="none" stroke="#b8a4ff" stroke-width="11" opacity=".75"/>
+    <circle cx="170" cy="170" r="34" fill="#b8a4ff"/>
+    <circle cx="342" cy="170" r="34" fill="#ff8bb6"/>
+    <circle cx="342" cy="342" r="34" fill="#74dbb5"/>
+    <circle cx="170" cy="342" r="34" fill="#ffc879"/>
+  </g>
+  </svg>

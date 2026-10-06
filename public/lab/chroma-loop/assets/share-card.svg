@@ -1,0 +1,143 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <title>Chroma Loop — One more connection.</title>
+  <defs>
+    <radialGradient id="violet"><stop stop-color="#6d519e" stop-opacity=".23"/><stop offset="1" stop-color="#6d519e" stop-opacity="0"/></radialGradient>
+    <radialGradient id="mint"><stop stop-color="#367c77" stop-opacity=".13"/><stop offset="1" stop-color="#367c77" stop-opacity="0"/></radialGradient>
+    <linearGradient id="panel" x2=".8" y2="1"><stop stop-color="#1e2540"/><stop offset="1" stop-color="#111827"/></linearGradient>
+    <linearGradient id="border" x2="1" y2="1"><stop stop-color="#8f7cb8" stop-opacity=".7"/><stop offset="1" stop-color="#4a596e" stop-opacity=".3"/></linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="#080c17"/>
+  <ellipse cx="240" cy="72" rx="560" ry="440" fill="url(#violet)"/>
+  <ellipse cx="1110" cy="500" rx="500" ry="390" fill="url(#mint)"/>
+  <rect x="22" y="22" width="1156" height="586" rx="23" fill="none" stroke="#b8a4ff" stroke-opacity=".1"/>
+  <g transform="translate(66 66) scale(.16)"><g transform="rotate(-12 256 256)">
+    <rect x="170" y="170" width="172" height="172" rx="27.004" fill="none" stroke="#b8a4ff" stroke-width="11" opacity=".75"/>
+    <circle cx="170" cy="170" r="34" fill="#b8a4ff"/>
+    <circle cx="342" cy="170" r="34" fill="#ff8bb6"/>
+    <circle cx="342" cy="342" r="34" fill="#74dbb5"/>
+    <circle cx="170" cy="342" r="34" fill="#ffc879"/>
+  </g></g>
+  <g font-family="Manrope, Arial, sans-serif">
+    <text x="164" y="106" font-size="23" letter-spacing="4" font-weight="800" fill="#f5f3ff">CHROMA LOOP</text>
+    <text x="78" y="256" font-size="65" letter-spacing="-3" font-weight="600" fill="#f5f3ff">One more</text>
+    <text x="75" y="342" font-size="73" letter-spacing="-3.5" font-weight="650" fill="#b8a4ff">connection.</text>
+    <text x="80" y="414" font-size="21" fill="#b4b9ce">Connect colors. Forge your next Nova.</text>
+    <text x="80" y="544" font-size="12" letter-spacing="2" font-weight="600" fill="#8790ab">RUSH  ·  DAILY  ·  ZEN  ·  EXPEDITION  ·  ATLAS</text>
+    <rect x="731" y="76" width="385" height="480" rx="31" fill="url(#panel)" stroke="url(#border)"/>
+    <text x="767" y="125" font-size="11" letter-spacing="2" font-weight="700" fill="#b9aecf">COLOR. CONNECT. REPEAT.</text>
+    <line x1="767" y1="154" x2="1080" y2="154" stroke="#3d4660" stroke-opacity=".6"/>
+    <path d="M785 209H835V259H785Z" stroke="#b8a4ff" stroke-width="10" fill="none" stroke-linejoin="round" opacity=".45"/>
+    <circle cx="785" cy="209" r="23" fill="#b8a4ff" opacity=".12"/>
+      <circle cx="785" cy="209" r="13" fill="#b8a4ff"/>
+      <circle cx="783" cy="206" r="9" fill="#ffffff" opacity=".06"/>
+      <circle cx="835" cy="209" r="23" fill="#b8a4ff" opacity=".12"/>
+      <circle cx="835" cy="209" r="13" fill="#b8a4ff"/>
+      <circle cx="833" cy="206" r="9" fill="#ffffff" opacity=".06"/>
+
+      <circle cx="885" cy="209" r="13" fill="#74dbb5"/>
+      <circle cx="883" cy="206" r="9" fill="#ffffff" opacity=".06"/>
+
+      <circle cx="935" cy="209" r="13" fill="#83baff"/>
+      <circle cx="933" cy="206" r="9" fill="#ffffff" opacity=".06"/>
+
+      <circle cx="985" cy="209" r="13" fill="#ff8bb6"/>
+      <circle cx="983" cy="206" r="9" fill="#ffffff" opacity=".06"/>
+
+      <circle cx="1035" cy="209" r="13" fill="#ffc879"/>
+      <circle cx="1033" cy="206" r="9" fill="#ffffff" opacity=".06"/>
+      <circle cx="785" cy="259" r="23" fill="#b8a4ff" opacity=".12"/>
+      <circle cx="785" cy="259" r="13" fill="#b8a4ff"/>
+      <circle cx="783" cy="256" r="9" fill="#ffffff" opacity=".06"/>
+      <circle cx="835" cy="259" r="23" fill="#b8a4ff" opacity=".12"/>
+      <circle cx="835" cy="259" r="13" fill="#b8a4ff"/>
+      <circle cx="833" cy="256" r="9" fill="#ffffff" opacity=".06"/>
+
+      <circle cx="885" cy="259" r="13" fill="#83baff"/>
+      <circle cx="883" cy="256" r="9" fill="#ffffff" opacity=".06"/>
+
+      <circle cx="935" cy="259" r="13" fill="#74dbb5"/>
+      <circle cx="933" cy="256" r="9" fill="#ffffff" opacity=".06"/>
+
+      <circle cx="985" cy="259" r="13" fill="#ffc879"/>
+      <circle cx="983" cy="256" r="9" fill="#ffffff" opacity=".06"/>
+
+      <circle cx="1035" cy="259" r="13" fill="#ff8bb6"/>
+      <circle cx="1033" cy="256" r="9" fill="#ffffff" opacity=".06"/>
+
+      <circle cx="785" cy="309" r="13" fill="#74dbb5"/>
+      <circle cx="783" cy="306" r="9" fill="#ffffff" opacity=".06"/>
+
+      <circle cx="835" cy="309" r="13" fill="#ff8bb6"/>
+      <circle cx="833" cy="306" r="9" fill="#ffffff" opacity=".06"/>
+
+      <circle cx="885" cy="309" r="13" fill="#ffc879"/>
+      <circle cx="883" cy="306" r="9" fill="#ffffff" opacity=".06"/>
+
+      <circle cx="935" cy="309" r="13" fill="#b8a4ff"/>
+      <circle cx="933" cy="306" r="9" fill="#ffffff" opacity=".06"/>
+
+      <circle cx="985" cy="309" r="13" fill="#83baff"/>
+      <circle cx="983" cy="306" r="9" fill="#ffffff" opacity=".06"/>
+
+      <circle cx="1035" cy="309" r="13" fill="#74dbb5"/>
+      <circle cx="1033" cy="306" r="9" fill="#ffffff" opacity=".06"/>
+
+      <circle cx="785" cy="359" r="13" fill="#83baff"/>
+      <circle cx="783" cy="356" r="9" fill="#ffffff" opacity=".06"/>
+
+      <circle cx="835" cy="359" r="13" fill="#ffc879"/>
+      <circle cx="833" cy="356" r="9" fill="#ffffff" opacity=".06"/>
+
+      <circle cx="885" cy="359" r="13" fill="#ff8bb6"/>
+      <circle cx="883" cy="356" r="9" fill="#ffffff" opacity=".06"/>
+
+      <circle cx="935" cy="359" r="13" fill="#74dbb5"/>
+      <circle cx="933" cy="356" r="9" fill="#ffffff" opacity=".06"/>
+
+      <circle cx="985" cy="359" r="13" fill="#74dbb5"/>
+      <circle cx="983" cy="356" r="9" fill="#ffffff" opacity=".06"/>
+
+      <circle cx="1035" cy="359" r="13" fill="#b8a4ff"/>
+      <circle cx="1033" cy="356" r="9" fill="#ffffff" opacity=".06"/>
+
+      <circle cx="785" cy="409" r="13" fill="#ff8bb6"/>
+      <circle cx="783" cy="406" r="9" fill="#ffffff" opacity=".06"/>
+
+      <circle cx="835" cy="409" r="13" fill="#74dbb5"/>
+      <circle cx="833" cy="406" r="9" fill="#ffffff" opacity=".06"/>
+
+      <circle cx="885" cy="409" r="13" fill="#83baff"/>
+      <circle cx="883" cy="406" r="9" fill="#ffffff" opacity=".06"/>
+
+      <circle cx="935" cy="409" r="13" fill="#ffc879"/>
+      <circle cx="933" cy="406" r="9" fill="#ffffff" opacity=".06"/>
+
+      <circle cx="985" cy="409" r="13" fill="#74dbb5"/>
+      <circle cx="983" cy="406" r="9" fill="#ffffff" opacity=".06"/>
+      <path d="M985 400 987.7 406.3 994 409 987.7 411.7 985 418 982.3 411.7 976 409 982.3 406.3Z" fill="#122b29"/>
+      <circle cx="1035" cy="409" r="13" fill="#ff8bb6"/>
+      <circle cx="1033" cy="406" r="9" fill="#ffffff" opacity=".06"/>
+
+      <circle cx="785" cy="459" r="13" fill="#ffc879"/>
+      <circle cx="783" cy="456" r="9" fill="#ffffff" opacity=".06"/>
+
+      <circle cx="835" cy="459" r="13" fill="#83baff"/>
+      <circle cx="833" cy="456" r="9" fill="#ffffff" opacity=".06"/>
+
+      <circle cx="885" cy="459" r="13" fill="#b8a4ff"/>
+      <circle cx="883" cy="456" r="9" fill="#ffffff" opacity=".06"/>
+
+      <circle cx="935" cy="459" r="13" fill="#ff8bb6"/>
+      <circle cx="933" cy="456" r="9" fill="#ffffff" opacity=".06"/>
+
+      <circle cx="985" cy="459" r="13" fill="#83baff"/>
+      <circle cx="983" cy="456" r="9" fill="#ffffff" opacity=".06"/>
+
+      <circle cx="1035" cy="459" r="13" fill="#ffc879"/>
+      <circle cx="1033" cy="456" r="9" fill="#ffffff" opacity=".06"/>
+
+    <line x1="767" y1="495" x2="1080" y2="495" stroke="#3d4660" stroke-opacity=".6"/>
+    <circle cx="773" cy="525" r="3" fill="#74dbb5"/>
+    <text x="789" y="529" font-size="12" fill="#969fb9">Make a loop. Start a ripple.</text>
+  </g>
+</svg>

@@ -5,7 +5,8 @@ automation and custom software for small businesses and organizations.
 
 - `/` — the business site (services, process, about, contact)
 - `/lab` — the portal to KM Proto's independent apps
-- `/lab/games` — the Games portal, linked from the Lab, with preview cards for every game
+- `/lab/chroma-loop/` — CHROMA LOOP, a dedicated original puzzle game in the Lab
+- `/lab/games` — the Arcade portal, linked from the Lab, with preview cards for every classic recreation
 - `/lab/games/asteroids` — the browser arcade game
 - `/lab/games/contra` — eight-zone run-and-gun recreation, with local two-player co-op
 - `/lab/games/bubble-bobble` — 100-round arcade recreation, with bubble riding and local co-op
@@ -57,8 +58,18 @@ most 42% opacity. Hidden and offscreen
 views stop scheduling work. Run `npm run test:ripple-tank` for field physics,
 flat startup, node/pixel limits, bounded input, transfer reuse and quality control.
 
-Browser games have their own Vite entry points, so their engines are loaded only
-on game pages. `app/lab/games/catalog.ts` supplies the Games portal's cards;
+CHROMA LOOP is a dedicated Lab project, separate from Arcade. Its static release
+is checked into `public/lab/chroma-loop/`, so the public build serves the complete
+game and assets directly on kmproto.com. This copy comes from
+`SydFloyd/chroma-loop` commit `ede9fb53c7b69d1a57e9cd16dd7b4cd2c1f5a6eb`;
+the host copy adapts canonical/share URLs and adds a return link to the Lab.
+Rush, Daily, Zen, Expedition and Atlas retain the tested game rules. Scores and
+unlocks are local to this browser and origin; separate hosts keep separate records.
+For future releases, replace this directory with the tested source repository's
+`dist/`, retaining the kmproto.com metadata and Lab link.
+
+Arcade recreations have their own Vite entry points, so their engines are loaded only
+on game pages. `app/lab/games/catalog.ts` supplies the Arcade portal's cards;
 add future games there and register their HTML entry in `vite.vercel.config.ts`.
 The preview PNGs in `public/games/` are static scenes rendered from the games'
 own canvas code. The portal loads those small images without loading any game
