@@ -1,3 +1,14 @@
+# Lab list order
+
+Updated: 2026-10-05
+
+Swapped the final two Lab entries: Smoker Control Lab is eighth, followed by
+Games in ninth position. The shared labProjects array is the only directory
+ordering source. Production build, TypeScript, ESLint and a direct check of
+the final entries and their links pass.
+
+---
+
 # Hybrid smoker control
 
 Updated: 2026-10-05
