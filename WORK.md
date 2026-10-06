@@ -1,4 +1,26 @@
-# Continuous hero motion and softer KM
+# Waves only
+
+Updated: 2026-10-05
+Status: source cleanup and verification pass; publication pending.
+
+The homepage now always mounts the ripple tank. Random selection and theme query
+overrides are removed. Marble components, model, renderer, styles, tests and npm
+test command are deleted, along with its unused responsive canvas selectors.
+Blueprint components, zoom logic, styles, tests and npm command were already
+removed; a tracked-source audit confirms no implementation or references remain.
+The wave simulation, renderer, continuous currents and softened KM are preserved.
+
+Production build, TypeScript, lint and all 16 remaining wave physics/runtime
+checks pass. The build contains six homepage/water assets and no removed-theme
+chunks or strings. Browser checks at 1440/390/320 px confirm waves on normal
+startup and old theme URLs, continuous currents, mouse/tap ripples, full screen,
+keyboard pause/resume and no overflow or page errors. The worker bundle is
+identical to the previously verified production version. Evidence: ignored
+`outputs/waves-only-local.json` and screenshots.
+
+---
+
+# Earlier release: Continuous hero motion and softer KM
 
 Updated: 2026-10-05
 Status: published and verified at https://www.kmproto.com.

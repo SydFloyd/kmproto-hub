@@ -1,7 +1,0 @@
-.marble-instrument canvas { cursor: default; touch-action: pan-y pinch-zoom; mask-image: none; }
-.marble-instrument .ripple-fullscreen { color: #dce7e0; }
-.marble-instrument .ripple-fullscreen:hover { color: #f1f4ed; }
-.marble-instrument canvas:focus-visible, .marble-instrument .ripple-fullscreen:focus-visible { outline-color: #dce7e0; }
-.marble-instrument .marble-playback { right: 44px; opacity: 0.7; }
-.marble-instrument .marble-playback:hover, .marble-instrument .marble-playback:focus-visible { opacity: 1; }
-.marble-instrument:fullscreen .marble-playback, .marble-instrument.ripple-immersive .marble-playback { right: calc(max(12px, env(safe-area-inset-right)) + 44px); }

@@ -34,6 +34,6 @@
 .hero:has(.ripple-ribbon.ripple-immersive) { z-index: 1000; }
 .ripple-ribbon:fullscreen canvas, .ripple-ribbon.ripple-immersive canvas { touch-action: none; }
 @media (max-width: 1100px) { .hero > .shell { gap: 30px; } }
-@media (max-width: 900px) { .hero.hero-water { padding-block: 64px; } .hero > .shell { grid-template-columns: 1fr; gap: 32px; } .hero-copy { max-width: 640px; } .hero.hero-water h1 { font-size: 48px; } .ripple-instrument:where(:not(.ripple-ribbon)) canvas, .ripple-stage { height: 420px; } }
-@media (max-width: 480px) { .hero.hero-water { padding-block: 48px; } .hero > .shell { gap: 22px; } .hero.hero-water h1 { font-size: clamp(38px, 10vw, 44px); } .ripple-instrument:where(:not(.ripple-ribbon)) canvas, .ripple-stage { height: 360px; } }
+@media (max-width: 900px) { .hero.hero-water { padding-block: 64px; } .hero > .shell { grid-template-columns: 1fr; gap: 32px; } .hero-copy { max-width: 640px; } .hero.hero-water h1 { font-size: 48px; } .ripple-stage { height: 420px; } }
+@media (max-width: 480px) { .hero.hero-water { padding-block: 48px; } .hero > .shell { gap: 22px; } .hero.hero-water h1 { font-size: clamp(38px, 10vw, 44px); } .ripple-stage { height: 360px; } }
 @media print { .ripple-instrument, .ripple-stage { display: none; } .hero > .shell { display: block; } .hero.hero-water { background: #fff; } .hero.hero-water h1, .hero-water .hero-lede, .hero-water .eyebrow, .hero-water .page-note { color: #111; } }

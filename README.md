@@ -22,10 +22,9 @@ with matching entries for the Lab and games (served via `cleanUrls`).
 `public/og.png` is the 1200×630 social card. Typography uses
 system fonts; the site does not fetch external fonts.
 
-The homepage chooses the ASCII ripple tank or obliging marble machine with an
-equal chance on each startup. `app/components/HeroAnimation.tsx` lazy-loads only
-the selected engine. For device verification, `?animation=waves` and
-`?animation=marble` select a specific theme. Blueprint has been removed.
+The homepage always uses the ASCII ripple tank.
+`app/components/HeroAnimation.tsx` lazy-loads the water engine with a placeholder
+and error boundary.
 
 The ASCII ripple tank lives in `app/components/ripple-tank/`. A damped wave
 field reflects from the hidden KM and reveals it only during wave contact.
@@ -56,22 +55,6 @@ reuses its last field for these ambient frames. The KM uses muted color and at
 most 42% opacity. Hidden and offscreen
 views stop scheduling work. Run `npm run test:ripple-tank` for field physics,
 flat startup, node/pixel limits, bounded input, transfer reuse and quality control.
-
-The obliging marble machine lives in `app/components/marble-machine/`. One
-solid ivory marble, at least 11 screen pixels across, rolls around a continuous
-monochrome rail loop with a return lift and a brief release at the top. The
-upper rail bends into a bridge, the lower platform extends, and a counterweight
-opens the hinged passage around a pointer. The marble waits for clearance and
-resumes after the joints make room. Moving away folds the original rail back.
-Touch taps briefly hold an obstruction; swipes and pinch zoom stay native.
-Arrow keys place an imaginary pointer, Space/Enter engages it, Escape clears it,
-and P or the small playback icon pauses/resumes. Playback starts automatically;
-reduced motion uses 60% of the normal pace instead of stopping the marble.
-Chassis and settled
-mechanisms are cached, the rail has 180 nodes, the backing surface is capped at
-650,000 pixels, and the 30 fps loop sleeps while paused, hidden or offscreen.
-Run `npm run test:marble-machine` for continuity, clearance, stationary-obstacle
-recovery, folding, reduced-motion poses and minimum marble visibility.
 
 Browser games have their own Vite entry points, so their engines are loaded only
 on game pages. `app/lab/games/catalog.ts` supplies the Games portal's cards;
