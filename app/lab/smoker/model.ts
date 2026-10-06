@@ -10,10 +10,10 @@
  * Species, fuel geometry, flame mixing, emissions, and internal food geometry
  * require experimental calibration beyond this lumped model.
  */
-export type FuelKind = 'wood' | 'pellets';
+export type FuelKind = 'wood' | 'pellets' | 'hybrid';
 export type ControlMode = 'auto' | 'manual';
 export type PelletControl = 'feed-and-air' | 'damper-only';
-export type BurnPhase = 'Warming / drying' | 'Volatile flame' | 'Char / embers' | 'Metered pellet burn' | 'Fuel depleted' | 'Fire cooling';
+export type BurnPhase = 'Warming / drying' | 'Volatile flame' | 'Char / embers' | 'Metered pellet burn' | 'Hybrid wood + pellets' | 'Fuel depleted' | 'Fire cooling';
 
 export interface SmokerConfig {
   fuel: FuelKind;
@@ -24,6 +24,9 @@ export interface SmokerConfig {
   windMps: number;
   woodMoisture: number; // water / wet fuel mass, for either selected fuel
   meatMassKg: number;
+  initialWoodKg: number; // hybrid wet wood charge
+  initialPelletKg: number; // hybrid wet pellet hopper
+  pelletMoisture: number; // independent hybrid pellet wet-basis moisture
   initialFuelKg: number; // hardwood charge or pellet hopper, excludes starter
   pelletFeedKgH: number; // manual / damper-only commanded feed
   intake: number; // commanded fractions 0..1
@@ -33,6 +36,7 @@ export interface SmokerConfig {
 export const DEFAULT_CONFIG: SmokerConfig = {
   fuel: 'wood', mode: 'auto', pelletControl: 'feed-and-air', targetC: (250 - 32) * 5 / 9,
   ambientC: 20, windMps: 0, woodMoisture: 0.20, meatMassKg: 3,
+  initialWoodKg: .35, initialPelletKg: 3, pelletMoisture: .08,
   initialFuelKg: 1, pelletFeedKgH: 0.7, intake: 0.45, exhaust: 0.85,
 };
 
@@ -60,8 +64,69 @@ export const MODEL_ASSUMPTIONS = {
   notes: 'Nominal lumped geometry, kinetics, heat transfer and feedback gains. The smoke index is a relative oxygen / temperature indicator, not a particulate, flavor or emissions prediction. Food temperatures are illustrative, not a doneness or safety recommendation.',
 } as const;
 
+export interface FuelBed {
+  dryKg: number;
+  charKg: number;
+  waterKg: number;
+  temperatureC: number;
+  addedKg: number; // includes starter char and pellet hopper, by fuel origin
+  burnedKg: number;
+  escapedVolatilesKg: number;
+  waterEvaporatedKg: number;
+  releasedEnergyJ: number;
+  volatilePowerW: number;
+  charPowerW: number;
+  dryingW: number;
+  heatToFuelW: number;
+  potentialVolatileKgS: number;
+  potentialCharKgS: number;
+}
+
+export const HYBRID_CONTROL_ASSUMPTIONS = {
+  observerTimeS: 45, woodForecastS: 120, pitForecastS: 240,
+  proportionalWPerK: 40, integralWPerKS: .045,
+  fireStoredEnergyHorizonS: 240,
+  minimumIntake: .12, minimumExhaust: .72,
+  cleanGasExcessAirRatio: 1.25, feedExcessAirRatio: 1.8,
+  maximumFeedKgH: 2.5, effortSlewPerS: .003,
+  woodStarterCharKg: .04, pelletStarterDryKg: .025, pelletStarterCharKg: .025,
+  observer: 'Idealized access to simulated wood heat release. A real controller needs a calibrated observer using available sensors; that observer is not implemented here.',
+  thermalLedger: 'Initial hot-firebox sensible energy is explicit. Fuel mass and chemical-energy ledgers close; fuel sensible-enthalpy transport and changing capacities remain reduced-order approximations.',
+} as const;
+
 export interface SmokerState {
   config: SmokerConfig;
+  woodBed: FuelBed;
+  pelletBed: FuelBed;
+  woodPhase: BurnPhase;
+  pelletPhase: BurnPhase;
+  woodPowerW: number;
+  pelletPowerW: number;
+  woodVolatilePowerW: number;
+  woodCharPowerW: number;
+  pelletVolatilePowerW: number;
+  pelletCharPowerW: number;
+  woodFuelRemainingKg: number;
+  pelletFuelRemainingKg: number;
+  woodFuelC: number;
+  pelletFuelC: number;
+  woodDryingW: number;
+  pelletDryingW: number;
+  demandPowerW: number;
+  residualPelletPowerW: number;
+  estimatedWoodPowerW: number;
+  estimatedWoodRateWPerS: number;
+  predictedWoodPowerW: number;
+  committedPelletPowerW: number;
+  unavoidableWoodPowerW: number;
+  woodOverpower: boolean;
+  cleanAirLimited: boolean;
+  pelletFeedTargetKgH: number;
+  oxygenConsumedKgS: number;
+  oxygenDemandKgS: number;
+  startupSensibleEnergyJ: number;
+  hybridIntegralW: number;
+  controlReason: string;
   timeS: number;
   chamberC: number;
   wallC: number;
@@ -116,15 +181,18 @@ export const cToF = (c: number) => c * 9 / 5 + 32;
 export const fToC = (f: number) => (f - 32) * 5 / 9;
 
 function normalizeConfig(options: Partial<SmokerConfig>): SmokerConfig {
-  const fuel = options.fuel === 'pellets' ? 'pellets' : 'wood';
+  const fuel: FuelKind = options.fuel === 'hybrid' ? 'hybrid' : options.fuel === 'pellets' ? 'pellets' : 'wood';
   const config: SmokerConfig = { ...DEFAULT_CONFIG, ...options, fuel };
-  if (options.woodMoisture === undefined) config.woodMoisture = fuel === 'wood' ? .20 : .08;
+  if (options.woodMoisture === undefined) config.woodMoisture = fuel === 'pellets' ? .08 : .20;
   if (options.initialFuelKg === undefined) config.initialFuelKg = fuel === 'wood' ? 1 : 3;
   config.targetC = clamp(finite(config.targetC, DEFAULT_CONFIG.targetC), 65, 175);
   config.ambientC = clamp(finite(config.ambientC, 20), -20, 45);
   config.windMps = clamp(finite(config.windMps, 0), 0, 15);
   config.woodMoisture = clamp(finite(config.woodMoisture, .20), 0, .55);
   config.meatMassKg = clamp(finite(config.meatMassKg, 3), .5, 8);
+  config.initialWoodKg = clamp(finite(config.initialWoodKg, .35), 0, 10);
+  config.initialPelletKg = clamp(finite(config.initialPelletKg, 3), 0, 10);
+  config.pelletMoisture = clamp(finite(config.pelletMoisture, .08), 0, .55);
   config.initialFuelKg = clamp(finite(config.initialFuelKg, 1), 0, 10);
   config.pelletFeedKgH = clamp(finite(config.pelletFeedKgH, .7), 0, 2.5);
   config.intake = clamp(finite(config.intake, .45), 0, 1);
@@ -134,19 +202,42 @@ function normalizeConfig(options: Partial<SmokerConfig>): SmokerConfig {
 
 export function createSimulation(options: Partial<SmokerConfig> = {}): SmokerState {
   const config = normalizeConfig(options);
-  const woodDryKg = config.fuel === 'wood' ? config.initialFuelKg * (1 - config.woodMoisture) : .025;
-  const waterKg = config.fuel === 'wood' ? config.initialFuelKg * config.woodMoisture : .025 * config.woodMoisture / (1 - config.woodMoisture);
-  const charKg = config.fuel === 'wood' ? .18 : .025;
-  const hopperKg = config.fuel === 'pellets' ? config.initialFuelKg : 0;
-  const fuelAddedKg = woodDryKg + waterKg + charKg + hopperKg;
+  const hybrid = config.fuel === 'hybrid';
+  const woodChargeKg = hybrid ? config.initialWoodKg : config.fuel === 'wood' ? config.initialFuelKg : 0;
+  const pelletPresent = hybrid ? config.initialPelletKg > 0 : config.fuel === 'pellets';
+  const pelletMoisture = hybrid ? config.pelletMoisture : config.woodMoisture;
+  const hopperKg = hybrid ? config.initialPelletKg : config.fuel === 'pellets' ? config.initialFuelKg : 0;
+  const woodBed = makeBed(woodChargeKg * (1 - config.woodMoisture), woodChargeKg * config.woodMoisture,
+    hybrid ? (woodChargeKg > 0 ? HYBRID_CONTROL_ASSUMPTIONS.woodStarterCharKg : 0) : config.fuel === 'wood' ? .18 : 0, config.ambientC);
+  const pelletDryKg = pelletPresent ? .025 : 0;
+  const pelletBed = makeBed(pelletDryKg, pelletDryKg * pelletMoisture / (1 - pelletMoisture), pelletPresent ? .025 : 0, 160);
+  pelletBed.addedKg += hopperKg;
+  const woodDryKg = woodBed.dryKg + pelletBed.dryKg;
+  const waterKg = woodBed.waterKg + pelletBed.waterKg;
+  const charKg = woodBed.charKg + pelletBed.charKg;
+  const fuelAddedKg = woodBed.addedKg + pelletBed.addedKg;
   return {
-    config, timeS: 0, chamberC: config.ambientC, wallC: config.ambientC,
-    fireC: 480, fuelC: config.fuel === 'wood' ? config.ambientC : 160,
+    config, woodBed, pelletBed,
+    woodPhase: woodChargeKg > 0 ? 'Warming / drying' : 'Fuel depleted',
+    pelletPhase: pelletPresent ? 'Metered pellet burn' : 'Fuel depleted',
+    woodPowerW: 0, pelletPowerW: 0, woodVolatilePowerW: 0, woodCharPowerW: 0,
+    pelletVolatilePowerW: 0, pelletCharPowerW: 0,
+    woodFuelRemainingKg: woodBed.addedKg, pelletFuelRemainingKg: pelletBed.addedKg,
+    woodFuelC: woodBed.temperatureC, pelletFuelC: pelletBed.temperatureC,
+    woodDryingW: 0, pelletDryingW: 0, demandPowerW: 0, residualPelletPowerW: 0,
+    estimatedWoodPowerW: 0, estimatedWoodRateWPerS: 0, predictedWoodPowerW: 0,
+    committedPelletPowerW: 0, unavoidableWoodPowerW: 0, woodOverpower: false, cleanAirLimited: false,
+    pelletFeedTargetKgH: 0, oxygenConsumedKgS: 0, oxygenDemandKgS: 0,
+    startupSensibleEnergyJ: A.fireHeatCapacityJPerK * (480 - config.ambientC)
+      + (pelletBed.dryKg * 1700 + pelletBed.waterKg * 4180) * (160 - config.ambientC),
+    hybridIntegralW: 0, controlReason: hybrid ? 'Wood heat plus pellet trim' : 'Temperature feedback',
+    timeS: 0, chamberC: config.ambientC, wallC: config.ambientC,
+    fireC: 480, fuelC: config.fuel === 'pellets' ? 160 : config.ambientC,
     meatSurfaceC: 5, meatCoreC: 5, meatWaterKg: config.meatMassKg * .20, meatCoreWaterKg: config.meatMassKg * .45, feedInhibited: false,
     intake: config.intake, exhaust: config.exhaust, pelletFeedKgH: 0,
     powerW: 0, volatilePowerW: 0, charPowerW: 0, dryingW: 0, evaporationW: 0,
     heatIntoChamberW: 0, lossW: 0, airKgS: 0, oxygenRatio: 1, smokeIndex: 0,
-    fuelRemainingKg: fuelAddedKg, woodDryKg, charKg, waterKg, hopperKg, hopperMoisture: config.woodMoisture,
+    fuelRemainingKg: fuelAddedKg, woodDryKg, charKg, waterKg, hopperKg, hopperMoisture: pelletMoisture,
     fuelAddedKg, fuelConsumedKg: 0, fuelBurnedKg: 0, escapedVolatilesKg: 0,
     fuelWaterEvaporatedKg: 0, releasedEnergyJ: 0,
     phase: config.fuel === 'wood' ? 'Warming / drying' : 'Metered pellet burn',
@@ -157,12 +248,13 @@ export function createSimulation(options: Partial<SmokerConfig> = {}): SmokerSta
 }
 
 /** Live settings. Change fuel / meat mass with createSimulation for a fresh run. */
-export function setControls(state: SmokerState, controls: Partial<Omit<SmokerConfig, 'fuel' | 'initialFuelKg' | 'meatMassKg'>>): void {
+export function setControls(state: SmokerState, controls: Partial<Omit<SmokerConfig, 'fuel' | 'initialFuelKg' | 'initialWoodKg' | 'initialPelletKg' | 'meatMassKg'>>): void {
   const priorMode = state.config.mode;
   const priorPelletControl = state.config.pelletControl;
   state.config = normalizeConfig({ ...state.config, ...controls });
   if (priorMode !== state.config.mode || priorPelletControl !== state.config.pelletControl) {
     state.controllerIntegral = 0;
+    state.hybridIntegralW = 0;
     state.controllerEffort = state.intake;
   }
   if (state.config.mode === 'manual') {
@@ -172,9 +264,13 @@ export function setControls(state: SmokerState, controls: Partial<Omit<SmokerCon
 }
 
 /** Wet hardwood mass or hopper pellet mass; new wood is mixed into the fuel node. */
-export function refuel(state: SmokerState, kg = state.config.fuel === 'wood' ? .75 : 1): void {
+export function refuel(state: SmokerState, kg = state.config.fuel === 'pellets' ? 1 : .75, fuel?: 'wood' | 'pellets'): void {
   kg = clamp(finite(kg, 0), 0, 10);
   if (!kg) return;
+  if (state.config.fuel === 'hybrid') {
+    refuelHybrid(state, kg, fuel ?? 'wood');
+    return;
+  }
   if (state.config.fuel === 'pellets') {
     state.hopperMoisture = (state.hopperMoisture * state.hopperKg + state.config.woodMoisture * kg) / (state.hopperKg + kg);
     state.hopperKg += kg;
@@ -203,6 +299,7 @@ function airFlow(state: SmokerState, intake = state.intake, exhaust = state.exha
 
 function control(state: SmokerState): void {
   const config = state.config;
+  if (config.fuel === 'hybrid') { controlHybrid(state); return; }
   if (config.mode === 'manual') {
     state.intake = config.intake;
     state.exhaust = config.exhaust;
@@ -221,6 +318,9 @@ function control(state: SmokerState): void {
     + 3.2 * (config.meatMassKg / 3) ** (2 / 3) * (config.targetC - state.meatSurfaceC);
   const desiredFireC = config.targetC + desiredHeatW / 4.0;
   const desiredPowerW = desiredHeatW + (1.0 + .08 * config.windMps) * (desiredFireC - config.ambientC) + 100;
+  state.demandPowerW = desiredPowerW;
+  state.residualPelletPowerW = config.fuel === 'pellets' ? desiredPowerW : 0;
+  state.controlReason = feedControlled ? 'Meter pellet heat and match combustion air' : 'Adjust both dampers from predicted pit temperature';
   const pelletWetEnergyJ = (1 - state.hopperMoisture) * A.dryWoodNetJPerKg - state.hopperMoisture * A.waterLatentJPerKg;
   const baseline = feedControlled ? clamp(desiredPowerW * 3600 / pelletWetEnergyJ / 2.5, .10, .8) : .42;
   const raw = baseline + proportional * predictedError + state.controllerIntegral;
@@ -256,6 +356,10 @@ function stepOneSecond(state: SmokerState): void {
   control(state);
   const lidOpen = state.lidOpenRemainingS > 0;
   state.airKgS = airFlow(state);
+  let heatToFuelW = 0;
+  if (config.fuel === 'hybrid') {
+    heatToFuelW = burnHybrid(state);
+  } else {
   let feedKg = 0;
   state.feedInhibited = config.fuel === 'pellets' && config.mode === 'auto' && state.timeS > 300 && state.fireC < 120;
   if (config.fuel === 'pellets') {
@@ -272,7 +376,7 @@ function stepOneSecond(state: SmokerState): void {
 
   const fuelHeatCapacity = Math.max(config.fuel === 'wood' ? 80 : 8, state.woodDryKg * 1700 + state.waterKg * 4180);
   const fuelConductance = config.fuel === 'wood' ? 3.5 : fuelHeatCapacity / 8;
-  const heatToFuelW = fuelConductance * (state.fireC - state.fuelC);
+  heatToFuelW = fuelConductance * (state.fireC - state.fuelC);
   const waterRemovalKg = state.fuelC >= 95
     ? Math.min(state.waterKg, Math.max(0, heatToFuelW) / A.waterLatentJPerKg, state.waterKg / (config.fuel === 'wood' ? 120 : 5)) : 0;
   state.dryingW = waterRemovalKg * A.waterLatentJPerKg;
@@ -292,11 +396,13 @@ function stepOneSecond(state: SmokerState): void {
     * clamp((state.fireC - (config.fuel === 'wood' ? 80 : 180)) / (config.fuel === 'wood' ? 180 : 280), 0, 1.8));
   const oxygenKg = state.airKgS * A.airOxygenMassFraction;
   const oxygenDemandKg = volatileKg * A.volatileOxygenKgPerKg + charPotentialKg * A.charOxygenKgPerKg;
+  state.oxygenDemandKgS = oxygenDemandKg;
   state.oxygenRatio = oxygenDemandKg > 1e-10 ? Math.min(8, oxygenKg / oxygenDemandKg) : 8;
   const oxygenFraction = volatileKg > 1e-12 ? clamp(oxygenKg / (volatileKg * A.volatileOxygenKgPerKg), 0, 1) : 1;
   const hotMixing = clamp((state.fireC - 120) / 120, 0, 1);
   const volatileBurnKg = volatileKg * oxygenFraction * hotMixing;
   const charBurnKg = Math.min(charPotentialKg, Math.max(0, oxygenKg - volatileBurnKg * A.volatileOxygenKgPerKg) / A.charOxygenKgPerKg);
+  state.oxygenConsumedKgS = volatileBurnKg * A.volatileOxygenKgPerKg + charBurnKg * A.charOxygenKgPerKg;
   state.charKg -= charBurnKg;
   const escapedKg = volatileKg - volatileBurnKg;
   state.fuelBurnedKg += volatileBurnKg + charBurnKg;
@@ -306,6 +412,8 @@ function stepOneSecond(state: SmokerState): void {
   state.powerW = state.volatilePowerW + state.charPowerW;
   state.releasedEnergyJ += state.powerW;
   state.smokeIndex = volatileKg > 1e-9 ? clamp(escapedKg / volatileKg, 0, 1) : 0;
+  syncPureBed(state, heatToFuelW, volatileKg, charPotentialKg);
+  }
 
   state.heatIntoChamberW = 4.0 * (state.fireC - state.chamberC);
   const fireLossW = (1.0 + .08 * config.windMps) * (state.fireC - config.ambientC);
@@ -343,13 +451,16 @@ function stepOneSecond(state: SmokerState): void {
   state.fuelRemainingKg = state.woodDryKg + state.charKg + state.waterKg + state.hopperKg;
   state.fuelConsumedKg = state.fuelBurnedKg + state.escapedVolatilesKg + state.fuelWaterEvaporatedKg;
   state.errorC = config.targetC - state.chamberC;
+  syncFuelTelemetry(state);
   const minimumEffort = config.fuel === 'pellets' && config.pelletControl === 'feed-and-air' ? .10 : .025;
   state.setpointLimited = config.mode === 'auto' && (state.controllerEffort > .98 && state.errorC > 8
     || state.controllerEffort < minimumEffort + .005 && state.errorC < -8
-    || config.fuel === 'pellets' && config.pelletControl === 'damper-only' && state.smokeIndex > .35);
+    || config.fuel === 'pellets' && config.pelletControl === 'damper-only' && state.smokeIndex > .35
+    || config.fuel === 'hybrid' && state.woodOverpower);
   if (state.fuelRemainingKg < .002) state.phase = 'Fuel depleted';
   else if (state.powerW < 100 && state.fireC < 160) state.phase = 'Fire cooling';
-  else if (config.fuel === 'pellets' && state.hopperKg > 0) state.phase = 'Metered pellet burn';
+  else if (config.fuel === 'hybrid' && state.woodPowerW > 100 && state.pelletPowerW > 100) state.phase = 'Hybrid wood + pellets';
+  else if ((config.fuel === 'pellets' || config.fuel === 'hybrid') && state.pelletPowerW > state.woodPowerW && state.hopperKg > 0) state.phase = 'Metered pellet burn';
   else if (state.dryingW > state.volatilePowerW && state.waterKg > .002) state.phase = 'Warming / drying';
   else if (state.volatilePowerW > state.charPowerW && state.woodDryKg > .005) state.phase = 'Volatile flame';
   else state.phase = 'Char / embers';
@@ -357,6 +468,8 @@ function stepOneSecond(state: SmokerState): void {
     : state.phase === 'Fuel depleted' ? 'Fuel depleted · add fuel'
       : state.feedInhibited ? 'Fire cooled · pellet feed paused · reset to relight'
         : state.phase === 'Fire cooling' ? 'Fire cooling · insufficient heat'
+        : state.cleanAirLimited ? 'Damper airflow at capacity · clean combustion unavailable'
+        : state.woodOverpower ? 'Wood exceeds clean-air control authority · pellet command zero'
         : state.smokeIndex > .35 ? 'Oxygen-limited burn · smoky combustion'
           : state.setpointLimited ? 'Controller at limit · target unavailable'
             : Math.abs(state.errorC) <= 3 ? 'Holding the smoking temperature'
@@ -371,4 +484,273 @@ export function stepSimulation(state: SmokerState, seconds = 1): SmokerState {
   state.remainderS = Math.max(0, total - ticks);
   for (let i = 0; i < ticks; i++) stepOneSecond(state);
   return state;
+}
+
+function makeBed(dryKg: number, waterKg: number, charKg: number, temperatureC: number): FuelBed {
+  return { dryKg, waterKg, charKg, temperatureC, addedKg: dryKg + waterKg + charKg,
+    burnedKg: 0, escapedVolatilesKg: 0, waterEvaporatedKg: 0, releasedEnergyJ: 0,
+    volatilePowerW: 0, charPowerW: 0, dryingW: 0, heatToFuelW: 0,
+    potentialVolatileKgS: 0, potentialCharKgS: 0 };
+}
+
+function refuelHybrid(state: SmokerState, kg: number, fuel: 'wood' | 'pellets'): void {
+  if (fuel === 'pellets') {
+    state.hopperMoisture = (state.hopperMoisture * state.hopperKg + state.config.pelletMoisture * kg) / (state.hopperKg + kg);
+    state.hopperKg += kg;
+    state.pelletBed.addedKg += kg;
+  } else {
+    const bed = state.woodBed;
+    const oldCapacity = bed.dryKg * 1700 + bed.waterKg * 4180;
+    const newDryKg = kg * (1 - state.config.woodMoisture);
+    const newWaterKg = kg * state.config.woodMoisture;
+    const addedCapacity = newDryKg * 1700 + newWaterKg * 4180;
+    bed.temperatureC = (bed.temperatureC * oldCapacity + state.config.ambientC * addedCapacity) / (oldCapacity + addedCapacity);
+    bed.dryKg += newDryKg;
+    bed.waterKg += newWaterKg;
+    bed.addedKg += kg;
+  }
+  syncFuelTelemetry(state);
+}
+
+function syncPureBed(state: SmokerState, heatToFuelW: number, volatileKg: number, charKg: number): void {
+  const bed = state.config.fuel === 'wood' ? state.woodBed : state.pelletBed;
+  bed.dryKg = state.woodDryKg;
+  bed.charKg = state.charKg;
+  bed.waterKg = state.waterKg;
+  bed.temperatureC = state.fuelC;
+  bed.addedKg = state.fuelAddedKg;
+  bed.burnedKg = state.fuelBurnedKg;
+  bed.escapedVolatilesKg = state.escapedVolatilesKg;
+  bed.waterEvaporatedKg = state.fuelWaterEvaporatedKg;
+  bed.releasedEnergyJ = state.releasedEnergyJ;
+  bed.volatilePowerW = state.volatilePowerW;
+  bed.charPowerW = state.charPowerW;
+  bed.dryingW = state.dryingW;
+  bed.heatToFuelW = heatToFuelW;
+  bed.potentialVolatileKgS = volatileKg;
+  bed.potentialCharKgS = charKg;
+}
+
+function syncFuelTelemetry(state: SmokerState): void {
+  const w = state.woodBed, p = state.pelletBed;
+  state.woodPowerW = w.volatilePowerW + w.charPowerW;
+  state.pelletPowerW = p.volatilePowerW + p.charPowerW;
+  state.woodVolatilePowerW = w.volatilePowerW;
+  state.woodCharPowerW = w.charPowerW;
+  state.pelletVolatilePowerW = p.volatilePowerW;
+  state.pelletCharPowerW = p.charPowerW;
+  state.woodFuelC = w.temperatureC;
+  state.pelletFuelC = p.temperatureC;
+  state.woodDryingW = w.dryingW;
+  state.pelletDryingW = p.dryingW;
+  state.woodPhase = w.dryKg + w.charKg + w.waterKg < .002 ? 'Fuel depleted'
+    : state.woodPowerW < 100 && state.fireC < 160 ? 'Fire cooling'
+      : w.dryingW > w.volatilePowerW && w.waterKg > .002 ? 'Warming / drying'
+        : w.volatilePowerW > w.charPowerW && w.dryKg > .005 ? 'Volatile flame' : 'Char / embers';
+  state.pelletPhase = p.dryKg + p.charKg + p.waterKg + state.hopperKg < .002 ? 'Fuel depleted'
+    : state.pelletPowerW < 100 && state.fireC < 160 ? 'Fire cooling'
+      : state.hopperKg > 0 ? 'Metered pellet burn' : 'Char / embers';
+  state.woodFuelRemainingKg = w.dryKg + w.charKg + w.waterKg;
+  state.pelletFuelRemainingKg = p.dryKg + p.charKg + p.waterKg + state.hopperKg;
+  if (state.config.fuel === 'hybrid') {
+    state.woodDryKg = w.dryKg + p.dryKg; // retained legacy aggregate name
+    state.charKg = w.charKg + p.charKg;
+    state.waterKg = w.waterKg + p.waterKg;
+    state.fuelRemainingKg = state.woodFuelRemainingKg + state.pelletFuelRemainingKg;
+    state.fuelAddedKg = w.addedKg + p.addedKg;
+    state.fuelBurnedKg = w.burnedKg + p.burnedKg;
+    state.escapedVolatilesKg = w.escapedVolatilesKg + p.escapedVolatilesKg;
+    state.fuelWaterEvaporatedKg = w.waterEvaporatedKg + p.waterEvaporatedKg;
+    state.fuelConsumedKg = state.fuelBurnedKg + state.escapedVolatilesKg + state.fuelWaterEvaporatedKg;
+    state.releasedEnergyJ = w.releasedEnergyJ + p.releasedEnergyJ;
+    state.powerW = state.woodPowerW + state.pelletPowerW;
+    state.volatilePowerW = w.volatilePowerW + p.volatilePowerW;
+    state.charPowerW = w.charPowerW + p.charPowerW;
+    state.dryingW = w.dryingW + p.dryingW;
+    const mass = w.dryKg + w.waterKg + p.dryKg + p.waterKg;
+    state.fuelC = mass > 1e-12 ? ((w.dryKg + w.waterKg) * w.temperatureC + (p.dryKg + p.waterKg) * p.temperatureC) / mass : state.fireC;
+  }
+}
+
+function intakeForAir(state: SmokerState, desiredAirKgS: number, exhaust: number): number {
+  let low: number = HYBRID_CONTROL_ASSUMPTIONS.minimumIntake, high = 1;
+  for (let i = 0; i < 10; i++) {
+    const mid = (low + high) / 2;
+    if (airFlow(state, mid, exhaust) < desiredAirKgS) low = mid;
+    else high = mid;
+  }
+  return (low + high) / 2;
+}
+
+function minimumCleanAir(state: SmokerState): number {
+  const gasOxygenKgS = (state.woodBed.potentialVolatileKgS + state.pelletBed.potentialVolatileKgS) * A.volatileOxygenKgPerKg;
+  return Math.max(airFlow(state, HYBRID_CONTROL_ASSUMPTIONS.minimumIntake, HYBRID_CONTROL_ASSUMPTIONS.minimumExhaust),
+    gasOxygenKgS * HYBRID_CONTROL_ASSUMPTIONS.cleanGasExcessAirRatio / A.airOxygenMassFraction);
+}
+
+function controlHybrid(state: SmokerState): void {
+  const config = state.config, H = HYBRID_CONTROL_ASSUMPTIONS;
+  // This is an ideal simulated observer. Device software cannot read wood heat
+  // directly; identifying that heat from real temperature/O2 sensors is separate.
+  const previousEstimate = state.estimatedWoodPowerW;
+  state.estimatedWoodPowerW += (state.woodPowerW - state.estimatedWoodPowerW) / H.observerTimeS;
+  state.estimatedWoodRateWPerS += .025 * (state.estimatedWoodPowerW - previousEstimate - state.estimatedWoodRateWPerS);
+  state.predictedWoodPowerW = clamp(state.estimatedWoodPowerW + H.woodForecastS * state.estimatedWoodRateWPerS,
+    0, state.estimatedWoodPowerW * 2 + 200);
+  if (config.mode === 'manual') {
+    state.intake = config.intake;
+    state.exhaust = config.exhaust;
+    state.pelletFeedTargetKgH = config.pelletFeedKgH;
+    state.woodOverpower = false;
+    state.cleanAirLimited = false;
+    state.demandPowerW = 0;
+    state.residualPelletPowerW = 0;
+    state.unavoidableWoodPowerW = 0;
+    state.controlReason = 'Manual dampers and fixed pellet feed; both fuels share oxygen';
+    return;
+  }
+  if (state.lidOpenRemainingS > 0) { state.controlReason = 'Lid open: hold dampers and feed, freeze integral'; return; }
+  if (state.timeS > 300 && state.fireC < 120) {
+    state.pelletFeedTargetKgH = 0;
+    state.woodOverpower = false;
+    state.cleanAirLimited = false;
+    state.controlReason = 'Cold firebox: inhibit feed; external relighting is required';
+    return;
+  }
+  const anticipatedC = clamp(state.temperatureRateCPerS * H.pitForecastS, -12, 50);
+  const error = config.targetC - state.chamberC - anticipatedC;
+  const desiredHeatW = (3 + .35 * config.windMps + state.airKgS * 1005) * (config.targetC - config.ambientC)
+    + 32 * (config.targetC - state.wallC)
+    + 3.2 * (config.meatMassKg / 3) ** (2 / 3) * (config.targetC - state.meatSurfaceC);
+  const desiredFireC = config.targetC + desiredHeatW / 4;
+  const feedForwardW = desiredHeatW + (1 + .08 * config.windMps) * (desiredFireC - config.ambientC)
+    + Math.max(0, state.woodBed.heatToFuelW) + 100;
+  // Positive correction removes heat demand when the shared hot firebox already
+  // contains the energy needed during the next control horizon. It also handles
+  // the delay between stopping the auger and burning pellets already in the pot.
+  const storedFireCorrectionW = clamp(A.fireHeatCapacityJPerK * (state.fireC - desiredFireC) / H.fireStoredEnergyHorizonS, -1000, 2500);
+  state.demandPowerW = Math.max(0, feedForwardW + H.proportionalWPerK * error + state.hybridIntegralW - storedFireCorrectionW);
+  const wetEnergyJPerKg = (1 - state.hopperMoisture) * A.dryWoodNetJPerKg - state.hopperMoisture * A.waterLatentJPerKg;
+  const maximumPelletPowerW = wetEnergyJPerKg * H.maximumFeedKgH / 3600;
+  const rawResidualW = state.demandPowerW - state.predictedWoodPowerW;
+  state.residualPelletPowerW = clamp(rawResidualW, 0, maximumPelletPowerW);
+  state.pelletFeedTargetKgH = state.residualPelletPowerW * 3600 / wetEnergyJPerKg;
+  const feedControlled = config.pelletControl === 'feed-and-air';
+  const previousIntegralW = state.hybridIntegralW;
+  if (feedControlled) {
+    if (state.lidRecoveryS <= 0 && (state.hopperKg > 0 || error < 0) && (rawResidualW >= 0 && rawResidualW <= maximumPelletPowerW
+      || rawResidualW < 0 && error > 0 || rawResidualW > maximumPelletPowerW && error < 0)) {
+      state.hybridIntegralW = clamp(state.hybridIntegralW + H.integralWPerKS * error, -2500, 2500);
+    }
+    const targetEffort = state.pelletFeedTargetKgH / H.maximumFeedKgH;
+    state.controllerEffort += clamp(targetEffort - state.controllerEffort, -.01, H.effortSlewPerS);
+    state.controllerIntegral = state.hybridIntegralW / maximumPelletPowerW;
+  } else state.pelletFeedTargetKgH = config.pelletFeedKgH;
+
+  // A clean-air floor serves gases already being released by both beds. Feeding
+  // less cannot remove those gases, or pellets that are already in the firepot.
+  const floorAir = minimumCleanAir(state);
+  const expectedFeed = (state.hopperKg > 0 ? state.pelletFeedTargetKgH : 0) / 3600 * (1 - state.hopperMoisture);
+  const expectedFeedOxygen = expectedFeed * ((1 - A.charYield) * A.volatileOxygenKgPerKg + A.charYield * A.charOxygenKgPerKg);
+  const recentCharOxygen = state.charPowerW / A.charNetJPerKg * A.charOxygenKgPerKg;
+  const desiredAir = Math.max(floorAir, (Math.max(expectedFeedOxygen,
+    state.pelletBed.potentialVolatileKgS * A.volatileOxygenKgPerKg) + state.woodBed.potentialVolatileKgS * A.volatileOxygenKgPerKg
+    + recentCharOxygen) * H.feedExcessAirRatio / A.airOxygenMassFraction);
+  state.exhaust = clamp(H.minimumExhaust + desiredAir / .006 * .28, H.minimumExhaust, 1);
+  state.cleanAirLimited = desiredAir > airFlow(state, 1, state.exhaust) + 1e-9;
+  if (state.cleanAirLimited && error > 0) {
+    state.hybridIntegralW = previousIntegralW;
+    state.controllerIntegral = state.hybridIntegralW / maximumPelletPowerW;
+  }
+  if (!feedControlled) {
+    const effort = clamp(.42 + .010 * error + state.controllerIntegral, H.minimumIntake, 1);
+    state.controllerEffort += clamp(effort - state.controllerEffort, -.003, .003);
+    state.intake = Math.max(state.controllerEffort, intakeForAir(state, floorAir, state.exhaust));
+  } else state.intake = intakeForAir(state, desiredAir, state.exhaust);
+  // Lower-bound chemical wood output at the minimum clean draft, keeping the
+  // current hot fuel state fixed for one tick. This is a constraint diagnostic,
+  // not a claim that every positive wood release exceeds control authority.
+  const floorOxygen = Math.min(floorAir, airFlow(state, 1, state.exhaust)) * A.airOxygenMassFraction;
+  const totalGasPotential = state.woodBed.potentialVolatileKgS + state.pelletBed.potentialVolatileKgS;
+  const floorGasBurn = Math.min(totalGasPotential, floorOxygen / A.volatileOxygenKgPerKg) * clamp((state.fireC - 120) / 120, 0, 1);
+  const woodGasShare = totalGasPotential > 0 ? state.woodBed.potentialVolatileKgS / totalGasPotential : 0;
+  const remainingOxygen = Math.max(0, floorOxygen - floorGasBurn * A.volatileOxygenKgPerKg);
+  const charPotential = state.woodBed.potentialCharKgS + state.pelletBed.potentialCharKgS;
+  const floorCharBurnKg = Math.min(charPotential, remainingOxygen / A.charOxygenKgPerKg);
+  const woodCharShare = charPotential > 0 ? state.woodBed.potentialCharKgS / charPotential : 0;
+  state.unavoidableWoodPowerW = floorGasBurn * woodGasShare * A.volatileNetJPerKg + floorCharBurnKg * woodCharShare * A.charNetJPerKg;
+  state.woodOverpower = feedControlled && state.pelletFeedTargetKgH < 1e-8
+    && state.unavoidableWoodPowerW > state.demandPowerW + 150;
+  state.controlReason = state.cleanAirLimited ? 'Requested combustion air exceeds damper capacity; clean burning is not guaranteed'
+    : state.woodOverpower ? 'Wood heat exceeds the minimum clean-draft demand; pellet command is zero'
+    : state.pelletFeedTargetKgH < .001 ? 'Wood supplies the heat demand; pellet command is zero'
+      : state.hopperKg <= 0 ? 'Pellet hopper empty; available wood heat carries the fire'
+        : feedControlled ? 'Subtract observed wood heat, meter the residual pellet heat, preserve clean draft'
+          : 'Fixed pellet feed; dampers cannot cancel fuel already committed to the fire';
+}
+
+function prepareHybridBed(state: SmokerState, bed: FuelBed, kind: 'wood' | 'pellets'): void {
+  const wood = kind === 'wood';
+  const activeMass = bed.dryKg + bed.waterKg;
+  const capacity = Math.max(wood ? 80 : 8, bed.dryKg * 1700 + bed.waterKg * 4180);
+  const conductance = activeMass > 1e-9 ? (wood ? 3.5 * Math.min(1.5, (activeMass / .8) ** (2 / 3)) : capacity / 8) : 0;
+  bed.heatToFuelW = conductance * (state.fireC - bed.temperatureC);
+  const evaporatedKg = bed.temperatureC >= 95
+    ? Math.min(bed.waterKg, Math.max(0, bed.heatToFuelW) / A.waterLatentJPerKg, bed.waterKg / (wood ? 120 : 5)) : 0;
+  bed.dryingW = evaporatedKg * A.waterLatentJPerKg;
+  bed.waterKg -= evaporatedKg;
+  bed.waterEvaporatedKg += evaporatedKg;
+  bed.temperatureC += (bed.heatToFuelW - bed.dryingW) / capacity;
+  const activation = clamp((bed.temperatureC - 140) / 180, 0, 1.5);
+  const moistureDrag = 1 / (1 + 8 * bed.waterKg / Math.max(.02, bed.dryKg));
+  const pyrolyzedKg = Math.min(bed.dryKg, bed.dryKg / (wood ? 3500 : 65) * activation * moistureDrag);
+  bed.dryKg -= pyrolyzedKg;
+  bed.charKg += pyrolyzedKg * A.charYield;
+  bed.potentialVolatileKgS = pyrolyzedKg * (1 - A.charYield);
+  bed.potentialCharKgS = Math.min(bed.charKg, bed.charKg / (wood ? 600 : 90)
+    * clamp((state.fireC - (wood ? 80 : 180)) / (wood ? 180 : 280), 0, 1.8));
+}
+
+function burnHybrid(state: SmokerState): number {
+  const config = state.config, pellet = state.pelletBed, wood = state.woodBed;
+  state.feedInhibited = config.mode === 'auto' && state.timeS > 300 && state.fireC < 120;
+  const commandedKgH = config.mode === 'auto' && config.pelletControl === 'feed-and-air'
+    ? state.controllerEffort * HYBRID_CONTROL_ASSUMPTIONS.maximumFeedKgH : config.pelletFeedKgH;
+  const feedKg = state.feedInhibited ? 0 : Math.min(state.hopperKg, commandedKgH / 3600);
+  if (feedKg > 0) {
+    const oldCapacity = pellet.dryKg * 1700 + pellet.waterKg * 4180;
+    const addedDryKg = feedKg * (1 - state.hopperMoisture), addedWaterKg = feedKg * state.hopperMoisture;
+    const addedCapacity = addedDryKg * 1700 + addedWaterKg * 4180;
+    pellet.temperatureC = (pellet.temperatureC * oldCapacity + config.ambientC * addedCapacity) / (oldCapacity + addedCapacity);
+    pellet.dryKg += addedDryKg;
+    pellet.waterKg += addedWaterKg;
+    state.hopperKg -= feedKg;
+  }
+  state.pelletFeedKgH = feedKg * 3600;
+  prepareHybridBed(state, wood, 'wood');
+  prepareHybridBed(state, pellet, 'pellets');
+  const volatilePotential = wood.potentialVolatileKgS + pellet.potentialVolatileKgS;
+  const charPotential = wood.potentialCharKgS + pellet.potentialCharKgS;
+  const oxygenAvailable = state.airKgS * A.airOxygenMassFraction;
+  state.oxygenDemandKgS = volatilePotential * A.volatileOxygenKgPerKg + charPotential * A.charOxygenKgPerKg;
+  state.oxygenRatio = state.oxygenDemandKgS > 1e-10 ? Math.min(8, oxygenAvailable / state.oxygenDemandKgS) : 8;
+  const mixing = clamp((state.fireC - 120) / 120, 0, 1);
+  const volatileBurn = Math.min(volatilePotential, oxygenAvailable / A.volatileOxygenKgPerKg) * mixing;
+  const oxygenAfterGas = Math.max(0, oxygenAvailable - volatileBurn * A.volatileOxygenKgPerKg);
+  const charBurn = Math.min(charPotential, oxygenAfterGas / A.charOxygenKgPerKg);
+  state.oxygenConsumedKgS = volatileBurn * A.volatileOxygenKgPerKg + charBurn * A.charOxygenKgPerKg;
+  for (const bed of [wood, pellet]) {
+    const gasBurn = volatilePotential > 0 ? volatileBurn * bed.potentialVolatileKgS / volatilePotential : 0;
+    const solidBurn = charPotential > 0 ? charBurn * bed.potentialCharKgS / charPotential : 0;
+    bed.charKg = Math.max(0, bed.charKg - solidBurn);
+    bed.burnedKg += gasBurn + solidBurn;
+    bed.escapedVolatilesKg += bed.potentialVolatileKgS - gasBurn;
+    bed.volatilePowerW = gasBurn * A.volatileNetJPerKg;
+    bed.charPowerW = solidBurn * A.charNetJPerKg;
+    bed.releasedEnergyJ += bed.volatilePowerW + bed.charPowerW;
+  }
+  state.smokeIndex = volatilePotential > 1e-9 ? clamp(1 - volatileBurn / volatilePotential, 0, 1) : 0;
+  state.committedPelletPowerW = pellet.potentialVolatileKgS * A.volatileNetJPerKg + pellet.potentialCharKgS * A.charNetJPerKg;
+  syncFuelTelemetry(state);
+  return wood.heatToFuelW + pellet.heatToFuelW;
 }

@@ -3,7 +3,7 @@
 import { useId } from "react";
 
 export type SmokerDiagramProps = {
-  fuel: "wood" | "pellets";
+  fuel: "wood" | "pellets" | "hybrid";
   intake: number;
   exhaust: number;
   chamberC: number;
@@ -15,6 +15,9 @@ export type SmokerDiagramProps = {
   lidOpen: boolean;
   running: boolean;
   unit?: "F" | "C";
+  woodKw?: number;
+  pelletKw?: number;
+  woodPhase?: string;
 };
 
 const clamp = (value: number) => Math.min(1, Math.max(0, value));
@@ -34,12 +37,18 @@ export default function SmokerDiagram({
   lidOpen,
   running,
   unit = "F",
+  woodKw,
+  pelletKw,
+  woodPhase,
 }: SmokerDiagramProps) {
   const id = useId().replaceAll(":", "");
   const air = clamp(intake);
   const vent = clamp(exhaust);
   const clean = clamp(cleanBurn);
-  const coalBed = fuel === "wood" && phase === "Char / embers";
+  const hybrid = fuel === "hybrid";
+  const woodRelease = Math.max(0, woodKw ?? (fuel === "pellets" ? 0 : heatKw * (hybrid ? .5 : 1)));
+  const pelletRelease = Math.max(0, pelletKw ?? (fuel === "wood" ? 0 : heatKw * (hybrid ? .5 : 1)));
+  const coalBed = fuel !== "pellets" && (woodPhase ?? phase) === "Char / embers";
   const flameScale = Math.min(1.1, Math.max(0.15, (fireC - 35) / 650)) * (coalBed ? .45 : 1);
   const burning = heatKw > 0.02;
   const smokeColor = clean > 0.6 ? "#7d9fa8" : "#858078";
@@ -47,6 +56,12 @@ export default function SmokerDiagram({
   const navy = "#102638";
   const amber = "#c85a21";
   const teal = "#23777c";
+  const pelletAmber = "#b77615";
+  const augerPath = hybrid ? "M65 190L285 205V298" : "M65 190V228L161 299";
+  const flamePaths = <>
+    <path d="M182 308C158 291 194 278 187 253C211 264 204 274 215 282C224 263 225 247 219 232C257 268 263 287 239 308Z" fill={amber} />
+    <path d="M198 308C187 294 207 289 208 273C226 287 223 294 234 308Z" fill="#efb76c" />
+  </>;
 
   return (
     <figure className="smoker-visual" style={{ margin: 0 }} data-running={running}>
@@ -57,7 +72,7 @@ export default function SmokerDiagram({
         style={{ width: "100%", height: "auto", display: "block" }}
       >
         <title id={`${id}-title`}>
-          {fuel === "wood" ? "Wood-fired" : "Pellet-fired"} smoker, {phase}
+          {hybrid ? "Hybrid wood and pellet" : fuel === "wood" ? "Wood-fired" : "Pellet-fired"} smoker, {phase}
         </title>
         <desc id={`${id}-desc`}>
           Cutaway of an offset smoker. Air enters the firebox through an intake
@@ -67,6 +82,7 @@ export default function SmokerDiagram({
           between the cooking chamber and meat, and through the chamber walls.
           {lidOpen ? " The cooking chamber lid is open." : " The lid is closed."}
           {running ? " Simulation running." : " Simulation paused."}
+          {hybrid && ` Wood splits and an auger-fed pellet burn pot occupy separate parts of one shared firebox. Wood releases ${woodRelease.toFixed(2)} kilowatts and pellets release ${pelletRelease.toFixed(2)} kilowatts. Their heat combines before entering the chamber. This is a conceptual arrangement, not a manufacturer-specific design.`}
         </desc>
         <defs>
           <linearGradient id={`${id}-chamber`} x1="0" y1="0" x2="1" y2="0">
@@ -85,28 +101,38 @@ export default function SmokerDiagram({
         <circle cx="211" cy="280" r="63" fill={`url(#${id}-fire)`} opacity={burning ? 1 : 0.15} />
         <path d="M128 341V364M281 341V364" stroke={navy} strokeWidth="6" strokeLinecap="round" />
 
-        {fuel === "wood" ? (
-          <g>
+        {fuel !== "pellets" && (
+          <g transform={hybrid ? "translate(31 92) scale(.7)" : undefined}>
             <rect x="153" y="306" width="109" height="16" rx="8" fill={coalBed ? "#4f4840" : "#805234"} stroke={navy} strokeWidth="2" transform="rotate(-8 206 314)" />
             <rect x="159" y="311" width="104" height="15" rx="7" fill={coalBed ? "#63564a" : "#a77443"} stroke={navy} strokeWidth="2" transform="rotate(10 211 318)" />
             <path d="M172 308L194 316M211 304L226 315M233 313L251 320" stroke={coalBed ? "#c85a21" : "#dfab70"} strokeWidth="2" />
           </g>
-        ) : (
+        )}
+        {fuel !== "wood" && (
           <g>
             <path d="M34 123H94L87 190H45Z" fill="#e3e9e9" stroke={navy} strokeWidth="3" />
             <path d="M41 140H88L82 183H49Z" fill="#b58a5e" />
             <path d="M53 148L63 153M72 146L82 151M51 165L61 170M68 165L78 170" stroke="#7e573a" strokeWidth="5" strokeLinecap="round" />
-            <path d="M65 190V228L161 299" fill="none" stroke={navy} strokeWidth="14" strokeLinejoin="round" />
-            <path d="M65 190V228L161 299" fill="none" stroke="#e3e9e9" strokeWidth="8" strokeLinejoin="round" />
-            <path d="M166 306L174 325H252L260 306Z" fill="#c5cfce" stroke={navy} strokeWidth="2" />
-            <path d="M178 309H246" stroke="#a77443" strokeWidth="8" strokeLinecap="round" />
+            <path d={augerPath} fill="none" stroke={navy} strokeWidth="14" strokeLinejoin="round" />
+            <path d={augerPath} fill="none" stroke="#e3e9e9" strokeWidth="8" strokeLinejoin="round" />
+            {hybrid && <><path d="M77 191L272 204" fill="none" stroke={pelletAmber} strokeWidth="3" strokeDasharray="4 9" /><text x="181" y="181" textAnchor="middle" fill={navy} fontSize="17">Auger feed</text></>}
+            <g transform={hybrid ? "translate(139 123) scale(.6)" : undefined}>
+              <path d="M166 306L174 325H252L260 306Z" fill="#c5cfce" stroke={navy} strokeWidth="2" />
+              <path d="M178 309H246" stroke="#a77443" strokeWidth="8" strokeLinecap="round" />
+            </g>
             <text x="65" y="111" textAnchor="middle" fill={navy} fontSize="17" fontWeight="600">Pellets</text>
           </g>
         )}
-        <g opacity={burning ? 1 : 0.15} transform={`translate(210 309) scale(${flameScale}) translate(-210 -309)`}>
-          <path d="M182 308C158 291 194 278 187 253C211 264 204 274 215 282C224 263 225 247 219 232C257 268 263 287 239 308Z" fill={amber} />
-          <path d="M198 308C187 294 207 289 208 273C226 287 223 294 234 308Z" fill="#efb76c" />
-        </g>
+        {hybrid ? <>
+          <g transform="translate(31 92) scale(.7)">
+            <g opacity={woodRelease > .02 ? 1 : .08} transform={`translate(210 309) scale(${flameScale}) translate(-210 -309)`}>{flamePaths}</g>
+          </g>
+          <g transform="translate(139 123) scale(.6)">
+            <g opacity={pelletRelease > .02 ? 1 : .08} transform={`translate(210 309) scale(${Math.min(1.1, Math.max(.2, pelletRelease / 3))}) translate(-210 -309)`}>{flamePaths}</g>
+          </g>
+          <text x="178" y="337" textAnchor="middle" fill={navy} fontSize="15" fontWeight="600">Splits / coals</text>
+          <text x="267" y="337" textAnchor="middle" fill={navy} fontSize="15" fontWeight="600">Burn pot</text>
+        </> : <g opacity={burning ? 1 : 0.15} transform={`translate(210 309) scale(${flameScale}) translate(-210 -309)`}>{flamePaths}</g>}
 
         {/* Damper blades: transverse means closed, parallel to flow means open. */}
         <path d="M31 280H82" fill="none" stroke={teal} strokeWidth="4" strokeLinecap="round" opacity={0.15 + air * 0.85} />
@@ -132,8 +158,12 @@ export default function SmokerDiagram({
         <text x="548" y="191" textAnchor="middle" fill={navy} fontSize="19" fontWeight="600">Cooking chamber</text>
 
         {/* Warm gas carries heat from the fire into the chamber. */}
+        {hybrid && <>
+          <path d="M190 277C237 246 285 248 326 273" fill="none" stroke={amber} strokeWidth="3" strokeLinecap="round" opacity={woodRelease > .02 ? .9 : .2} />
+          <path d="M273 286Q305 295 326 273" fill="none" stroke={pelletAmber} strokeWidth="3" strokeDasharray="5 4" strokeLinecap="round" opacity={pelletRelease > .02 ? .9 : .2} />
+        </>}
         <g fill="none" stroke={amber} strokeWidth="4" strokeLinecap="round" opacity={burning ? 0.9 : 0.25}>
-          <path d="M278 273C340 273 352 227 425 226H475" />
+          <path d={hybrid ? "M326 273C340 273 352 227 425 226H475" : "M278 273C340 273 352 227 425 226H475"} />
           <path d="M461 218L476 226L461 234" />
           <path d="M457 277H493" />
           <path d="M480 269L494 277L480 285" />
@@ -161,11 +191,11 @@ export default function SmokerDiagram({
           <path d="M785 230H818M808 223L819 230L808 237" />
         </g>
         <text x="533" y="66" textAnchor="middle" fill="#9c4820" fontSize="17">Heat to surroundings</text>
-        <text x="207" y="385" textAnchor="middle" fill={navy} fontSize="18" fontWeight="600">{fuel === "wood" ? "Wood firebox" : "Pellet firebox"}</text>
-        <text x="568" y="385" textAnchor="middle" fill={teal} fontSize="18" fontWeight="600">{chamberC >= coreC ? "Heat moves inward to the core" : "Heat leaves the meat as it cools"}</text>
+        <text x="207" y="385" textAnchor="middle" fill={navy} fontSize="18" fontWeight="600">{hybrid ? "Shared firebox" : fuel === "wood" ? "Wood firebox" : "Pellet firebox"}</text>
+        <text x="568" y="385" textAnchor="middle" fill={teal} fontSize="18" fontWeight="600">Heat exchange with the meat core</text>
       </svg>
-      <figcaption style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: "0.75rem", paddingTop: "1rem", color: navy }}>
-        {[
+      <figcaption style={{ paddingTop: "1rem", color: navy }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: "0.75rem" }}>{[
           ["Firebox", fireC],
           ["Chamber", chamberC],
           ["Meat core", coreC],
@@ -174,7 +204,14 @@ export default function SmokerDiagram({
             <span style={{ display: "block", fontSize: "0.75rem", color: "#536570" }}>{label}</span>
             <strong style={{ display: "block", fontSize: "1.25rem", fontVariantNumeric: "tabular-nums" }}>{unit === "F" ? fahrenheit(Number(temperature)) : Math.round(Number(temperature))}°{unit}</strong>
           </div>
-        ))}
+        ))}</div>
+        {hybrid && <>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: ".75rem", marginTop: "1rem", paddingTop: ".75rem", borderTop: "1px solid #dce2e6" }}>
+            <div><span style={{ display: "block", fontSize: ".75rem", color: "#536570" }}>Wood heat · solid path</span><strong style={{ color: "#9d4219", fontSize: "1rem", fontVariantNumeric: "tabular-nums" }}>{woodRelease.toFixed(2)} kW</strong>{woodPhase && <span style={{ display: "block", fontSize: ".7rem", color: "#536570" }}>{woodPhase}</span>}</div>
+            <div><span style={{ display: "block", fontSize: ".75rem", color: "#536570" }}>Pellet heat · dashed path</span><strong style={{ color: "#825212", fontSize: "1rem", fontVariantNumeric: "tabular-nums" }}>{pelletRelease.toFixed(2)} kW</strong></div>
+          </div>
+          <p style={{ fontSize: ".75rem", lineHeight: 1.6, color: "#536570", marginTop: ".75rem" }}>Conceptual shared firebox: both fuels burn together, and their heat combines. The arrangement represents no specific manufacturer’s smoker.</p>
+        </>}
       </figcaption>
     </figure>
   );

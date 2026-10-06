@@ -10,7 +10,7 @@ automation and custom software for small businesses and organizations.
 - `/lab/games/contra` — eight-zone run-and-gun recreation, with local two-player co-op
 - `/lab/games/bubble-bobble` — 100-round arcade recreation, with bubble riding and local co-op
 - `/lab/games/rc-pro-am` — NES isometric racing recreation, with weapons and vehicle upgrades
-- `/lab/smoker` — wood and pellet combustion, damper control and meat heating simulation
+- `/lab/smoker` — wood, pellet and simultaneous hybrid combustion, damper control and meat heating simulation
 
 Content lives in `app/data.ts` (email, services, process and Lab projects).
 The homepage keeps a single “Websites starting at $1,200” line. Package pricing,
@@ -155,6 +155,25 @@ starts paused, suspends in hidden tabs and stops at 12 simulated hours. No serve
 external assets, telemetry or hardware connection is involved. Run
 `npm run test:smoker` for mass/energy accounting, fuel phases, airflow, controller
 response, disturbances and finite fuel behavior.
+
+Hybrid is the default option: wood splits and pellets burn simultaneously in a
+shared firebox. Each origin has its own moisture, dry fuel, charcoal, temperature
+and exact fuel mass/chemical-energy ledger, while combustion allocates one
+common oxygen budget. A nominal observer forecasts wood heat; a heat-balance
+and PI supervisor meters the nonnegative pellet supplement and coordinates
+intake/exhaust. It stops the auger for excess wood heat and reports inadequate
+draft or unavailable control authority. Observer access to simulated wood heat
+is idealized; it is not an implemented physical-device estimator. Independent
+refills, moisture settings, small/large wood-charge scenarios, and source-power
+charts demonstrate the handoff and its limits. Manual/fixed-feed displays show
+the configured feed, and the controller-demand curve has gaps while inactive.
+
+Full SI equations, nominal coefficients, predictor/feedback pseudocode, oxygen
+allocation, ledgers, actuator limits, sensor requirements and a calibration
+plan are in [HYBRID_MODEL.md](app/lab/smoker/HYBRID_MODEL.md), linked from the
+page’s Hybrid math disclosure. The 23 model tests include the 14 original
+regressions plus hybrid conservation, simultaneous burning, refuel response,
+takeover, disturbances, depletion and infeasible large-wood loads.
 
 ## Local development
 

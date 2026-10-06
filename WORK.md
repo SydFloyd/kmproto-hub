@@ -1,3 +1,58 @@
+# Hybrid smoker control
+
+Updated: 2026-10-05
+Status: implementation and local verification complete; publishing to the existing public Vercel destination.
+
+Added simultaneous wood/pellet Hybrid mode as the default in Smoker Control Lab,
+which remains ninth and last in the Lab directory. Hardware layout is undecided;
+the interface and engineering notes identify a shared firebox as the first
+design candidate. Each fuel has independent water, dry biomass, char, temperature
+and origin ledgers, with a common oxygen budget and cooker thermal network.
+Pellet and wood gases divide available oxygen proportionally before the remaining
+oxygen can burn char. Chemical energy and fuel-origin mass are conserved;
+variable fuel heat capacities and omitted outgoing sensible enthalpy mean the
+model does not claim a complete cooker thermal-energy ledger.
+
+The controller forecasts observed wood heat, computes required heat from a
+heat balance and bounded PI feedback, and allocates a nonnegative pellet
+supplement with finite feed capacity and actuator slew. Chamber trend and
+stored firebox heat account indirectly for delayed pellet heat. It maintains a
+draft floor, freezes integral action during lid openings, inhibits automatic
+feed after flameout and reports draft or excess-wood control limits. The wood
+observer has ideal access to simulated states; a physical device requires
+sensor-based estimation and measured calibration. It is a constrained nominal
+controller, not a claim of global optimality or production firmware.
+
+Separate moisture/refill controls, source heat/phase readouts, heat-budget and
+handoff charts, and small/large wood-charge scenarios demonstrate simultaneous
+combustion and its limits. Manual/fixed-feed modes show actual heat and configured
+feed; the automatic demand trace has gaps while inactive. Full equations,
+coefficients, discretization, pseudocode, ledgers, sensor requirements and
+calibration steps are in app/lab/smoker/HYBRID_MODEL.md, linked from the UI.
+The notes also describe the separate-firebox extension without claiming it is
+implemented. Primary USDA sources support the physical principles; manufacturer
+documentation confirms a commercial shared-firebox hybrid example.
+
+Verification: 23 model tests (14 original regressions and nine hybrid tests),
+production build, TypeScript, full ESLint and diff checks pass. Tests cover
+independent mass/chemical-energy conservation, common oxygen limits, concurrent
+burning, pellet takeover/refuel response, 225/250/275 F regulation, lid/weather
+disturbances, finite fuel, cold-fire inhibit, deterministic batching and excess
+wood heat. A separate 86,400-step audit found maximum fuel-mass residual
+7.8e-13 kg, chemical-energy residual 2.4e-5 J and oxygen overdraw 2.2e-19 kg/s.
+Those are numerical accounting checks, not measured hardware performance.
+
+Browser checks pass at 1440/768/390/320 px for all three fuel modes, both hybrid
+refills, manual/automatic and fixed-feed controls, source heat-budget consistency,
+large-wood oversupply with zero feed, temperature units, math disclosures,
+playback/reset, hidden-tab suspension, 12-hour bounds and last-position Lab
+navigation. No page errors, horizontal overflow or automated WCAG A/AA violations;
+desktop and phone screenshots were inspected. Evidence: ignored
+outputs/check-hybrid.cjs, outputs/hybrid-browser.json and outputs/hybrid-*.png.
+The older owner-private Sites publication and unrelated pricing files are unchanged.
+
+---
+
 # Smoker Control Lab
 
 Updated: 2026-10-05

@@ -153,3 +153,26 @@
   .smoker-workbench { display: block; }
   .smoker-panel { break-inside: avoid; }
 }
+.smoker-hybrid-budget { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; border-block: 1px solid #e1e5e8; padding: 14px 0; margin-top: 8px; }
+.smoker-hybrid-budget span { display: block; color: var(--muted); font-size: 11px; }
+.smoker-hybrid-budget strong { display: block; color: var(--ink); font-size: 24px; font-weight: 500; font-variant-numeric: tabular-nums; }
+.smoker-hybrid-budget small { font-size: 12px; }
+.smoker-hybrid-budget > div:nth-child(2) strong { color: #a54518; }
+.smoker-hybrid-budget > div:nth-child(3) strong { color: #23777c; }
+.smoker-hybrid-reason { margin: 13px 0 8px; color: var(--ink); font-size: 13px; font-weight: 600; }
+.smoker-hybrid-scenarios { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 14px; }
+.smoker-hybrid-scenarios span { font-size: 11px; color: var(--muted); margin-right: auto; }
+.smoker-hybrid-scenarios button { background: white; color: var(--ink); border: 1px solid #b3c0ca; border-radius: 3px; padding: 8px 10px; min-height: 38px; font-size: 11px; }
+.smoker-equations { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin: 18px 0; }
+.smoker-equations section { min-width: 0; padding: 18px; background: white; border: 1px solid #c7d0d6; border-radius: 4px; }
+.smoker-equations h3 { font-size: 14px; margin-bottom: 13px; }
+.smoker-formula { color: var(--ink); font-family: Georgia, serif; font-size: 15px; line-height: 1.6; overflow-wrap: anywhere; }
+.smoker-hybrid-math > div { max-width: 100%; }
+@media (max-width: 760px) {
+  .smoker-hybrid-budget { gap: 8px; }
+  .smoker-hybrid-budget span { font-size: 10px; }
+  .smoker-hybrid-budget strong { font-size: 22px; }
+  .smoker-hybrid-scenarios span { width: 100%; }
+  .smoker-hybrid-scenarios button { flex: 1; }
+  .smoker-equations { grid-template-columns: 1fr; }
+}
