@@ -26,7 +26,7 @@ export class Sound {
     this._stopVoices();
     try {
       if (this.context && this.context.state !== 'closed') await this.context.suspend();
-    } catch (_) { /* Browsers may disallow a state change during teardown. */ }
+    } catch { /* Browsers may disallow a state change during teardown. */ }
     return false;
   }
 
@@ -54,15 +54,15 @@ export class Sound {
       if (typeof document !== 'undefined' && document.hidden) return false;
       if (this.context.state !== 'running') await this.context.resume();
       return this.enabled && this.context.state === 'running';
-    } catch (_) {
+    } catch {
       return false;
     }
   }
 
   _stopVoices() {
     for (const voice of this.voices) {
-      try { voice.stop(); } catch (_) {}
-      try { voice.disconnect(); } catch (_) {}
+      try { voice.stop(); } catch {}
+      try { voice.disconnect(); } catch {}
     }
     this.voices.clear();
   }
@@ -91,7 +91,7 @@ export class Sound {
       };
       oscillator.start(time);
       oscillator.stop(time + duration + 0.015);
-    } catch (_) { /* Sound should never interrupt gameplay. */ }
+    } catch { /* Sound should never interrupt gameplay. */ }
   }
 
   select(chainLength, color = 0) {
@@ -155,6 +155,32 @@ export class Sound {
       this._tone(392 * 2 ** (note / 12), index * 0.043, 0.38, 0.052);
     });
     this._tone(1567.9817, 0.14, 0.29, 0.018);
+  }
+
+  spectrumCharge(count, ready = false) {
+    if (ready) {
+      // A light major ninth marks the power-up becoming ready, without
+      // competing with the clear that earned its final color.
+      [0, 4, 7, 14].forEach((note, index) => {
+        this._tone(523.2512 * 2 ** (note / 12), index * 0.028, 0.3, 0.036);
+      });
+      this._tone(1046.5024, 0.085, 0.22, 0.012);
+      return;
+    }
+    const step = Math.min(3, Math.max(1, Math.floor(Number(count) || 1)));
+    const frequency = 523.2512 * 2 ** ([0, 4, 7][step - 1] / 12);
+    // Each new color confirms progress with a slightly higher glass note.
+    this._tone(frequency, 0, 0.17, 0.042);
+    this._tone(frequency * 2, 0.018, 0.12, 0.012);
+  }
+
+  spectrumBurst() {
+    // The deeper root and resolved upper triad distinguish the sweep from
+    // its ready cue. A short roll leaves the next connection audible.
+    [0, 7, 12, 16, 19].forEach((note, index) => {
+      this._tone(261.6256 * 2 ** (note / 12), index * 0.018, 0.46, 0.057);
+    });
+    this._tone(1046.5024, 0.09, 0.29, 0.018);
   }
 
   reward() {

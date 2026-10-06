@@ -13,6 +13,8 @@ export const ACHIEVEMENTS = [
   { id: 'first-loop', title: 'Full circle', hint: 'Close your first loop', key: 'loops', target: 1, icon: 'retry' },
   { id: 'first-nova', title: 'Little supernova', hint: 'Detonate your first Nova', key: 'novas', target: 1, icon: 'star' },
   { id: 'first-forge', title: 'Star smith', hint: 'Forge a Nova with a 5-dot chain', key: 'forges', target: 1, icon: 'star' },
+  { id: 'first-spectrum', title: 'Prism pilot', hint: 'Release your first Spectrum sweep', key: 'spectrums', target: 1, icon: 'star' },
+  { id: 'spectrum-trio', title: 'Prism conductor', hint: 'Release 3 Spectrum sweeps in one run', key: 'maxSpectrums', target: 3, icon: 'check' },
   { id: 'long-chain', title: 'Long way round', hint: 'Connect 6 dots in one chain', key: 'maxChain', target: 6, icon: 'arrow' },
   { id: 'rhythm', title: 'In the zone', hint: 'Reach a ×5 multiplier', key: 'maxCombo', target: 5, icon: 'sound' },
   { id: 'fever', title: 'On fire', hint: 'Trigger your first Fever', key: 'fevers', target: 1, icon: 'flame' },

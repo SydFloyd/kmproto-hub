@@ -68,11 +68,13 @@ export function animateBoardMove({ board, result, createDot, updateDot, reducedM
       const dot = previous[index];
       dot.classList.add('motion-clearing');
       const cascade = result.detonated.indexOf(index);
-      const delay = reducedMotion ? 0 : cascade >= 0 ? cascade * 65 : Math.min(order, 7) * 9;
+      const delay = reducedMotion ? 0 : result.spectrum
+        ? index % 6 * 30 + Math.floor(index / 6) * 6 + Math.max(0, cascade) * 35
+        : cascade >= 0 ? cascade * 65 : Math.min(order, 7) * 9;
       return animate(dot.querySelector('.gem'), reducedMotion
         ? [{ opacity: 1 }, { opacity: 0 }]
         : [{ transform: 'scale(1.12)', opacity: 1 }, { transform: 'scale(1.3)', opacity: 1, offset: .32 }, { transform: 'scale(.12)', opacity: 0 }],
-      { duration: reducedMotion ? 55 : result.detonated.length ? 210 : 165, delay, easing: 'cubic-bezier(.3,.05,.6,1)' });
+      { duration: reducedMotion ? 55 : result.spectrum ? 190 : result.detonated.length ? 210 : 165, delay, easing: 'cubic-bezier(.3,.05,.6,1)' });
     });
     await Promise.all(clears);
     if (stopped) return;

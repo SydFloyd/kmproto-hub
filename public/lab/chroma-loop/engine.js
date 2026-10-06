@@ -3,6 +3,7 @@ const CELLS = WIDTH * WIDTH;
 const COLORS = 5;
 export const FORGE_CHAIN = 5;
 export const FORGE_BONUS = 150;
+export const SPECTRUM_BONUS = 100;
 
 /** Stable 32-bit hash for daily challenges and shareable seeds. */
 export function seedFromText(text) {
@@ -139,10 +140,11 @@ export function extendPath(board, path, index) {
 }
 
 /** Inspect a move and its cascading blasts without drawing randomness or mutating inputs. */
-export function previewMove(board, path, { multiplier = 1, fever = false, novas = [], novaRadius = 1, forge = false } = {}) {
+export function previewMove(board, path, { multiplier = 1, fever = false, novas = [], novaRadius = 1, forge = false, spectrum = false } = {}) {
   const info = inspectPath(board, path);
   if (!info || info.longest < 2) return null;
-  const selected = info.loop
+  const powered = spectrum === true;
+  const selected = info.loop || powered
     ? board.reduce((indexes, color, index) => {
       if (color === info.color) indexes.push(index);
       return indexes;
@@ -175,7 +177,7 @@ export function previewMove(board, path, { multiplier = 1, fever = false, novas 
     return { cleared, removed, detonated };
   };
   const endpoint = path[path.length - 1];
-  const candidate = forge === true && !info.loop && info.longest >= FORGE_CHAIN && !markers.has(endpoint);
+  const candidate = forge === true && !info.loop && !powered && info.longest >= FORGE_CHAIN && !markers.has(endpoint);
   let blast = clear(candidate ? endpoint : null);
   let forged = null;
   if (candidate) {
@@ -190,9 +192,9 @@ export function previewMove(board, path, { multiplier = 1, fever = false, novas 
   const { cleared, detonated } = blast;
   const amount = cleared.length;
   const factor = Number.isFinite(multiplier) && multiplier >= 0 ? multiplier : 1;
-  const points = (10 * amount + 5 * amount * (amount - 1) + (info.loop ? 150 : 0) + 100 * detonated.length + (forged ? FORGE_BONUS : 0))
+  const points = (10 * amount + 5 * amount * (amount - 1) + (info.loop ? 150 : 0) + 100 * detonated.length + (forged ? FORGE_BONUS : 0) + (powered ? SPECTRUM_BONUS : 0))
     * factor * (fever ? 2 : 1);
-  return { cleared, points, loop: info.loop, color: info.color, longest: info.longest, detonated, forged };
+  return { cleared, points, loop: info.loop, color: info.color, longest: info.longest, detonated, forged, ...(powered ? { spectrum: true } : {}) };
 }
 
 /** Choose a playable power dot using only the supplied random source. */
@@ -215,8 +217,8 @@ export function spawnNova(board, rng, existingNovas = []) {
  * source row = Math.floor(origin / WIDTH), source column = (origin % WIDTH + WIDTH) % WIDTH.
  * These identities follow the pieces through gravity and any safety reshuffle.
  */
-export function resolveMove(board, path, rng = Math.random, { multiplier = 1, fever = false, novas = [], novaRadius = 1, forge = false } = {}) {
-  const move = previewMove(board, path, { multiplier, fever, novas, novaRadius, forge });
+export function resolveMove(board, path, rng = Math.random, { multiplier = 1, fever = false, novas = [], novaRadius = 1, forge = false, spectrum = false } = {}) {
+  const move = previewMove(board, path, { multiplier, fever, novas, novaRadius, forge, spectrum });
   if (!move) return null;
   const removed = new Set(move.cleared);
   const markers = new Set(sanitizeNovas(novas));

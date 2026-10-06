@@ -5,6 +5,7 @@ import { PERKS, createExpedition, stageInfo, expeditionEffects, expeditionBonus,
 import { LEVELS as ATLAS_LEVELS, createAtlas, levelInfo, advanceAtlas, starsForRun, normalizeAtlasRecords, recordAtlasResult, isLevelUnlocked, atlasSummary, makeAtlasBoard } from './atlas.js';
 import { rhythmState, feverExtension, RHYTHM_WINDOW } from './flow.js';
 import { animateBoardMove } from './board-motion.js';
+import { createSpectrum, advanceSpectrum, SPECTRUM_COLORS } from './spectrum.js';
 
 const $ = id => document.getElementById(id);
 const format = value => Math.round(value).toLocaleString();
@@ -19,9 +20,9 @@ const PALETTES = [
 ];
 const COLOR_NAMES = ['Violet ring', 'Rose square', 'Mint diamond', 'Gold triangle', 'Blue cross'];
 const MODE_COPY = {
-  rush: { name: 'Rush', summary: '60 seconds. Beat your best.', kicker: 'SCORE ATTACK', title: 'Find your next spark.', copy: 'Connect colors. Forge Novas.<br>Set off a chain reaction.', button: 'Play Rush', hint: '60 seconds · Loops earn extra time' },
+  rush: { name: 'Rush', summary: '60 seconds. Beat your best.', kicker: 'SCORE ATTACK', title: 'Find your next spark.', copy: 'Connect three colors. Charge a Spectrum.<br>Choose your color. Let it sweep.', button: 'Play Rush', hint: '60 seconds · Loops earn extra time' },
   daily: { name: 'Daily', summary: 'Same board. A better route.', kicker: 'DAILY CHALLENGE', title: "Today's challenge.", copy: 'A fixed board for today.<br>Replay it to find your best route.', button: 'Play today', hint: '60 seconds · The same seed on every retry' },
-  zen: { name: 'Zen', summary: 'No clock. Just connections.', kicker: 'FREE PLAY', title: 'Play at your pace.', copy: 'Find a color. Follow a possibility.<br>Every connection is yours to make.', button: 'Play Zen', hint: 'No timer · Finish whenever you like' },
+  zen: { name: 'Zen', summary: 'No clock. Just connections.', kicker: 'FREE PLAY', title: 'Play at your pace.', copy: 'Three colors. One sweeping move.<br>Find your route through loops and Novas.', button: 'Play Zen', hint: 'No timer · Finish whenever you like' },
   expedition: { name: 'Expedition', summary: 'Five stages. Build your run.', kicker: 'BUILD AN ADVENTURE', title: 'Make the run yours.', copy: 'Clear each stage. Choose upgrades.<br>Carry your build through all five.', button: 'Start Expedition', hint: 'Five stages · Moves count, the clock waits' },
 };
 const LEVELS = [{ dots: 0, name: 'Color curious' }, { dots: 100, name: 'Loop explorer' }, { dots: 300, name: 'Rhythm finder' }, { dots: 600, name: 'Color conductor' }, { dots: 1000, name: 'Flow state' }, { dots: 2000, name: 'Loop legend' }];
@@ -43,7 +44,7 @@ function loadProgress() {
       daily: Object.fromEntries(Object.entries(value.daily || {}).filter(([date, score]) => /^\d{4}-\d{2}-\d{2}$/.test(date) && Number.isFinite(score) && score >= 0).slice(-30)),
       runs: Array.isArray(value.runs) ? value.runs.filter(run => run && ['rush', 'daily', 'zen', 'expedition', 'atlas'].includes(run.mode) && Number.isFinite(run.score) && run.score >= 0 && Number.isFinite(run.dots) && run.dots >= 0).slice(0, 5) : [],
       skin: PALETTES.some(palette => palette.id === value.skin && safeNumber(value.totalDots) >= palette.dots) ? value.skin : 'moonlight',
-      stats: Object.fromEntries(['novas', 'forges', 'fevers', 'maxChain', 'maxCombo', 'maxCascade', 'maxRunLoops', 'maxMissions', 'maxScore', 'maxExpeditionStage', 'maxBuild', 'expeditionWins'].map(key => [key, safeNumber(value.stats?.[key])])),
+      stats: Object.fromEntries(['novas', 'forges', 'spectrums', 'maxSpectrums', 'fevers', 'maxChain', 'maxCombo', 'maxCascade', 'maxRunLoops', 'maxMissions', 'maxScore', 'maxExpeditionStage', 'maxBuild', 'expeditionWins'].map(key => [key, safeNumber(value.stats?.[key])])),
       achievements: Object.fromEntries(ACHIEVEMENTS.filter(item => typeof value.achievements?.[item.id] === 'string').map(item => [item.id, value.achievements[item.id]])),
       atlas: normalizeAtlasRecords(value.atlas),
     };
@@ -90,6 +91,8 @@ function renderSaveStatus() {
 function getBest() { return state.mode === 'atlas' ? progress.atlas[selectedAtlasLevel]?.bestScore || 0 : state.mode === 'daily' ? progress.daily[state.date] || 0 : progress.bests[state.mode] || 0; }
 function timed() { return state.mode === 'rush' || state.mode === 'daily'; }
 function forgeEnabled() { return state.mode !== 'atlas'; }
+function spectrumEnabled() { return ['rush', 'daily', 'zen'].includes(state.mode); }
+function spectrumReady() { return spectrumEnabled() && state.spectrum?.ready === true; }
 function effects() { return expeditionEffects(state.expedition); }
 function novaInterval() { return effects().novaInterval; }
 function buildSize() { return Object.values(state.expedition?.perks || {}).reduce((total, level) => total + level, 0); }
@@ -191,14 +194,15 @@ function updatePath() {
   const wasForgeReady = $('connection-tip').classList.contains('forge-ready');
   const previousLanding = $('connection-tip').dataset.forgeLanding;
   const loop = isLoop(); const color = state.board[state.path[0]];
-  const preview = previewMove(state.board, state.path, { multiplier: nextMultiplier(), fever: state.feverUntil > state.elapsed, novas: state.novas, novaRadius: effects().novaRadius, forge: forgeEnabled() });
+  const preview = previewMove(state.board, state.path, { multiplier: nextMultiplier(), fever: state.feverUntil > state.elapsed, novas: state.novas, novaRadius: effects().novaRadius, forge: forgeEnabled(), spectrum: spectrumReady() });
   const last = state.path.at(-1);
-  const forgePriming = forgeEnabled() && !loop && state.path.length >= 3 && state.path.length < FORGE_CHAIN && !state.novas.includes(last) && state.novas.length - (preview?.detonated.length || 0) < 2;
+  const forgePriming = forgeEnabled() && !spectrumReady() && !loop && state.path.length >= 3 && state.path.length < FORGE_CHAIN && !state.novas.includes(last) && state.novas.length - (preview?.detonated.length || 0) < 2;
   for (const dot of $('board').children) {
     const index = Number(dot.dataset.index);
     const selected = state.path.includes(index);
     dot.classList.toggle('selected', selected);
     dot.classList.toggle('loop-color', loop && Number(dot.dataset.color) === color);
+    dot.classList.toggle('spectrum-color', !!preview?.spectrum && preview.cleared.includes(index));
     dot.classList.toggle('blast-preview', !!preview?.detonated.length && preview.cleared.includes(Number(dot.dataset.index)) && !selected);
     dot.classList.toggle('forge-tip', preview?.forged?.from === index);
     dot.classList.toggle('forge-landing', !!preview?.forged && preview.forged.index !== preview.forged.from && preview.forged.index === index);
@@ -207,6 +211,7 @@ function updatePath() {
   }
   $('connection-path').setAttribute('d', state.path.map((index, i) => `${i ? 'L' : 'M'}${(index % 6) * 100 + 50},${Math.floor(index / 6) * 100 + 50}`).join(' '));
   document.querySelector('.connection-layer').style.color = palette().colors[color] || palette().colors[0];
+  $('board-wrap').classList.toggle('spectrum-preview', !!preview?.spectrum);
   $('connection-tip').classList.toggle('forge-ready', !!preview?.forged);
   $('connection-tip').dataset.forgeLanding = preview?.forged ? String(preview.forged.index) : '';
   if (preview?.forged && (!wasForgeReady || previousLanding !== String(preview.forged.index)) && state.phase === 'playing') announce(`${preview.cleared.length} dots will clear. Release or press Enter on the endpoint to forge a Nova. After gravity it lands at row ${Math.floor(preview.forged.index / 6) + 1}, column ${preview.forged.index % 6 + 1}.`);
@@ -220,8 +225,30 @@ function updatePath() {
     const missionBonus = preview && !state.expedition && !state.atlas ? advanceMission(state.mission, missionEvent(preview, nextMultiplier(), startsFever)).completion?.reward || 0 : 0;
     const extra = preview ? expeditionBonus(state.expedition, preview, { board: state.board }) : 0;
     const feverExtra = preview ? feverExtension(preview, state.feverUntil > state.elapsed, state.feverBonus) : 0;
-    $('chain-label').textContent = `${preview?.detonated.length ? 'NOVA! ' : loop ? 'LOOP! ' : ''}${n} dots · +${format((preview?.points || 0) + missionBonus + extra)} points${preview?.forged ? ' · Forge a Nova' : forgePriming ? ` · ${FORGE_CHAIN - state.path.length} more to forge` : missionBonus ? ' · mission!' : loop && timed() && state.bonusTime < 10 ? ' · +2s' : ''}${feverExtra ? ' · +1s Fever' : ''}`;
-  } else if (state.phase === 'playing') $('chain-label').textContent = state.path.length ? 'Follow this color…' : forgeEnabled() ? 'Connect 2+ dots · Forge at 5' : 'Drag to connect matching colors';
+    $('chain-label').textContent = `${preview?.spectrum ? 'SPECTRUM! ' : preview?.detonated.length ? 'NOVA! ' : loop ? 'LOOP! ' : ''}${n} dots · +${format((preview?.points || 0) + missionBonus + extra)} points${preview?.forged ? ' · Forge a Nova' : forgePriming ? ` · ${FORGE_CHAIN - state.path.length} more to forge` : missionBonus ? ' · mission!' : loop && timed() && state.bonusTime < 10 ? ' · +2s' : ''}${feverExtra ? ' · +1s Fever' : ''}`;
+  } else if (state.phase === 'playing') $('chain-label').textContent = spectrumReady() ? 'Spectrum ready · Choose a color to sweep' : state.path.length ? 'Follow this color…' : forgeEnabled() ? 'Connect 2+ dots · Forge at 5' : 'Drag to connect matching colors';
+}
+
+function renderSpectrum() {
+  const enabled = spectrumEnabled(), meter = $('spectrum-meter');
+  const colors = state.spectrum?.colors || [], ready = spectrumReady();
+  meter.hidden = !enabled;
+  meter.classList.toggle('ready', ready);
+  meter.dataset.colors = colors.join(',');
+  meter.dataset.ready = String(ready);
+  meter.setAttribute('aria-label', ready ? 'Spectrum charged. Your next connection sweeps every dot of its color, with a 100-point bonus before multipliers.' : `Spectrum: ${colors.length} of ${SPECTRUM_COLORS} different connection colors. Connect a new color to charge a sweep.`);
+  $('spectrum-count').textContent = ready ? 'Ready' : `${colors.length}/${SPECTRUM_COLORS}`;
+  for (const pip of meter.querySelectorAll('[data-spectrum-color]')) pip.classList.toggle('active', colors.includes(Number(pip.dataset.spectrumColor)));
+  $('board-wrap').classList.toggle('spectrum-ready', ready && state.phase === 'playing' && !state.locked);
+  $('board').dataset.spectrumEnabled = String(enabled);
+  $('board').dataset.spectrumReady = String(ready);
+  const rule = $('quick-spectrum-rule');
+  if (rule.dataset.spectrum !== String(enabled)) {
+    rule.dataset.spectrum = String(enabled);
+    rule.querySelector('strong').textContent = enabled ? '3' : '5';
+    rule.lastElementChild.textContent = enabled ? 'Spectrum' : 'Forge';
+    $('overlay-rules').setAttribute('aria-label', enabled ? 'Connect two or more matching dots. Close a loop to clear a color. Connect three different colors to charge a Spectrum sweep.' : 'Connect two or more matching dots. Close a loop to clear a color. Connect five to forge a Nova.');
+  }
 }
 
 function updateStats() {
@@ -270,6 +297,7 @@ function updateStats() {
   renderMission();
   renderExpedition();
   renderAtlas();
+  renderSpectrum();
   const nextLayout = `${inRound}/${state.mode}/${buildSize()}`;
   if (nextLayout !== layoutSignature) { layoutSignature = nextLayout; schedulePlayfieldFit(); }
 }
@@ -501,6 +529,8 @@ function prepare(mode = state.mode) {
   dragging = false; lastPointer = null; activePointer = null;
   state = { mode, phase: 'idle', board: [], novas: [], novaCountdown: 4, path: [], rng: createRng(seedFromText(mode === 'daily' ? `chroma-v3-${localDate()}` : 'chroma-welcome-v2')), score: 0, time: 60, elapsed: 0, combo: 0, lastMove: -Infinity, maxCombo: 1, charge: 0, feverUntil: 0, feverDuration: 10, dots: 0, loops: 0, moves: 0, shuffles: 3, bonusTime: 0, locked: false, startTotalDots: progress.totalDots, date: localDate(), mission: { stage: 0, progress: 0, completed: 0 }, novaBlasts: 0, forges: 0, badgesEarned: [], bestPassed: false, expedition: mode === 'expedition' ? createExpedition() : null, perkRng: createRng(12345), perkOffers: [] };
   state.rhythmReadyAt = -Infinity; state.feverBonus = 0; state.rhythmPeakAnnounced = false;
+  state.spectrum = createSpectrum();
+  $('board-wrap').classList.remove('spectrum-preview', 'spectrum-release');
   state.atlas = mode === 'atlas' ? createAtlas(selectedAtlasLevel) : null;
   state.atlasStartRecord = state.atlas ? { ...progress.atlas[selectedAtlasLevel] } : null;
   if (state.atlas) {
@@ -634,8 +664,12 @@ function commitMove(focusAfter = null) {
   if (state.phase !== 'playing' || state.locked) { cancelPath(); return; }
   const multiplier = nextMultiplier(); const fever = !state.atlas && state.feverUntil > state.elapsed;
   const beforeBoard = state.board;
-  const result = resolveMove(state.board, state.path, state.rng, { multiplier, fever, novas: state.novas, novaRadius: effects().novaRadius, forge: forgeEnabled() });
+  const result = resolveMove(state.board, state.path, state.rng, { multiplier, fever, novas: state.novas, novaRadius: effects().novaRadius, forge: forgeEnabled(), spectrum: spectrumReady() });
   if (!result) { cancelPath(); return; }
+  const spectrumBefore = state.spectrum;
+  if (spectrumEnabled()) state.spectrum = advanceSpectrum(state.spectrum, result);
+  const spectrumCollected = state.spectrum.colors.length > spectrumBefore.colors.length;
+  const spectrumCharged = !spectrumBefore.ready && state.spectrum.ready;
   const feverExtra = feverExtension(result, fever, state.feverBonus);
   const expeditionPoints = expeditionBonus(state.expedition, result, { board: beforeBoard });
   const expeditionStep = state.expedition ? advanceExpedition(state.expedition, result) : null;
@@ -713,9 +747,18 @@ function commitMove(focusAfter = null) {
     $('board-wrap').classList.add('forge-release');
     forgeReleaseTimer = setTimeout(() => { if (roundId === thisRound) $('board-wrap').classList.remove('forge-release'); }, 450);
   }
+  if (result.spectrum) {
+    sound.spectrumBurst();
+    notice(`Spectrum sweep. ${result.cleared.length} dots, one color chosen.`, 1900);
+    $('board-wrap').classList.remove('spectrum-release');
+    void $('board-wrap').offsetWidth;
+    $('board-wrap').classList.add('spectrum-release');
+  }
   const stats = progress.stats;
   stats.novas = (stats.novas || 0) + result.detonated.length;
   stats.forges = (stats.forges || 0) + Number(!!result.forged);
+  stats.spectrums = (stats.spectrums || 0) + Number(!!result.spectrum);
+  stats.maxSpectrums = Math.max(stats.maxSpectrums || 0, state.spectrum.bursts);
   stats.fevers = (stats.fevers || 0) + Number(feverStarted);
   stats.maxChain = Math.max(stats.maxChain || 0, result.longest);
   stats.maxCombo = Math.max(stats.maxCombo || 0, multiplier);
@@ -731,11 +774,12 @@ function commitMove(focusAfter = null) {
     state.bestPassed = true;
     if (!result.detonated.length && !result.forged && !mission.completion) notice('Past your personal best. Keep your rhythm.');
   }
-  sound.clear(result.cleared.length, result.loop, multiplier);
+  if (!result.spectrum) sound.clear(result.cleared.length, result.loop, multiplier);
   burst(result.cleared, result.color);
-  const rewardLabel = result.forged ? 'NOVA FORGED' : expeditionPoints ? `YOUR BUILD · +${format(expeditionPoints)} BONUS` : mission.completion ? `MISSION COMPLETE · +${format(bonus)} BONUS` : result.detonated.length > 1 ? 'CHAIN REACTION' : result.detonated.length ? 'SUPERNOVA' : result.loop ? 'FULL COLOR CLEAR' : multiplier > 1 ? `×${multiplier} RHYTHM${fever ? ' · DOUBLE POINTS' : ''}` : result.cleared.length > 4 ? 'NICE CONNECTION' : '';
+  const rewardLabel = result.spectrum ? 'SPECTRUM SWEEP' : result.forged ? 'NOVA FORGED' : expeditionPoints ? `YOUR BUILD · +${format(expeditionPoints)} BONUS` : mission.completion ? `MISSION COMPLETE · +${format(bonus)} BONUS` : result.detonated.length > 1 ? 'CHAIN REACTION' : result.detonated.length ? 'SUPERNOVA' : result.loop ? 'FULL COLOR CLEAR' : multiplier > 1 ? `×${multiplier} RHYTHM${fever ? ' · DOUBLE POINTS' : ''}` : result.cleared.length > 4 ? 'NICE CONNECTION' : '';
   floatScore(result.points + bonus + expeditionPoints, `${rewardLabel}${feverExtra ? ' · +1s FEVER' : ''}`, result.color);
   state.path = []; $('connection-path').setAttribute('d', ''); $('connection-tip').style.display = 'none';
+  $('board-wrap').classList.remove('spectrum-preview');
   $('connection-tip').classList.remove('forge-ready');
   $('chain-status').classList.remove('selecting'); $('chain-label').textContent = result.forged ? 'A star you shaped. Set up your next blast.' : result.detonated.length ? 'A little star. A beautiful ripple.' : result.loop ? 'That felt good. Find your next color.' : 'Keep the rhythm. Find your next connection.';
   updateStats(); announce(`${result.cleared.length} dots cleared. ${result.points + bonus + expeditionPoints} points. Score ${state.score}.${result.forged ? ' Nova forged at your chain endpoint.' : ''}${feverExtra ? ' One second of Fever earned.' : ''}${mission.completion ? ' Mission complete.' : ''}`);
@@ -743,6 +787,12 @@ function commitMove(focusAfter = null) {
     if (roundId !== thisRound) return;
     boardMotion = null;
     state.locked = false; state.rhythmReadyAt = state.elapsed; updatePath(); updateStats();
+    $('board-wrap').classList.remove('spectrum-release');
+    if (spectrumCollected && state.phase === 'playing') {
+      sound.spectrumCharge(state.spectrum.colors.length, spectrumCharged);
+      if (spectrumCharged) notice('Spectrum charged. Choose your next color to sweep.', 2300);
+      else if (!result.detonated.length && !result.forged && !mission.completion) notice(`${state.spectrum.colors.length} / ${SPECTRUM_COLORS} colors · A new color brings your sweep closer.`, 1400);
+    }
     if (!reducedMotion) {
       const arrivals = [...new Set([...(result.forged ? [result.forged.index] : []), ...state.novas.filter(index => !result.novas.includes(index))])];
       for (const index of arrivals) $('board').children[index]?.classList.add('nova-arrived');
@@ -756,7 +806,7 @@ function commitMove(focusAfter = null) {
     if (Number.isInteger(focusAfter) && state.phase === 'playing') focusDot(focusAfter);
     beginHeldPointer();
     if (result.reshuffled) notice('Fresh connections. Board automatically shuffled.');
-    else if ((novaSpawned || orbitNova) && !result.detonated.length && !result.forged && !mission.completion) notice('A fresh Nova. Follow the star.', 1300);
+    else if ((novaSpawned || orbitNova) && !spectrumCharged && !result.detonated.length && !result.forged && !mission.completion) notice('A fresh Nova. Follow the star.', 1300);
   } });
 }
 
@@ -781,7 +831,7 @@ function finish() {
   const previousDots = state.startTotalDots;
   if (state.mode === 'daily') progress.daily[state.date] = Math.max(previousBest, state.score);
   else if (!state.atlas) progress.bests[state.mode] = Math.max(previousBest, state.score);
-  const run = { mode: state.mode, score: state.score, dots: state.dots, loops: state.loops, forges: state.forges, date: state.date };
+  const run = { mode: state.mode, score: state.score, dots: state.dots, loops: state.loops, forges: state.forges, spectrums: state.spectrum.bursts, date: state.date };
   if (state.expedition) {
     run.stages = state.expedition.completedStages; run.perks = { ...state.expedition.perks }; run.won = state.expedition.won;
     if (state.expedition.won) progress.stats.expeditionWins = (progress.stats.expeditionWins || 0) + 1;
@@ -824,6 +874,8 @@ function finish() {
   $('result-dots').textContent = format(state.dots); $('result-loops').textContent = state.loops; $('result-combo').textContent = `×${state.maxCombo}`;
   $('result-novas').textContent = state.novaBlasts; $('result-missions').textContent = state.mission.completed;
   $('result-forges').textContent = state.forges; $('result-forges').parentElement.hidden = !!state.atlas;
+  $('result-spectrum').hidden = !spectrumEnabled();
+  $('result-spectrum').textContent = state.spectrum.bursts ? `${state.spectrum.bursts} Spectrum ${state.spectrum.bursts === 1 ? 'sweep' : 'sweeps'}${state.spectrum.bursts >= 3 ? ' · Prism conductor' : ' · 3 in one run earns Prism conductor'}` : 'Connect three colors to charge your first Spectrum sweep.';
   $('result-missions').nextSibling.textContent = state.expedition ? ' stages complete' : ' missions complete';
   if (state.expedition) $('result-missions').textContent = state.expedition.completedStages;
   const rank = rankForScore(state.score); $('result-rank').textContent = rank.title; $('result-rank').style.setProperty('--rank-color', rank.color);

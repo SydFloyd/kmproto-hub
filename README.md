@@ -66,8 +66,15 @@ This repository maintains the kmproto.com metadata, Lab link, responsive layout
 and board motion. Survivor pieces retain their DOM identity and follow the engine's
 source-cell mapping through gravity; new dots enter from above. The game clock,
 Fever and combo window wait while pieces settle, and pause holds the animation.
-Rush, Daily, Zen, Expedition and Atlas retain the tested game rules. Scores and
+Rush, Daily, Zen, Expedition and Atlas share the tested puzzle engine. Scores and
 unlocks are local to this browser and origin; separate hosts keep separate records.
+Rush, Daily and Zen add Spectrum: connect three distinct colors to charge the next
+legal connection into a full-color sweep with a 100-point bonus before multipliers.
+Repeated colors do not add charge; previews and canceled paths never spend it.
+Spectrum keeps real loop bonuses, Nova cascades and exact gravity, and adds two
+skill badges. Expedition and Atlas keep their existing rules. Run
+`node --test tests/chroma-spectrum.test.mjs` to check charge cycles, sweep scoring
+and deterministic engine integration.
 Port future source releases deliberately rather than replacing this directory,
 preserving these host changes. Run `node --test tests/chroma-motion.test.mjs` for
 gravity, refill, reshuffle and Nova identity checks, then exercise normal and
