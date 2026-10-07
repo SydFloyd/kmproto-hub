@@ -1,9 +1,10 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { WAVE_BUDGETS, WaveBudget } from '../app/components/ripple-tank/budget.ts';
+import { WAVE_BUDGETS, WaveBudget, wavePixelBudget } from '../app/components/ripple-tank/budget.ts';
 import { poolLayout, copyOpacity } from '../app/components/ripple-tank/geometry.ts';
 import { WaveSimulation } from '../app/components/ripple-tank/simulation.ts';
 import { currentHeight } from '../app/components/ripple-tank/appearance.ts';
+import { QuietWaterRenderer } from '../app/components/ripple-tank/renderer.ts';
 
 const config = { generation: 1, columns: 44, rows: 25, placement: { x: 30, y: 13, size: 15 } };
 test('startup is exactly still, with no monogram revealed', () => {
@@ -24,9 +25,68 @@ test('phone, desktop, desktop-on-phone and full screen all obey node and pixel b
       assert.ok(water <= budget.water, `${water} water nodes > ${budget.water}`);
       assert.ok(letters <= budget.letters);
       assert.ok(layout.columns * layout.rows <= budget.physics);
-      assert.ok(width * height * layout.ratio ** 2 <= budget.pixels + 1);
+      assert.ok(width * height * layout.ratio ** 2 <= wavePixelBudget(width, height, tier) + 1);
       assert.ok(letters > 100, 'letter detail remains independent of solver size');
     }
+  }
+});
+test('small, dense water characters survive software fallback, quality reduction and 4K full screen', () => {
+  for (const [width, height] of [[320, 1000], [390, 850], [1440, 709], [1920, 1080], [3840, 2160]]) {
+    const zone = { x: width / 2, y: 0, width: width / 2, height };
+    let reference;
+    for (const tier of [2, 1, 0]) for (const density of [.75, 1, 2, 3]) {
+      const layout = poolLayout(width, height, zone, null, tier, density);
+      const water = [];
+      for (let i = 0; i < layout.points.length; i += 6) {
+        assert.ok(layout.points[i + 4] <= 12, 'water and KM glyphs stay small even in full screen');
+        if (!layout.points[i + 5]) {
+          water.push([...layout.points.slice(i, i + 6)]);
+          assert.equal(layout.points[i + 4], 12, 'glyph size stays fixed in CSS pixels');
+        }
+      }
+      assert.equal(water.length, Math.floor(width / 9) * Math.floor(height / 9), 'larger displays add detail');
+      assert.ok(Math.abs(water[1][0] - water[0][0] - 9) < .001, 'nine-pixel character spacing');
+      if (reference) assert.deepEqual(water, reference, 'GPU quality and pixel density cannot spread the characters out');
+      else reference = water;
+      assert.ok(Math.round(12 * layout.ratio) / layout.ratio <= 14, 'software stamps stay small after backing-pixel rounding');
+    }
+  }
+  assert.equal(wavePixelBudget(390, 850, 0), 160_000, 'phone software pixels remain bounded');
+  assert.equal(wavePixelBudget(3840, 2160, 0), 650_000, 'large software displays have a bounded sharper surface');
+});
+test('software painting before the first worker reply matches a configured flat field', () => {
+  const originalCanvas = globalThis.OffscreenCanvas;
+  // Only atlas rasterization is stubbed; layout, interpolation, stamp
+  // composition and worker field encoding use their real implementations.
+  globalThis.OffscreenCanvas = class {
+    getContext() {
+      return { fillText() {}, getImageData(x, y, width, height) {
+        const data = new Uint8ClampedArray(width * height * 4);
+        data[3] = 255;
+        return { data };
+      } };
+    }
+  };
+  try {
+    let painted;
+    const context = {
+      createImageData: (width, height) => ({ data: new Uint8ClampedArray(width * height * 4) }),
+      putImageData: frame => { painted = frame.data.slice(); },
+    };
+    const renderer = new QuietWaterRenderer({ width: 0, height: 0 }, context);
+    const layout = poolLayout(320, 500, { x: 0, y: 0, width: 320, height: 500 }, null, 0, 1);
+    renderer.resize(layout);
+    assert.equal(renderer.draw(0, { x: .5, y: .5, visible: false }), true);
+    const first = painted;
+    assert.ok(first.some(value => value > 0), 'the early paint contains still-water punctuation');
+    const simulation = new WaveSimulation();
+    renderer.update(simulation.configure({ generation: 1, columns: layout.columns, rows: layout.rows, placement: layout.placement }));
+    renderer.draw(0, { x: .5, y: .5, visible: false });
+    assert.deepEqual(painted, first, 'initial interpolation is valid before any worker field arrives');
+    renderer.dispose();
+  } finally {
+    if (originalCanvas === undefined) delete globalThis.OffscreenCanvas;
+    else globalThis.OffscreenCanvas = originalCanvas;
   }
 });
 test('a pebble has signed coherent waves, reveals the offset logo, and reuses the transfer buffer', () => {

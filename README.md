@@ -40,15 +40,22 @@ reduced motion slows their pace, and manual pause freezes them.
 
 The solver runs in a request-driven worker with one reusable frame buffer and one
 pending pointer segment. A tick has at most 12 solver steps and 16 wake samples.
-WebGL draws the punctuation and fine, square KM lettering in one batch. Phone
-budgets are 1,600 water nodes, 900 letter nodes, 1,100 solver cells and 650,000
-backing pixels; desktop ceilings are 2,600 / 1,200 / 1,800 / 1,000,000. Quality
-reduces under sustained pressure, including texture-upload and presentation
+WebGL draws the punctuation and fine, square KM lettering in one batch. Water
+characters use a nine-CSS-pixel grid and twelve-pixel glyph tiles on every
+rendering tier; larger displays add characters, up to 128,000 water nodes.
+The KM has its own fine grid, capped at 32,000 nodes and twelve-pixel glyph
+tiles. Phone budgets are 1,100 solver cells and 650,000 backing pixels;
+desktop ceilings are 1,800 / 1,000,000. Solver quality and backing resolution
+reduce under sustained pressure, including texture-upload and presentation
 cost. An overloaded, unavailable or software-emulated GPU uses cached punctuation
 stamps on a transferred OffscreenCanvas: both simulation and drawing stay in the
 worker, with only a small completion message sent to the page. This path caps
-water nodes at 450, letter nodes at 360, solver cells at 360 and pixels at 160,000.
-Browsers without canvas transfer draw the same small surface on the page;
+solver cells at 360. Its character grids stay dense, with currents evaluated
+on the small field and interpolated onto the water grid, and KM highlights
+cached per field cell.
+Software backing pixels stay at 160,000 on phones; larger surfaces use a bounded
+quarter-resolution surface up to 650,000 pixels to keep tiny symbols legible.
+Browsers without canvas transfer draw the same bounded surface on the page;
 blocked or stalled workers also use the small field locally. Continued overload
 switches the physical ripples to input-driven snapshots while ambient drawing
 continues at 8 fps. Normal interaction targets 30 fps; quiet currents paint at

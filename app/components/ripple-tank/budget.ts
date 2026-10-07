@@ -1,9 +1,19 @@
 export type WaveTier = 0 | 1 | 2;
+// Drawing detail is independent of solver quality and the available GPU.
+// The ceiling covers a 4K full-screen pool at nine CSS pixels per character.
+const WATER_NODES = 128_000;
+const LETTER_NODES = 32_000;
 export const WAVE_BUDGETS = [
-  { water: 450, letters: 360, physics: 360, pixels: 160_000, fps: 30, idleFps: 15 },
-  { water: 1600, letters: 900, physics: 1100, pixels: 650_000, fps: 30, idleFps: 20 },
-  { water: 2600, letters: 1200, physics: 1800, pixels: 1_000_000, fps: 30, idleFps: 20 },
+  { water: WATER_NODES, letters: LETTER_NODES, physics: 360, pixels: 160_000, fps: 30, idleFps: 15 },
+  { water: WATER_NODES, letters: LETTER_NODES, physics: 1100, pixels: 650_000, fps: 30, idleFps: 20 },
+  { water: WATER_NODES, letters: LETTER_NODES, physics: 1800, pixels: 1_000_000, fps: 30, idleFps: 20 },
 ] as const;
+
+export function wavePixelBudget(width: number, height: number, tier: WaveTier) {
+  // Keep the phone's small software surface. Larger displays need enough
+  // backing pixels to avoid magnifying one-pixel stamps into large symbols.
+  return tier === 0 ? Math.max(WAVE_BUDGETS[0].pixels, Math.min(650_000, width * height / 4)) : WAVE_BUDGETS[tier].pixels;
+}
 
 // Measure presentation cadence as well as JS time: an overloaded GPU can
 // stall presentation while draw submission itself still looks inexpensive.

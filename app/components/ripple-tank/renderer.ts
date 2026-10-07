@@ -92,6 +92,7 @@ function glyphAtlas(colored = false) {
 }
 
 export class BatchedWaterRenderer implements WaterRenderer {
+  private canvas: HTMLCanvasElement;
   private gl: WebGLRenderingContext;
   private program: WebGLProgram;
   private vertexBuffer: WebGLBuffer;
@@ -106,7 +107,8 @@ export class BatchedWaterRenderer implements WaterRenderer {
   private fieldHeight = 1;
   private cursorVertices = new Float32Array(24);
 
-  constructor(private canvas: HTMLCanvasElement) {
+  constructor(canvas: HTMLCanvasElement) {
+    this.canvas = canvas;
     const gl = canvas.getContext("webgl", { alpha: true, antialias: false, depth: false, stencil: false, powerPreference: "low-power", preserveDrawingBuffer: false });
     if (!gl) throw new Error("WebGL unavailable");
     this.gl = gl;
@@ -191,18 +193,23 @@ export class BatchedWaterRenderer implements WaterRenderer {
 }
 
 // Software fallback: compose cached tiny punctuation stamps into one pixel
-// buffer. One putImageData replaces hundreds of individual canvas draw calls.
+// buffer. One putImageData replaces thousands of individual canvas draw calls.
 export class QuietWaterRenderer implements WaterRenderer {
+  private canvas: HTMLCanvasElement | OffscreenCanvas;
+  private ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D;
   private layout: PoolLayout | null = null;
   private values = new Uint8Array([128, 0, 0, 255]);
   private columns = 1;
   private rows = 1;
   private frame: ImageData | null = null;
   private base = new Uint8ClampedArray(0);
-  private nodes: { x: number; y: number; size: number; alpha: number; letter: number; u: number; v: number }[] = [];
+  private heights = new Float32Array(0);
+  private glints = new Float32Array(0);
+  private nodes: { x: number; y: number; size: number; alpha: number; letter: number; u: number; v: number; sample: number; fx: number; fy: number }[] = [];
   private stamps = new Map<number, Uint16Array[]>();
   private colors: number[][] = [];
-  constructor(private canvas: HTMLCanvasElement | OffscreenCanvas, private ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D) {
+  constructor(canvas: HTMLCanvasElement | OffscreenCanvas, ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D) {
+    this.canvas = canvas; this.ctx = ctx;
     for (const [base, peak] of [[[29, 60, 80], [102, 173, 190]], [[41, 86, 104], [196, 244, 226]], [[42, 100, 112], [189, 220, 207]]]) {
       for (let i = 0; i < 8; i++) this.colors.push(base.map((value, j) => Math.round(value + (peak[j] - value) * (i / 7) ** 0.75)));
     }
@@ -211,9 +218,16 @@ export class QuietWaterRenderer implements WaterRenderer {
     this.layout = layout;
     this.canvas.width = Math.floor(layout.width * layout.ratio); this.canvas.height = Math.floor(layout.height * layout.ratio);
     this.frame = this.ctx.createImageData(this.canvas.width, this.canvas.height);
+    // Main-thread fallback can paint before its first worker reply. Initialize
+    // a flat field with the new dimensions so interpolation is valid then too.
+    this.columns = layout.columns; this.rows = layout.rows;
+    this.values = new Uint8Array(this.columns * this.rows * 4);
+    for (let i = 0; i < this.values.length; i += 4) { this.values[i] = 128; this.values[i + 3] = 255; }
+    this.heights = new Float32Array(layout.columns * layout.rows);
+    this.glints = new Float32Array(layout.columns * layout.rows);
     this.base = new Uint8ClampedArray(this.frame.data.length); this.stamps.clear(); this.nodes = [];
     for (let i = 0; i < layout.points.length; i += 6) {
-      const x = layout.points[i], y = layout.points[i + 1], size = Math.max(2, Math.round(layout.points[i + 4] * layout.ratio));
+      const x = layout.points[i], y = layout.points[i + 1], size = Math.max(1, Math.round(layout.points[i + 4] * layout.ratio));
       if (!this.stamps.has(size)) {
         const sheet = typeof document === "undefined" ? new OffscreenCanvas(size * 5, size) : document.createElement("canvas");
         sheet.width = size * 5; sheet.height = size;
@@ -226,8 +240,13 @@ export class QuietWaterRenderer implements WaterRenderer {
           return new Uint16Array(points);
         }));
       }
+      const u = layout.points[i + 2], v = layout.points[i + 3];
+      const sx = Math.max(0, Math.min(layout.columns - 1, u * (layout.columns - 1)));
+      const sy = Math.max(0, Math.min(layout.rows - 1, v * (layout.rows - 1)));
+      const left = Math.min(layout.columns - 2, Math.floor(sx)), top = Math.min(layout.rows - 2, Math.floor(sy));
       const node = { x: Math.round(x * layout.ratio - size / 2), y: Math.round(y * layout.ratio - size / 2), size,
-        alpha: copyOpacity(x, y, layout.copy, layout.width), letter: layout.points[i + 5], u: layout.points[i + 2], v: layout.points[i + 3] };
+        alpha: copyOpacity(x, y, layout.copy, layout.width), letter: layout.points[i + 5], u, v,
+        sample: top * layout.columns + left, fx: sx - left, fy: sy - top };
       this.nodes.push(node);
       if (!node.letter) this.stamp(this.base, node.x, node.y, size, 0, this.colors[9], node.alpha);
     }
@@ -249,21 +268,40 @@ export class QuietWaterRenderer implements WaterRenderer {
   update(frame: PoolFrame) {
     if (this.values.length !== frame.buffer.byteLength) this.values = new Uint8Array(frame.buffer.byteLength);
     this.values.set(new Uint8Array(frame.buffer)); this.columns = frame.columns; this.rows = frame.rows;
+    // Letter highlights share the small field. Cache each neighborhood once
+    // per physical frame rather than inspecting it for every fine KM node.
+    for (let y = 0; y < this.rows; y++) for (let x = 0; x < this.columns; x++) {
+      let glint = 0;
+      for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
+        const xx = Math.max(0, Math.min(this.columns - 1, x + dx)), yy = Math.max(0, Math.min(this.rows - 1, y + dy));
+        glint = Math.max(glint, this.values[(yy * this.columns + xx) * 4 + 2] / 255);
+      }
+      this.glints[y * this.columns + x] = glint;
+    }
   }
   draw(time: number, cursor: WaterCursor, scale = 1) {
     const layout = this.layout, frame = this.frame;
     if (!layout || !frame) return false;
     frame.data.set(this.base);
+    // Evaluate currents once on the small field, then interpolate them onto
+    // the dense character grid. Detail adds stamps rather than sine calls or
+    // solver work for every character, including on the software renderer.
+    const heights = this.heights;
+    for (let y = 0; y < this.rows; y++) for (let x = 0; x < this.columns; x++) {
+      const i = y * this.columns + x, j = i * 4;
+      heights[i] = (this.values[j] * 256 + this.values[j + 1] - 32768) / 32767 * scale
+        + currentHeight(x / (this.columns - 1), y / (this.rows - 1), time);
+    }
     for (const node of this.nodes) {
-      const sx = Math.max(0, Math.min(this.columns - 1, Math.round(node.u * (this.columns - 1))));
-      const sy = Math.max(0, Math.min(this.rows - 1, Math.round(node.v * (this.rows - 1))));
-      const j = (sy * this.columns + sx) * 4;
-      const value = (this.values[j] * 256 + this.values[j + 1] - 32768) / 32767 * scale
-        + (node.letter ? 0 : currentHeight(node.u, node.v, time));
+      const i = node.sample;
+      const top = heights[i] + (heights[i + 1] - heights[i]) * node.fx;
+      const bottom = heights[i + this.columns] + (heights[i + this.columns + 1] - heights[i + this.columns]) * node.fx;
+      const value = top + (bottom - top) * node.fy;
       let glint = 0;
-      if (node.letter) for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
-        const xx = Math.max(0, Math.min(this.columns - 1, sx + dx)), yy = Math.max(0, Math.min(this.rows - 1, sy + dy));
-        glint = Math.max(glint, this.values[(yy * this.columns + xx) * 4 + 2] / 255 * scale);
+      if (node.letter) {
+        const sx = Math.max(0, Math.min(this.columns - 1, Math.round(node.u * (this.columns - 1))));
+        const sy = Math.max(0, Math.min(this.rows - 1, Math.round(node.v * (this.rows - 1))));
+        glint = this.glints[sy * this.columns + sx] * scale;
       }
       const energy = node.letter ? glint * 1.8 : Math.abs(value) * 2;
       if (energy < (node.letter ? 0.004 : 0.016)) continue;
@@ -279,5 +317,5 @@ export class QuietWaterRenderer implements WaterRenderer {
     }
     return true;
   }
-  dispose() { this.frame = null; this.base = new Uint8ClampedArray(0); this.stamps.clear(); this.nodes = []; }
+  dispose() { this.frame = null; this.base = new Uint8ClampedArray(0); this.heights = this.glints = new Float32Array(0); this.stamps.clear(); this.nodes = []; }
 }

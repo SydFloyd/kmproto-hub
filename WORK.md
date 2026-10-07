@@ -1,3 +1,44 @@
+# Consistent, dense ASCII waves
+
+Updated: 2026-10-07
+Status: approved for publication; live verification pending.
+
+The software fallback previously spread 450 water characters across the entire
+canvas, and larger displays enlarged the spacing further. Water now uses a
+nine-CSS-pixel grid and twelve-pixel glyph tiles across all rendering tiers.
+The independent KM grid also keeps small glyphs and consistent detail. Drawing
+ceilings are 128,000 water nodes and 32,000 letter nodes; solver ceilings remain
+360 / 1,100 / 1,800 cells. Quality reduction no longer spreads out the characters.
+
+Software drawing evaluates currents on the small field and interpolates them
+onto the dense grid. It caches KM highlight neighborhoods per physical frame.
+The fallback initializes a valid flat field before its first worker reply.
+Phone backing pixels remain capped at 160,000; large software surfaces use a
+quarter-resolution surface capped at 650,000 pixels to preserve small glyphs.
+
+Verification: Vercel production build, TypeScript, ESLint, diff checks and all
+18 wave physics/runtime regressions pass. Browser checks cover 320 / 390 /
+1,440 / 1,920 / 3,840 px, DPR 1 / 2 / 3, native full screen, pointer/tap input,
+pause/resume, overflow, worker painting, main-thread canvas, blocked workers
+and shader rendering. Screenshots were inspected, including the 4K KM.
+Shader checks force the hardware code path on this software-rendered host;
+they establish compatibility, not a physical GPU performance measurement.
+
+The five-minute phone run with 4x CPU throttling passes: 30.0 fps under continuous
+pointer/pebble input and landscape full screen, 15.0 fps unattended, no long
+tasks, overlapping requests or emergency fallback. Worker p95 is 1.8–4.3 ms;
+page p95 is 0.5–0.7 ms. Retained page heap growth is 380,370 bytes. A 4K full-screen
+software renderer reaches the existing 8 fps overload fallback; its dense grid
+and small glyphs remain intact. These are emulated browser measurements.
+
+Evidence: ignored outputs/check-wave-detail.cjs, outputs/wave-detail-browser.json,
+outputs/wave-detail-*.png, outputs/soak-wave-detail.cjs,
+outputs/wave-detail-soak.json and outputs/check-wave-large.cjs.
+The user approved publication on 2026-10-07. Release and live verification
+evidence will be recorded here after the production deployment completes.
+
+---
+
 # Lab list order
 
 Updated: 2026-10-05
