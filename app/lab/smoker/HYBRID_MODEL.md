@@ -1,21 +1,12 @@
 # Hybrid smoker model and controller
 
-The Hybrid option represents wood splits and auger-fed pellets burning at the
-same time in one firebox. The two fuel beds have independent temperatures,
-moisture, particle kinetics, inventories and origin ledgers; they share one
-oxygen supply and one firebox/chamber/wall/meat thermal model. This is the
-first design candidate for the KM Proto prototype; the hardware layout has
-not been chosen. It must be revised if the actual cooker has separately
-supplied combustion zones or fireboxes.
-
-A commercially listed example is the
-[Lone Star Grillz 24 × 48 Hybrid Offset](https://lonestargrillz.com/collections/smokers/products/24-x-48-offset-hybride-smoker),
-listed by its manufacturer at **$7,195** when checked on October 5, 2026. The
-manufacturer describes simultaneous wood and pellet combustion in one firebox,
-pellet compensation as a split burns down, and adjustment when wood is added.
-This is an example consistent with the proposed architecture, not an
-identification of the user's cooker. The simulation neither reproduces that
-product's geometry nor claims access to its FireBoard controller algorithm.
+The Hybrid option represents wood splits and auger-fed pellets burning in
+two dedicated fireboxes that feed one cooking chamber. Each firebox has its
+own intake, temperature, fuel bed and oxygen supply. The beds have independent
+moisture, particle kinetics, inventories and origin ledgers. The branches
+share an exhaust setting, the cooking chamber, walls and meat thermal model.
+This is the implemented nominal KM Proto design; its coefficients still need
+measurement before it can predict a physical cooker.
 
 `model.ts` is the executable specification. The equations below describe the
 implemented nominal model, including its limitations. Internal units are
@@ -48,7 +39,9 @@ specify this independent hybrid algorithm.
 | Air oxygen mass fraction | 0.232 | kg oxygen/kg air |
 | Volatile oxygen requirement, `r_v` | 1.15 | kg oxygen/kg volatiles burned |
 | Char oxygen requirement, `r_c` | 2.667 | kg oxygen/kg char burned |
-| Firebox heat capacity, `C_f` | 2,000 | J/K |
+| Wood / pellet firebox heat capacity, `C_fw`, `C_fp` | 2,000 each | J/K |
+| Each firebox-to-pit conductance, `G_wp`, `G_pp` | 2 | W/K |
+| Conditional minimum pellet feed | 0.10 | kg/h wet pellets |
 | Chamber heat capacity, `C_p` | 4,500 | J/K |
 | Wall heat capacity, `C_w` | 22,000 | J/K |
 | Meat specific heat, `c_m` | 3,300 | J/(kg K) |
@@ -68,14 +61,19 @@ ambient and zero wind. Each fuel can be independently loaded/refueled. Changing
 the moisture control affects newly added fuel, not material already present.
 Hopper refilling preserves its mass-weighted water fraction.
 
-The run assumes an established ember bed: 0.04 kg wood-origin char if wood is
-loaded, plus 0.025 kg pellet-origin dry starter and 0.025 kg pellet-origin char
-if the pellet hopper initially contains fuel. Starter pellet water is
-`0.025 M_p / (1 - M_p)`. The firebox begins at 480°C, the pellet bed at 160°C,
-and loaded wood at ambient temperature. Starters are included in the fuel and
-chemical-energy ledgers. `startupSensibleEnergyJ` records firebox sensible
-energy above ambient plus the initially warm pellet dry-fuel/water inventory;
-it is not a complete thermal energy ledger for the entire cooker.
+The run assumes an established ember bed: wood-origin starter char is
+`0.04 kg × initialWoodKg / 0.35 kg`, so the default charge starts with 0.04 kg
+char and an absent wood source starts with none. Scaling the startup ember
+bed with the initial wood charge is a nominal demonstration assumption, not
+new ignition energy on later refills. The pellet bed starts with 0.025 kg dry
+starter and 0.025 kg char if its hopper initially contains fuel. Starter pellet water is
+`0.025 M_p / (1 - M_p)`. Each firebox with an initial fuel supply begins at
+480°C; an absent source's firebox begins at ambient temperature. The pellet
+bed begins at 160°C and loaded wood at ambient temperature. Starters are
+included in the fuel and chemical-energy ledgers. `startupSensibleEnergyJ`
+records the sum of both fireboxes' sensible energy above ambient plus the
+initially warm pellet dry-fuel/water inventory. It is not a complete thermal
+energy ledger for the entire cooker.
 
 ## Fuel mass and chemical-energy ledgers
 
@@ -103,27 +101,32 @@ thermal energy separately; it is not subtracted a second time from the chemical
 ledger. Ash, CO chemistry, recondensed tar and individual exhaust species are
 not resolved.
 
-## Shared airflow and cooker heat balance
+## Branch airflow and common chamber heat balance
 
-Intake `u` and exhaust `v` are fractions from 0 to 1, not calibrated valve
-angles. The nominal two-restriction draft model is:
+Wood intake `u_w`, pellet intake `u_p` and common exhaust `v` are fractions
+from 0 to 1, not calibrated valve angles. For firebox `i`, the nominal
+two-restriction draft model is:
 
 ```text
-valve = 1 / sqrt(1/(u + 0.025)^2 + 1/(v + 0.025)^2)
-draft = sqrt(clamp((T_fire - T_ambient + 60)/520, 0.12, 2))
-air_kg_s = 0.00008 + 0.006 valve draft (1 + 0.045 wind_m_s)
+valve_i = 1 / sqrt(1/(u_i + 0.025)^2 + 1/(v + 0.025)^2)
+draft_i = sqrt(clamp((T_fire_i - T_ambient + 60)/520, 0.12, 2))
+air_i_kg_s = 0.00004 + 0.003 valve_i draft_i (1 + 0.045 wind_m_s)
+air_kg_s = air_wood_kg_s + air_pellet_kg_s
 ```
 
-The small leakage floor permits some flow with closed dampers. The model uses
-natural draft with a nominal wind multiplier, not a resolved fan/pressure
-network. A real combustion blower would require its own measured pressure/flow
-curve, actuation limits and fire-zone distribution.
+The small leakage floor permits some flow with closed dampers. Each branch's
+flow depends on its intake, its firebox temperature and the common exhaust.
+Opening the wood intake does not supply oxygen to the pellet bed. The shared
+exhaust restriction is a nominal approximation, not a resolved pressure
+network with branch interaction. A real chimney or combustion blower requires
+measured pressure/flow curves and actuation limits.
 
 For each one-second step, the nominal inter-node powers are:
 
 ```text
-Q_fire_pit  = 4 (T_fire - T_pit)
-Q_fire_loss = (1 + 0.08 wind) (T_fire - T_ambient)
+Q_wood_pit = 2 (T_fire_wood - T_pit)
+Q_pellet_pit = 2 (T_fire_pellet - T_pit)
+Q_fire_i_loss = (0.5 + 0.04 wind) (T_fire_i - T_ambient)
 Q_pit_wall = 32 (T_pit - T_wall)
 Q_wall_loss = (9 + 0.8 wind) (T_wall - T_ambient)
 Q_direct_loss = (3 + 0.35 wind + (lid_open ? 95 : 0)) (T_pit - T_ambient)
@@ -134,16 +137,27 @@ Q_surface_core = 0.95 area_factor (T_surface - T_core)
 ```
 
 Multipliers relating power to temperature difference are conductances in W/K;
-1005 is nominal air specific heat in J/(kg K). Firebox heating of both fuel
-beds is subtracted once from the shared firebox. Temperature updates are:
+1005 is nominal air specific heat in J/(kg K). Fuel heating is subtracted only
+from the corresponding firebox. Temperature updates are:
 
 ```text
-ΔT_fire = (P_wood + P_pellet - Q_fire_pit
-           - Q_fuel_wood - Q_fuel_pellet - Q_fire_loss) / C_f
-ΔT_pit  = (Q_fire_pit - Q_pit_wall - Q_direct_loss
+ΔT_fire_wood = (P_wood - Q_wood_pit - Q_fuel_wood
+                - Q_fire_wood_loss) / C_fw
+ΔT_fire_pellet = (P_pellet - Q_pellet_pit - Q_fuel_pellet
+                  - Q_fire_pellet_loss) / C_fp
+ΔT_pit  = (Q_wood_pit + Q_pellet_pit - Q_pit_wall - Q_direct_loss
            - Q_exhaust_loss - Q_pit_meat) / C_p
 ΔT_wall = (Q_pit_wall - Q_wall_loss) / C_w
 ```
+
+`woodPowerW` and `pelletPowerW` report chemical combustion heat release.
+`woodHeatIntoChamberW` and `pelletHeatIntoChamberW` report the corresponding
+signed firebox-to-pit transfers. Their sum is `heatIntoChamberW`. These are
+different quantities: a firebox can store released heat, spend it on drying
+fuel, lose it to ambient, or receive heat from a hotter pit.
+`woodFireC`, `pelletFireC`, `woodIntake` and `pelletIntake` are independent
+states. The legacy aggregate `fireC` and `intake` fields report their arithmetic
+averages; they do not supply one shared combustion temperature or intake.
 
 The meat model has a surface capacity `0.20 meat_kg c_m` and core capacity
 `0.80 meat_kg c_m`. Initial removable surface/core water inventories are
@@ -182,10 +196,10 @@ char sensible energy is not a separately tracked fuel node. The aggregate
 its own temperature. Chemical-energy conservation is checked independently
 from these thermal approximations.
 
-## Two fuel beds, one oxygen budget
+## Two fuel beds with dedicated oxygen budgets
 
-The sequence within each one-second tick is controller update, shared airflow,
-actual pellet transfer, preparation of both beds, oxygen allocation, thermal
+The sequence within each one-second tick is controller update, branch airflow,
+actual pellet transfer, preparation of both beds, branch combustion, thermal
 updates and telemetry. A command is not instantaneous fire power: material
 already in the pellet bed continues to dry, devolatilize and burn after the
 auger slows or stops.
@@ -208,7 +222,8 @@ pellet: minimum_capacity = 8 J/K
         k_b = C_b / 8 s
 ```
 
-If `D + W ≤ 10^-9 kg`, conductance is zero. With `Q_b = k_b (T_fire - T_b)`:
+If `D + W ≤ 10^-9 kg`, conductance is zero. With
+`Q_b = k_b (T_fire_i - T_b)` for the corresponding firebox:
 
 ```text
 evap_kg = T_b >= 95 ? min(W, max(0, Q_b)/L, W/t_dry) : 0
@@ -232,34 +247,37 @@ region or use an Arrhenius material reaction model.
 Potential char oxidation per second, after new char is produced, is:
 
 ```text
-wood:   char_potential = min(C, C/600 × clamp((T_fire - 80)/180, 0, 1.8))
-pellet: char_potential = min(C, C/90  × clamp((T_fire - 180)/280, 0, 1.8))
+wood:   char_potential = min(C, C/600 × clamp((T_fire_wood - 80)/180, 0, 1.8))
+pellet: char_potential = min(C, C/90  × clamp((T_fire_pellet - 180)/280, 0, 1.8))
 ```
 
-Let `g_w`, `g_p` and `c_w`, `c_p` be the two beds' potential volatile and char
-masses for the tick; let `g = g_w + g_p`, `c = c_w + c_p` and
-`O = 0.232 air_kg_s`. Combustion uses this **one shared oxygen allocation**:
+For each bed `i`, let `g_i` and `c_i` be its potential volatile and char masses
+for the tick, and `O_i = 0.232 air_i_kg_s`. Each firebox uses only its branch
+oxygen allocation:
 
 ```text
-mix = clamp((T_fire - 120)/120, 0, 1)
-gas_burn = min(g, O/r_v) × mix
-O_after_gas = max(0, O - gas_burn r_v)
-char_burn = min(c, O_after_gas/r_c)
-bed_i_gas_burn = g > 0 ? gas_burn × g_i/g : 0
-bed_i_char_burn = c > 0 ? char_burn × c_i/c : 0
+mix_i = clamp((T_fire_i - 120)/120, 0, 1)
+gas_i_burn = min(g_i, O_i/r_v) × mix_i
+O_i_after_gas = max(0, O_i - gas_i_burn r_v)
+char_i_burn = min(c_i, O_i_after_gas/r_c)
+O_i_consumed = gas_i_burn r_v + char_i_burn r_c ≤ O_i
 ```
 
-Gas has first access to oxygen; each origin gets a proportional share of that
-gas budget. Char then shares the remaining oxygen proportionally. Oxygen used
-is exactly `gas_burn r_v + char_burn r_c ≤ O`, subject to floating-point
-roundoff. There are not two full oxygen supplies for two simultaneous fires.
+Gas has first access to its own branch oxygen, then its char uses the remainder.
+The two supplies are computed independently; neither fire can use oxygen from
+the other branch. The aggregate consumption is the sum of the two branch
+consumptions, subject to floating-point roundoff.
 Unburned gas escapes, keeps its chemical energy in the escaped-gas ledger and
 produces no combustion power. Unburned char stays in its bed.
 
-For each origin, `P_i = bed_i_gas_burn H_v + bed_i_char_burn H_c`; total power
-is `P_wood + P_pellet`. The displayed oxygen ratio is
-`min(8, O / (g r_v + c r_c))`, or 8 for negligible demand. The smoke index is
-`1 - gas_burn/g`, or zero for negligible evolved gas. It is a relative
+For each origin, `P_i = gas_i_burn H_v + char_i_burn H_c`; total chemical power
+is `P_wood + P_pellet`. Its branch oxygen ratio is
+`min(8, O_i / (g_i r_v + c_i r_c))`, or 8 for negligible demand. The branch
+smoke index is `1 - gas_i_burn/g_i`, or zero for negligible evolved gas. The
+aggregate oxygen ratio uses summed supply and potential demand; aggregate
+smoke uses summed escaping and evolved gas. An aggregate ratio can hide an
+oxygen shortage in one firebox, so branch telemetry is the useful diagnostic.
+Smoke index is a relative
 incomplete-combustion indicator, not measured particulate concentration,
 smoke flavor, a desirable smoke dose or emissions compliance.
 
@@ -273,8 +291,9 @@ excessive wood load by starving its fire. This is deterministic feed-forward
 plus constrained PI/trend compensation, not a numerical optimizer or a proof
 of optimal meat flavor, texture or fuel economy.
 
-The wood observer has **ideal access to simulated wood heat release**. At each
-tick it filters the prior tick's actual wood power:
+The wood observer has **ideal access to simulated wood chemical heat release**.
+At each tick it filters the prior tick's actual `woodPowerW`, rather than its
+signed transfer into the chamber:
 
 ```text
 previous_estimate = wood_estimate
@@ -295,8 +314,11 @@ anticipated_rise_C = clamp(240 pit_rate, -12, 50)
 e = T_target - T_pit - anticipated_rise_C
 ```
 
-The thermal feed-forward solves the current lumped heat balance at the target,
-using current wall and meat-surface temperatures:
+The thermal feed-forward solves the common chamber's current lumped heat
+balance at the target, using summed branch airflow and current wall and
+meat-surface temperatures. Both branches have equal nominal transfer/loss
+ratios, so it uses an equivalent firebox target to express total combustion
+heat demand:
 
 ```text
 Q_target = (3 + 0.35 wind + 1005 air_kg_s) (T_target - T_ambient)
@@ -305,24 +327,35 @@ Q_target = (3 + 0.35 wind + 1005 air_kg_s) (T_target - T_ambient)
 T_fire_target = T_target + Q_target/4
 P_ff = Q_target + (1 + 0.08 wind) (T_fire_target - T_ambient)
        + max(0, Q_fuel_wood) + 100
-P_stored = clamp(C_f (T_fire - T_fire_target)/240, -1000, 2500)
+P_stored = clamp((C_fw (T_fire_wood - T_fire_target)
+                  + C_fp (T_fire_pellet - T_fire_target))/240, -1000, 2500)
 P_demand = max(0, P_ff + 40 e + I_W - P_stored)
 ```
 
-The 100 W term is a nominal pellet-bed heating allowance. The stored-firebox
-correction reduces fresh heat demand while the firebox contains excess sensible
-energy. It partially compensates pellet-bed delay through observed firebox
-temperature; `committedPelletPowerW` is diagnostic potential power, not an
+`P_demand` is equivalent chemical combustion power, not heat transferred into
+the pit. `Q_target` is in the pit-transfer domain. The 100 W term is a nominal
+pellet-bed heating allowance. The stored-firebox correction reduces fresh heat
+demand while the two fireboxes contain excess sensible energy. It partially
+compensates pellet-bed delay through observed branch temperatures;
+`committedPelletPowerW` is diagnostic potential power, not an
 independent subtraction of the current pellet flame from the commanded future
 feed. Subtracting the same steady pellet contribution twice would bias demand.
 
-The residual wood-subtracted pellet demand and feed target are:
+The wood-subtracted heat gap, conditional keep-warm floor and pellet feed
+target are:
 
 ```text
 E_wet = (1 - hopper_moisture) H_d - hopper_moisture L
 P_pellet_max = E_wet × 2.5/3600
 P_raw = P_demand - predicted_wood
-P_residual = clamp(P_raw, 0, P_pellet_max)
+P_gap = clamp(P_raw, 0, P_pellet_max)
+P_wood_floor_072 = woodPowerAtAir(air_wood_floor, exhaust=0.72)
+keep_warm_allowed = feed_controlled and not feed_inhibited and hopper_kg > 0
+                    and predicted_wood <= P_ff + 150
+                    and P_wood_floor_072 <= P_ff + 150
+P_keep_warm = keep_warm_allowed ? E_wet × 0.10/3600 : 0
+P_residual = feed_inhibited ? 0 : max(P_gap, P_keep_warm)
+keep_warm_active = P_keep_warm > P_gap
 feed_target_kg_h = 3600 P_residual/E_wet
 effort_target = feed_target_kg_h/2.5
 ```
@@ -331,64 +364,89 @@ effort_target = feed_target_kg_h/2.5
 after its initial water evaporates. Unlike the chemical-energy ledger, it is
 a feed-sizing quantity that includes moisture's latent thermal cost.
 
+In automatic feed-controlled operation, the 0.10 kg/h keep-warm floor supplies
+the established pellet bed while wood provides most of the required heat.
+It is a real feed command, not ignition energy. `residualPelletPowerW` therefore
+includes the applicable floor and can exceed the pure wood-subtracted gap;
+`demandPowerW` still reports equivalent required combustion power. The floor
+is allowed only when both the forecast wood power and wood's minimum clean-air
+chemical power are no more than 150 W above the uncorrected `P_ff` heat balance. The
+latter uses the wood floor airflow capped by full-open intake capacity at
+exhaust 0.72, with the branch's gas-first combustion calculation. The later
+`unavoidableWoodPowerW` diagnostic instead uses the selected common exhaust.
+`pelletPilotPowerW` reports the allowed floor; `pelletPilotActive` reports when
+it exceeds the pure gap. Excessive wood heat disables the floor, so pellet
+target feed can still reach zero. An empty hopper or latched feed inhibit also
+prevents the keep-warm command.
+
 The PI integral has units W, nominal gain 0.045 W/(K s), and limits ±2500 W.
-It updates only outside lid recovery, when residual demand lies within the
-actuator range or the error would move it away from a saturated limit. Integral
+It updates only outside lid recovery, when raw residual demand lies between
+the applicable keep-warm power and maximum pellet power, or the error would
+move it away from a saturated limit. Integral
 action that would increase heat demand is also blocked when the requested
 combustion airflow exceeds fully open intake capacity at the selected exhaust.
-An empty hopper blocks positive integration while still allowing negative
-unwinding; the controller does not accumulate a demand debt for unavailable
-pellet fuel.
+An empty hopper or latched pellet feed inhibit blocks positive integration
+while still allowing negative unwinding; the controller does not accumulate a
+demand debt for unavailable pellet fuel.
 Pellet effort increases by at most 0.003 per second and decreases by at most 0.01 per
 second, bounded toward the desired effort. A zero pellet target therefore
 allows a brief auger rundown; it does not erase previously delivered pellets.
 The simulation distinguishes a zero command from actual delivered feed.
 
-Automatic damper-only mode retains the configured fixed pellet feed. Its
+Automatic damper-only mode retains the configured fixed pellet feed unless
+the feed inhibit is latched. Its
 temperature-related intake effort is clamped to the hybrid draft floor and
-maximum opening; a combustion-air floor may open it further. This mode shows
-why dampers alone cannot cancel excessive fuel delivery while preserving
-combustion air. Manual mode uses the configured dampers and pellet feed directly
-and retains the physical shared-oxygen limitation.
+maximum opening; each branch's combustion-air floor may open its intake
+further. This mode shows why dampers alone cannot cancel excessive fuel
+delivery while preserving combustion air. It does not apply the keep-warm
+feed floor. Manual mode uses the configured dampers and pellet feed directly
+and retains each firebox's physical oxygen limitation.
 
 ### Air coordination and control-authority diagnostic
 
-Using the prior tick's gas/char potentials and char burn, the controller requests
-air for both observed committed fuel and intended new pellet delivery:
+Using the prior tick's gas/char potentials and each branch's char burn, the
+controller requests air for observed committed fuel and intended new pellet
+delivery. The floors and oxygen requests are evaluated separately:
 
 ```text
-air_floor = max(airFlow(intake=0.12, exhaust=0.72),
-                (g_w + g_p) r_v × 1.25/0.232)
+air_i_floor = max(branchAirFlow(i, intake=0.12, exhaust=0.72),
+                  g_i r_v × 1.25/0.232)
 dry_feed_kg_s = (hopper_kg > 0 ? feed_target_kg_h : 0)
                 × (1 - hopper_moisture)/3600
 O_feed = dry_feed_kg_s ((1 - y_c) r_v + y_c r_c)
-O_recent_char = P_char/H_c × r_c
-air_request = max(air_floor,
-  (max(O_feed, g_p r_v) + g_w r_v + O_recent_char) × 1.8/0.232)
-exhaust = clamp(0.72 + (air_request/0.006) × 0.28, 0.72, 1)
+O_i_recent_char = P_i_char/H_c × r_c
+air_wood_request = max(air_wood_floor,
+  (g_w r_v + O_wood_recent_char) × 1.8/0.232)
+air_pellet_request = max(air_pellet_floor,
+  (max(O_feed, g_p r_v) + O_pellet_recent_char) × 1.8/0.232)
+exhaust = clamp(0.72 + ((air_wood_request + air_pellet_request)/0.006)
+                × 0.28, 0.72, 1)
 ```
 
 The greater of the expected pellet-feed oxygen demand and the pellet bed's
 observed gas demand avoids giving the same gas two independent air budgets.
-Recent char demand is an approximate extra requirement. A ten-iteration
-bisection chooses intake from 0.12 to 1 to meet the requested air through the
-shared draft model; actual available oxygen still comes exclusively from the
-resulting airflow. Exhaust stays at least 0.72 in automatic hybrid operation.
+Recent branch char demand is an approximate extra requirement. A ten-iteration
+bisection chooses each intake from 0.12 to 1 to meet its requested air through
+the branch draft model at the selected common exhaust. Actual available
+oxygen still comes exclusively from the corresponding branch airflow.
+Exhaust stays at least 0.72 in automatic hybrid operation.
 This is a clean-combustion **target**: insufficient physical flow, delayed fuel
 response or a cold flame can still cause escaping gas. `cleanAirLimited`
-explicitly reports a request greater than available flow, and positive
-integral action is frozen at that capacity limit.
+explicitly reports either branch's request exceeding its available flow, and
+positive integral action is frozen at that capacity limit.
 An empty hopper removes expected new-feed demand from the air calculation;
 pellet gas and char already committed to the bed remain in the oxygen request.
 
-`unavoidableWoodPowerW` evaluates the previous tick's hot-fuel potentials at
-the requested minimum clean airflow, capped by available intake capacity.
-It uses exactly the same combined-gas mixing/proportional allocation and
-remaining-oxygen char allocation as combustion. Thus it is a one-tick
-constraint diagnostic for the current model state, not a theorem about the
+`unavoidableWoodPowerW` evaluates the previous tick's wood hot-fuel potentials
+at the wood branch's requested minimum clean airflow, capped by its available
+intake capacity. It uses the wood firebox's mixing factor, gas-first oxygen
+consumption and remaining-oxygen char allocation, as in branch combustion.
+It reports chemical power; it does not include pellet power or current
+firebox-to-pit transfer. Thus it is a one-tick constraint diagnostic for the
+current model state, not a theorem about the
 whole future trajectory. `woodOverpower` is true in feed-controlled mode when
 the pellet feed target is effectively zero and this diagnostic exceeds current
-heat demand by more than 150 W.
+equivalent chemical heat demand by more than 150 W.
 
 A sufficiently large hot wood charge continues releasing energy with pellet
 delivery at zero. Existing char, evolved gases, pellets already in the bed and
@@ -407,23 +465,28 @@ updates stay frozen for 120 seconds while proportional/feed-forward recovery
 continues. This prevents a transient fall in measured air temperature from
 immediately creating a large delayed fuel-energy surge.
 
-If the firebox is below 120°C after the first 300 simulated seconds, automatic
-pellet delivery is inhibited. Refueling a cooled cooker does not add ignition
-energy; reset starts a new established-fire demonstration. Manual mode does
-not implement that automatic feed inhibit. There is no actual ignition,
-shutdown, fault-rated purge or hardware interlock sequence in this browser lab.
+If the pellet firebox is below 120°C after the first 300 simulated seconds,
+automatic pellet delivery is inhibited until reset. Heat in the wood firebox
+alone does not keep pellet delivery enabled or relight the pellet bed. The
+keep-warm floor cannot clear this latch. A large wood load
+can drive pellet feed to zero long enough for the pellet firebox to cool, which
+then limits later pellet takeover even with fuel remaining in the hopper.
+Refueling adds no ignition energy; reset starts a new established-fire
+demonstration. Manual mode can command feed but does not clear the automatic
+inhibit latch. There is no actual ignition, shutdown, fault-rated purge or
+hardware interlock sequence in this browser lab.
 
 ## What real hardware needs
 
-The simulated observer can read both fuel-origin heat releases; a real
+The simulated observer can read both fuel-origin chemical heat releases; a real
 controller cannot. The present algorithm is therefore an engineering
 demonstration, not deployable firmware with a completed physical-state
 observer. A useful measurement/calibration program would include:
 
-1. Identify the actual firebox, pellet-pot and damper/fan topology. Measure
-   chamber/firebox geometry, leakage, thermal mass and spatial temperature
+1. Measure both fireboxes, fuel beds and intake/exhaust or fan topology.
+   Measure chamber/firebox geometry, leakage, thermal mass and spatial temperature
    variation with empty and loaded racks.
-2. Calibrate pit, firebox and meat probes, log their lag and accuracy, and
+2. Calibrate pit, both firebox and meat probes, log their lag and accuracy, and
    measure actuator position/delay and auger wet-mass delivery against duty
    cycle. Hopper weight or a verified fuel-flow calibration is useful for
    detecting depletion, bridging and blocked delivery.
@@ -431,7 +494,7 @@ observer. A useful measurement/calibration program would include:
    repeated-refuel burns over airflow levels to identify heating, drying,
    pyrolysis, char kinetics and energy-transfer fractions. Repeat for the
    intended pellet types and moisture range.
-4. Measure pressure/draft or flow and combustion-gas oxygen, and use CO or
+4. Measure branch pressure/draft or flow and combustion-gas oxygen, and use CO or
    another appropriate combustion-quality measurement during development.
    Airflow, firebox temperature, pellet delivery and known refuel events can
    constrain a wood-heat observer. One pit-temperature probe cannot generally
@@ -451,36 +514,29 @@ nominal chamber-temperature regulation under constrained combustion.
 ## Verification and scope
 
 `npm run test:smoker` checks source-origin mass and chemical-energy accounting,
-shared oxygen consumption, independent moisture/inventories, simultaneous
-combustion, feed compensation, finite fuel, disturbances and controller limits.
+each branch's oxygen consumption, independent airflow, firebox heat balances,
+moisture/inventories, simultaneous combustion, feed compensation, finite fuel,
+disturbances and controller limits.
 The model runs at a fixed one-second step and accepts batched advancement
 without altering deterministic state history. Tests demonstrate arithmetic
 invariants and the defined nominal behaviors; they do not validate the model
 against a physical smoker or guarantee setpoint reachability for every fuel
 load and weather condition.
 
-## If the hardware layout changes
+## Implemented topology and calibration scope
 
-The prototype layout is undecided. The executable simulation evaluates a
-shared-firebox candidate. For separate wood and pellet fireboxes feeding one
-cooking chamber, replace the shared fire temperature with two thermal states
-and allocate measured airflow to each branch. A conceptual extension is:
+Hybrid uses two dedicated fireboxes and independent intake commands feeding
+one cooking chamber. The common exhaust setting affects both branch draft
+calculations, but the model does not resolve chimney pressure, reverse flow,
+branch recirculation, spatial hot spots or mixing after gases enter the pit.
+Each branch has 2,000 J/K nominal heat capacity to sustain its own startup
+thermal reserve. Each uses half the original firebox-to-pit conductance,
+airflow coefficient and ambient-loss coefficient. This preserves the combined
+transfer, airflow and loss scale at equal branch conditions while giving the
+two dedicated fireboxes independent thermal storage.
 
-```text
-C_fw dT_fw/dt = P_wood - G_wp (T_fw - T_pit) - Q_w_loss - Q_w_fuel
-C_fp dT_fp/dt = P_pellet - G_pp (T_fp - T_pit) - Q_p_loss - Q_p_fuel
-C_pit dT_pit/dt = G_wp (T_fw - T_pit) + G_pp (T_fp - T_pit)
-                  - Q_walls - Q_meat - Q_chamber_loss
-O2_wood_available   = 0.232 air_wood_kg_s
-O2_pellet_available = 0.232 air_pellet_kg_s
-```
-
-Each bed would be limited by its own branch oxygen, rather than receiving the
-full summed supply. The branch airflow model must account for their common
-exhaust pressure if they share a chimney. Independent air actuators could
-provide additional control authority, but a large already-burning split still
-cannot produce negative heat. These equations describe an extension to
-evaluate; separate fireboxes are **not implemented** in the current UI/model.
-Choosing between layouts needs dimensions, leakage/draft measurements, thermal
-response and practical fuel-handling constraints. The simulated temperature
-response does not by itself settle that engineering choice.
+The independent intakes provide branch airflow control, but an already-burning
+wood split still cannot produce negative heat. Real geometry, leakage/draft,
+thermal response, fuel handling and measured branch interaction are needed to
+calibrate this topology. The simulated response alone does not validate a
+physical build.

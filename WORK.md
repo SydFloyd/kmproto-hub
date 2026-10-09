@@ -1,3 +1,50 @@
+# Dedicated smoker fireboxes
+
+Updated: 2026-10-09
+Status: verified locally and approved for publication; deployment pending.
+
+Hybrid now uses separate wood and pellet fireboxes feeding one cooking chamber.
+Each source has its own intake, oxygen budget, firebox temperature, stored heat
+and transfer to the pit. The common exhaust restricts both paths. Fuel-origin
+mass and chemical-energy ledgers remain separate. Single-fuel demonstrations
+retain their existing model.
+
+Manual controls expose both intakes; automatic control forecasts wood heat,
+meters the pellet supplement and selects each firebox's draft. Pellet flameout
+depends on the pellet firebox alone and stays inhibited until a new cook is
+reset, even while the wood fire remains hot. The diagram and readouts show both
+fireboxes, source temperatures, combustion airflow and pit heat transfers.
+Engineering notes and math disclosure describe the implemented topology and
+its nominal assumptions.
+
+Each hybrid firebox has a nominal 2,000 J/K thermal capacity and 2 W/K pit
+conductance. A conditional 0.10 kg/h pellet minimum keeps its established fire
+lit during normal wood peaks; excessive wood heat disables that minimum. The
+heat-budget display identifies when this command exceeds the wood-subtracted
+gap. Starter wood charcoal scales with the initial charge and remains in its
+origin ledger. Heat arrows follow the signed pit transfer, including stored
+heat and reverse transfer into a colder firebox.
+
+Verification: all 31 model tests, production Vercel build, TypeScript, full
+ESLint and diff checks pass. Tests cover independent oxygen limits/intakes,
+common exhaust, source thermal balances, mass/chemical-energy conservation,
+refueling, keep-warm control, 225/250/275 F regulation after 90 simulated
+minutes, lid/weather recovery and persistent pellet flameout handling.
+Desktop/tablet/phone browser checks at 1440/768/390/320 px cover all fuel modes,
+manual/automatic/fixed-feed controls, both refills, units, disturbances, math
+disclosure, playback, hidden tabs and the 12-hour limit. No page errors or
+horizontal overflow; screenshots were inspected. The default hybrid reaches
+249 F at two hours; the deliberately oversized 1.5 kg wood charge reaches
+424 F at 30 minutes with pellet feed stopped. These are nominal model outputs.
+
+Evidence: ignored outputs/check-dual-fireboxes.cjs,
+outputs/dual-fireboxes-browser.json, outputs/dual-fireboxes-*.png and
+outputs/dual-firebox-visual-*.png. No automated axe audit was run because its
+local package is absent. The user approved publication on 2026-10-09. Source
+and production deployment evidence will be recorded after live verification.
+
+---
+
 # Consistent, dense ASCII waves
 
 Updated: 2026-10-07

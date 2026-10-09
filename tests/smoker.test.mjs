@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import {
   MODEL_ASSUMPTIONS as A,
+  HYBRID_CONTROL_ASSUMPTIONS as H,
   createSimulation, stepSimulation, setControls, refuel, openLid, cToF, fToC,
 } from '../app/lab/smoker/model.ts';
 
@@ -214,9 +215,10 @@ test('finite fuel inventories eventually cool, and wet meat cores respect boilin
 });
 
 test('bounded inputs and extreme manual disturbances remain finite for the full demo horizon', () => {
-  for (const fuel of ['wood', 'pellets']) {
+  for (const fuel of ['wood', 'pellets', 'hybrid']) {
     const state = createSimulation({ fuel, mode: 'manual', ambientC: -20, windMps: 15,
-      woodMoisture: .55, initialFuelKg: 10, meatMassKg: .5, intake: 1, exhaust: 1, pelletFeedKgH: 2.5 });
+      woodMoisture: .55, pelletMoisture: .55, initialFuelKg: 10, initialWoodKg: 10, initialPelletKg: 10,
+      meatMassKg: .5, intake: 1, exhaust: 1, pelletFeedKgH: 2.5 });
     openLid(state, 600);
     for (let i = 0; i < 48; i++) { stepSimulation(state, 900); assertFinite(state); }
   }
@@ -267,22 +269,25 @@ test('hybrid fuel origins independently conserve mass and chemical energy, inclu
   }
 });
 
-test('two burning beds consume one shared oxygen budget, with proportional volatile allocation', () => {
+test('dedicated burning beds obey their own oxygen budgets throughout the cook', () => {
   const state = createSimulation({ fuel: 'hybrid', mode: 'manual', initialWoodKg: 1,
-    intake: .025, exhaust: .025, pelletFeedKgH: .7 });
-  state.fireC = 600;
+    woodIntake: .025, pelletIntake: 1, exhaust: 1, pelletFeedKgH: .7 });
+  state.woodFireC = 600; state.pelletFireC = 600;
   state.woodBed.temperatureC = 500;
   state.pelletBed.temperatureC = 500;
   stepSimulation(state);
   assert.ok(state.woodVolatilePowerW > 0 && state.pelletVolatilePowerW > 0);
-  assert.ok(state.smokeIndex > .5);
-  close(state.woodVolatilePowerW / state.pelletVolatilePowerW,
-    state.woodBed.potentialVolatileKgS / state.pelletBed.potentialVolatileKgS, 1e-9);
+  assert.ok(state.woodSmokeIndex > .5);
+  assert.ok(state.woodSmokeIndex > state.pelletSmokeIndex, 'closed wood intake cannot borrow pellet oxygen');
   for (let i = 0; i < 3_600; i++) {
-    const consumed = state.volatilePowerW / A.volatileNetJPerKg * A.volatileOxygenKgPerKg
-      + state.charPowerW / A.charNetJPerKg * A.charOxygenKgPerKg;
-    close(state.oxygenConsumedKgS, consumed, 1e-12);
-    assert.ok(consumed <= state.airKgS * A.airOxygenMassFraction + 1e-12);
+    for (const origin of ['wood', 'pellet']) {
+      const consumed = state[`${origin}VolatilePowerW`] / A.volatileNetJPerKg * A.volatileOxygenKgPerKg
+        + state[`${origin}CharPowerW`] / A.charNetJPerKg * A.charOxygenKgPerKg;
+      close(state[`${origin}OxygenConsumedKgS`], consumed, 1e-12);
+      assert.ok(consumed <= state[`${origin}AirKgS`] * A.airOxygenMassFraction + 1e-12);
+    }
+    close(state.airKgS, state.woodAirKgS + state.pelletAirKgS, 1e-12);
+    close(state.oxygenConsumedKgS, state.woodOxygenConsumedKgS + state.pelletOxygenConsumedKgS, 1e-12);
     stepSimulation(state);
   }
 });
@@ -290,15 +295,15 @@ test('two burning beds consume one shared oxygen budget, with proportional volat
 test('default hybrid combustion overlaps, and pellets replace wood heat as the finite wood charge tapers', () => {
   const state = createSimulation({ fuel: 'hybrid' });
   stepSimulation(state, 300);
-  assert.ok(state.woodPowerW > 500 && state.pelletPowerW > 500, 'both fuels release heat in the same firebox');
-  stepSimulation(state, 1_800);
+  assert.ok(state.woodPowerW > 500 && state.pelletPowerW > 500, 'both dedicated fireboxes release heat');
+  stepSimulation(state, 3_300);
   const woodEarly = state.woodPowerW;
   const feedEarly = state.pelletFeedKgH;
-  assert.ok(state.woodPowerW > 500 && state.pelletPowerW > 500);
+  assert.ok(state.woodPowerW > 500 && state.pelletPowerW > 100);
   close(cToF(state.chamberC), 250, 5);
-  stepSimulation(state, 5_100);
+  stepSimulation(state, 3_600);
   assert.ok(state.woodPowerW < woodEarly * .2);
-  assert.ok(state.pelletFeedKgH > feedEarly * 1.5);
+  assert.ok(state.pelletFeedKgH > feedEarly * 1.25);
   assert.ok(state.pelletPowerW > 1_000);
   close(cToF(state.chamberC), 250, 2);
 });
@@ -306,7 +311,7 @@ test('default hybrid combustion overlaps, and pellets replace wood heat as the f
 test('hybrid feedback holds 225–275 F with both fuels and compensates for lid and weather disturbances', () => {
   for (const targetF of [225, 250, 275]) {
     const state = createSimulation({ fuel: 'hybrid', targetC: fToC(targetF) });
-    stepSimulation(state, 3_600);
+    stepSimulation(state, 5_400);
     close(cToF(state.chamberC), targetF, 3);
     const integral = state.hybridIntegralW;
     openLid(state, 45);
@@ -317,19 +322,20 @@ test('hybrid feedback holds 225–275 F with both fuels and compensates for lid 
     setControls(state, { ambientC: 5, windMps: 4 });
     stepSimulation(state, 1_800);
     close(cToF(state.chamberC), targetF, 3);
-    assert.ok(state.exhaust >= .72 && state.intake >= .12);
+    assert.ok(state.exhaust >= .72 && state.woodIntake >= .12 && state.pelletIntake >= .12);
     assert.ok(state.smokeIndex < .1);
   }
 });
 
 test('adding wood raises its heat contribution and reduces the residual pellet command', () => {
   const state = createSimulation({ fuel: 'hybrid' });
-  stepSimulation(state, 5_400);
-  const woodBefore = state.woodPowerW, feedBefore = state.pelletFeedKgH;
+  stepSimulation(state, 3_600);
+  const unchanged = structuredClone(state);
   refuel(state, .15, 'wood');
   stepSimulation(state, 900);
-  assert.ok(state.woodPowerW > woodBefore * 2);
-  assert.ok(state.pelletFeedKgH < feedBefore * .7);
+  stepSimulation(unchanged, 900);
+  assert.ok(state.woodPowerW > unchanged.woodPowerW * 2);
+  assert.ok(state.pelletFeedKgH < unchanged.pelletFeedKgH * .7);
   close(cToF(state.chamberC), 250, 5);
   close(state.pelletFeedTargetKgH, state.residualPelletPowerW * 3600
     / ((1 - state.hopperMoisture) * A.dryWoodNetJPerKg - state.hopperMoisture * A.waterLatentJPerKg), 1e-12);
@@ -344,8 +350,9 @@ test('large wood charges cannot be canceled: the auger stops and the clean-draft
   assert.ok(cToF(state.chamberC) > 300);
   assert.equal(state.woodOverpower, true);
   assert.ok(state.unavoidableWoodPowerW > state.demandPowerW + 150);
-  assert.ok(state.exhaust >= .72 && state.intake >= .12);
-  assert.match(state.controlReason, /minimum clean-draft/);
+  assert.ok(state.exhaust >= .72 && state.woodIntake >= .12 && state.pelletIntake >= .12);
+  assert.equal(state.pelletPilotActive, false, 'excess wood cancels even the keep-warm feed');
+  assert.match(state.controlReason, /minimum clean-draft|intake capacity/);
   assert.ok(Math.abs(state.hybridIntegralW) <= 2_500);
 });
 
@@ -389,7 +396,7 @@ test('hybrid fixed-step batching, cold-fire inhibit and the full finite demo hor
   for (let i = 0; i < 900; i++) stepSimulation(single);
   assert.deepEqual(batched, single);
   const cold = createSimulation({ fuel: 'hybrid' });
-  cold.timeS = 600; cold.fireC = 40;
+  cold.timeS = 600; cold.woodFireC = 40; cold.pelletFireC = 40;
   cold.woodBed.temperatureC = 30; cold.pelletBed.temperatureC = 30;
   const hopper = cold.hopperKg;
   stepSimulation(cold, 900);
@@ -406,4 +413,142 @@ test('hybrid fixed-step batching, cold-fire inhibit and the full finite demo hor
   }
   assert.equal(full.hopperKg, 0);
   assert.ok(full.chamberC < 35);
+});
+
+test('closing either dedicated intake leaves the other firebox oxygen and immediate combustion unchanged', () => {
+  const hot = createSimulation({ fuel: 'hybrid', mode: 'manual', initialWoodKg: 1,
+    woodIntake: 1, pelletIntake: 1, exhaust: 1 });
+  hot.woodFireC = 600; hot.pelletFireC = 600;
+  hot.woodBed.temperatureC = 500; hot.pelletBed.temperatureC = 500;
+  const open = structuredClone(hot), woodClosed = structuredClone(hot), pelletClosed = structuredClone(hot);
+  setControls(woodClosed, { woodIntake: 0 });
+  setControls(pelletClosed, { pelletIntake: 0 });
+  for (const state of [open, woodClosed, pelletClosed]) stepSimulation(state);
+  assert.ok(open.woodAirKgS > woodClosed.woodAirKgS * 10);
+  assert.ok(open.pelletAirKgS > pelletClosed.pelletAirKgS * 10);
+  assert.ok(open.woodPowerW > woodClosed.woodPowerW * 2);
+  assert.ok(open.pelletPowerW > pelletClosed.pelletPowerW * 2);
+  close(woodClosed.pelletAirKgS, open.pelletAirKgS, 1e-12);
+  close(woodClosed.pelletPowerW, open.pelletPowerW, 1e-12);
+  close(woodClosed.pelletFireC, open.pelletFireC, 1e-12);
+  assert.deepEqual(woodClosed.pelletBed, open.pelletBed);
+  close(pelletClosed.woodAirKgS, open.woodAirKgS, 1e-12);
+  close(pelletClosed.woodPowerW, open.woodPowerW, 1e-12);
+  close(pelletClosed.woodFireC, open.woodFireC, 1e-12);
+  assert.deepEqual(pelletClosed.woodBed, open.woodBed);
+});
+
+test('the common exhaust restricts both dedicated air paths without exchanging their oxygen', () => {
+  const open = createSimulation({ fuel: 'hybrid', mode: 'manual', woodIntake: 1, pelletIntake: 1, exhaust: 1 });
+  const closed = structuredClone(open);
+  setControls(closed, { exhaust: 0 });
+  stepSimulation(open); stepSimulation(closed);
+  assert.ok(open.woodAirKgS > closed.woodAirKgS * 10);
+  assert.ok(open.pelletAirKgS > closed.pelletAirKgS * 10);
+  for (const kind of ['wood', 'pellet']) {
+    assert.ok(closed[`${kind}OxygenConsumedKgS`] <= closed[`${kind}AirKgS`] * A.airOxygenMassFraction + 1e-12);
+  }
+});
+
+test('each dedicated thermal node heats only its own fuel and both transfers enter the common pit once', () => {
+  const state = createSimulation({ fuel: 'hybrid', mode: 'manual', pelletFeedKgH: 0 });
+  state.woodFireC = 650; state.pelletFireC = 200;
+  state.chamberC = 250;
+  const woodFire = state.woodFireC, pelletFire = state.pelletFireC, pit = state.chamberC;
+  stepSimulation(state);
+  close(state.woodHeatIntoChamberW, H.fireToPitWPerK * (woodFire - pit), 1e-12);
+  close(state.pelletHeatIntoChamberW, H.fireToPitWPerK * (pelletFire - pit), 1e-12);
+  assert.ok(state.pelletHeatIntoChamberW < 0, 'a cooler box can absorb stored pit heat');
+  close(state.heatIntoChamberW, state.woodHeatIntoChamberW + state.pelletHeatIntoChamberW, 1e-12);
+  for (const [origin, fire] of [['wood', woodFire], ['pellet', pelletFire]]) {
+    const loss = (H.fireLossWPerK + H.fireWindLossWPerKPerMps * state.config.windMps) * (fire - state.config.ambientC);
+    const bed = state[`${origin}Bed`];
+    const expectedFire = fire + (state[`${origin}PowerW`] - state[`${origin}HeatIntoChamberW`] - bed.heatToFuelW - loss) / H.fireHeatCapacityJPerK;
+    close(state[`${origin}FireC`], expectedFire, 1e-12);
+  }
+  close(state.fireC, (state.woodFireC + state.pelletFireC) / 2, 1e-12);
+});
+
+test('refueling one source changes only its own inventory and cannot add ignition or sensible firebox energy', () => {
+  const state = createSimulation({ fuel: 'hybrid' });
+  stepSimulation(state, 900);
+  const pellet = structuredClone(state.pelletBed), woodFire = state.woodFireC, pelletFire = state.pelletFireC;
+  const startup = state.startupSensibleEnergyJ, hopper = state.hopperKg;
+  refuel(state, .5, 'wood');
+  assert.deepEqual(state.pelletBed, pellet);
+  assert.equal(state.hopperKg, hopper);
+  assert.equal(state.woodFireC, woodFire); assert.equal(state.pelletFireC, pelletFire);
+  const wood = structuredClone(state.woodBed);
+  refuel(state, 1, 'pellets');
+  assert.deepEqual(state.woodBed, wood);
+  assert.equal(state.woodFireC, woodFire); assert.equal(state.pelletFireC, pelletFire);
+  assert.equal(state.startupSensibleEnergyJ, startup);
+  const empty = createSimulation({ fuel: 'hybrid', initialWoodKg: 0, initialPelletKg: 0 });
+  close(empty.startupSensibleEnergyJ, 0, 1e-12);
+  close(empty.woodFireC, empty.config.ambientC, 1e-12);
+  close(empty.pelletFireC, empty.config.ambientC, 1e-12);
+});
+
+test('a cold pellet firebox stays inhibited beside hot wood and cannot bypass relighting by toggling modes', () => {
+  const state = createSimulation({ fuel: 'hybrid' });
+  state.timeS = 600; state.woodFireC = 700; state.pelletFireC = 40;
+  state.woodBed.temperatureC = 500; state.pelletBed.temperatureC = 30;
+  const hopper = state.hopperKg;
+  stepSimulation(state);
+  assert.ok(state.woodPowerW > 500);
+  assert.equal(state.pelletFeedKgH, 0);
+  assert.equal(state.hopperKg, hopper);
+  assert.equal(state.pelletRelightRequired, true);
+  refuel(state, .5, 'pellets');
+  setControls(state, { mode: 'manual' });
+  stepSimulation(state);
+  assert.ok(state.pelletFeedKgH > 0, 'manual fuel delivery does not certify successful ignition');
+  assert.equal(state.pelletRelightRequired, true);
+  setControls(state, { mode: 'auto' });
+  state.pelletFireC = 200; // passive heat or a temperature reading cannot clear the latch
+  stepSimulation(state);
+  assert.equal(state.feedInhibited, true);
+  assert.equal(state.pelletFeedKgH, 0);
+  assert.match(state.controlReason, /reset/);
+  const newCook = createSimulation({ fuel: 'hybrid' });
+  assert.equal(newCook.pelletRelightRequired, false);
+});
+
+test('the keep-warm pellet command supports the low target using its own live firebox', () => {
+  const state = createSimulation({ fuel: 'hybrid', targetC: fToC(225) });
+  let pilotTicks = 0;
+  for (let i = 0; i < 10_800; i++) {
+    stepSimulation(state);
+    if (state.pelletPilotActive) {
+      pilotTicks++;
+      close(state.pelletFeedTargetKgH, H.minimumWarmFeedKgH, 1e-12);
+      close(state.residualPelletPowerW, state.pelletPilotPowerW, 1e-12);
+      assert.ok(state.residualPelletPowerW > Math.max(0, state.demandPowerW - state.predictedWoodPowerW));
+      assert.ok(state.pelletFireC >= 120);
+    }
+    assert.equal(state.feedInhibited, false);
+    assert.ok(state.pelletOxygenConsumedKgS <= state.pelletAirKgS * A.airOxygenMassFraction + 1e-12);
+    if (i >= 5_400) close(cToF(state.chamberC), 225, 3);
+  }
+  assert.ok(pilotTicks > 300, 'wood peaks leave a sustained explicit keep-warm interval');
+});
+
+test('hybrid commands clamp independent intakes and legacy intake still controls both branches', () => {
+  const state = createSimulation({ fuel: 'hybrid', mode: 'manual', woodIntake: -1, pelletIntake: 2 });
+  assert.equal(state.woodIntake, 0); assert.equal(state.pelletIntake, 1);
+  setControls(state, { intake: .3 });
+  assert.equal(state.woodIntake, .3); assert.equal(state.pelletIntake, .3);
+  setControls(state, { woodIntake: .8 });
+  assert.equal(state.woodIntake, .8); assert.equal(state.pelletIntake, .3);
+  close(state.intake, .55, 1e-12);
+});
+
+test('a hot paused pellet fire reports cooling while it transfers stored heat to the pit', () => {
+  const state = createSimulation({ fuel: 'hybrid', mode: 'manual', pelletFeedKgH: 0 });
+  state.pelletBed.dryKg = 0; state.pelletBed.waterKg = 0; state.pelletBed.charKg = 0;
+  stepSimulation(state);
+  assert.equal(state.pelletPowerW, 0);
+  assert.ok(state.pelletFireC > 160);
+  assert.ok(state.pelletHeatIntoChamberW > 0);
+  assert.equal(state.pelletPhase, 'Fire cooling');
 });

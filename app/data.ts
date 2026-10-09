@@ -49,7 +49,7 @@ export const projects = [
 
 export const labProjects = [
   ...projects,
-  { name: "Smoker Control Lab", description: "Explore wood, pellets and simultaneous hybrid combustion, adjust the dampers, and watch a software controller balance the heat.", category: "Thermodynamics", href: "/lab/smoker" },
+  { name: "Smoker Control Lab", description: "Explore dedicated wood and pellet fireboxes, adjust each intake, and watch a software controller balance heat in one pit.", category: "Thermodynamics", href: "/lab/smoker" },
   { name: "CHROMA LOOP", description: "Connect matching colors, close loops and forge Novas in an original puzzle game. Play five ways, from a quick Rush to twelve handcrafted Atlas puzzles.", category: "Original puzzle game", href: "/lab/chroma-loop/" },
   { name: "Arcade", description: "Recreations of classic arcade and console games, playable in your browser.", category: "Classic recreations", href: "/lab/games" },
 ] as const;
