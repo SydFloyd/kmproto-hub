@@ -1,7 +1,7 @@
 # Dedicated smoker fireboxes
 
 Updated: 2026-10-09
-Status: verified locally and approved for publication; deployment pending.
+Status: published and verified at https://www.kmproto.com/lab/smoker.
 
 Hybrid now uses separate wood and pellet fireboxes feeding one cooking chamber.
 Each source has its own intake, oxygen budget, firebox temperature, stored heat
@@ -40,8 +40,20 @@ horizontal overflow; screenshots were inspected. The default hybrid reaches
 Evidence: ignored outputs/check-dual-fireboxes.cjs,
 outputs/dual-fireboxes-browser.json, outputs/dual-fireboxes-*.png and
 outputs/dual-firebox-visual-*.png. No automated axe audit was run because its
-local package is absent. The user approved publication on 2026-10-09. Source
-and production deployment evidence will be recorded after live verification.
+local package is absent. The user approved publication on 2026-10-09.
+
+Source af6b3c35349fe956b84314c106199e39af44c2cb was pushed to main; Vercel
+production deployment 6970090377 reports success. Live desktop/tablet/phone
+checks at 1440/768/390/320 px pass for the three fuel modes, independent intake
+controls, common exhaust, manual/automatic/fixed-feed operation, refills,
+disturbances, units, math disclosure, playback and the 12-hour limit. No page
+errors or horizontal overflow; the live phone screenshot was inspected. All
+seven smoker/Lab script and stylesheet references and downloaded asset hashes
+match the verified local production build. Hybrid now replaces the former
+shared-firebox topology; hardwood-only and pellet-only modes remain available.
+Live evidence: ignored outputs/check-dual-fireboxes-live.cjs,
+outputs/smoker-dual-live.json, outputs/smoker-dual-live-assets.json and
+outputs/smoker-dual-live-*.png.
 
 ---
 
