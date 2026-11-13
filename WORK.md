@@ -1,3 +1,63 @@
+# Chroma Loop removal
+
+Updated: 2026-11-12
+Status: removal prepared; publication pending.
+
+The owner requested complete removal of Chroma Loop. Removed its game scripts,
+styles, HTML, manifest, icons, artwork, bundled font, two test files, Lab listing,
+redirect and README documentation. The earlier local deletions are now authorized
+for publication. Obsolete generated release copies and deployment payloads that
+contained the game are being cleared as part of this change.
+
+The Spotify playlist exporter remains in the Lab. This release also synchronizes
+its previously API-published source with GitHub. The remote main branch was
+verified at `09f4facc300a4b50f8675e8b19d97385d580a100` before preparing the commit.
+
+---
+
+# Spotify playlist text export
+
+Updated: 2026-11-12
+Status: published at https://www.kmproto.com/lab/spotify-to-txt.
+
+Added `/lab/spotify-to-txt` to the Lab and both the production Vite entry points
+and app-router tree. The family-facing tool connects directly to Spotify with
+PKCE, lists owned/collaborative playlists, accepts a shared playlist link, and
+prepares a UTF-8 text preview with download/copy actions. Optional song links,
+full pagination, duplicates, unavailable entries, local files and podcast
+episodes are handled. Tokens stay in this tab's session storage; no secret,
+database or server integration is required.
+
+The owner's supplied public Client ID is configured. Register the exact HTTPS
+callback `https://www.kmproto.com/lab/spotify-to-txt` and add the father's account
+under Spotify User Management. Setup is documented in
+`app/lab/spotify-to-txt/README.md`.
+
+Verification: all 13 automated Spotify tests, TypeScript, targeted React/code
+checks and the production Vite build pass. Tests cover PKCE, callback state,
+single-use code deduplication, API pagination, access errors, expired sessions,
+untrusted next-page URLs and text output. The current sandbox blocks local
+socket listeners, Chromium launch and network DNS, so visual/browser QA and a
+live Spotify sign-in were not verified.
+
+The owner authorized the existing Vercel team connection. Production deployment
+`dpl_3oHZeoytZDMAP2BT6effDLiY8JjG` reports READY and has the public domain aliases.
+The tool and Lab pages return HTTP 200. All four app script/style assets return
+200 with the correct content types; the published app includes the supplied
+Client ID and exact HTTPS redirect, and the shared Lab data includes the new
+directory link. Cloud and local production asset filenames match. A real user
+must still complete Spotify sign-in; browser interaction was not verified.
+
+Published through the Vercel source-files API from an isolated release based on
+the previous production commit `09f4facc300a4b50f8675e8b19d97385d580a100`.
+Existing README/config edits and Chroma Loop removals were excluded. Release
+source, the task-only patch and deployment/check records are saved under
+`outputs/spotify-release*` and `outputs/spotify-to-txt.patch`. The prior rollback
+target is `dpl_FBu6r8dVd4hCitVdn8iNa4M7pDB8`. GitHub synchronization is separate
+from this direct API deployment and remains to be completed.
+
+---
+
 # Dedicated smoker fireboxes
 
 Updated: 2026-10-09

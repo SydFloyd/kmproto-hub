@@ -49,7 +49,7 @@ export const projects = [
 
 export const labProjects = [
   ...projects,
+  { name: "Playlist to TXT", description: "Save a Spotify playlist as a readable text file of songs and artists, ready to keep, print or share.", category: "Music tools", href: "/lab/spotify-to-txt" },
   { name: "Smoker Control Lab", description: "Explore dedicated wood and pellet fireboxes, adjust each intake, and watch a software controller balance heat in one pit.", category: "Thermodynamics", href: "/lab/smoker" },
-  { name: "CHROMA LOOP", description: "Connect matching colors, close loops and forge Novas in an original puzzle game. Play five ways, from a quick Rush to twelve handcrafted Atlas puzzles.", category: "Original puzzle game", href: "/lab/chroma-loop/" },
   { name: "Arcade", description: "Recreations of classic arcade and console games, playable in your browser.", category: "Classic recreations", href: "/lab/games" },
 ] as const;
