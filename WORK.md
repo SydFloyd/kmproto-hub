@@ -1,7 +1,7 @@
 # Bible Discovery link
 
 Updated: 2026-11-12
-Status: prepared and locally verified; publication waits for the app's HTTPS deployment check.
+Status: published and verified at https://www.kmproto.com/lab.
 
 The owner authorized deploying Bible Discovery under kmproto.com. Added a Lab
 entry linking to the separate browser application at `https://bible.kmproto.com/`.
@@ -14,6 +14,19 @@ walkthrough pass. The link has the intended destination, the Spotify exporter
 remains listed, and Chroma Loop remains absent. Local receipts are in
 `outputs/bible-discovery-link-check.json` and `outputs/bible-discovery-lab.png`.
 The previous production rollback target is `dpl_A28mbLnaN5GCpbXtdhzBr1niSxq3`.
+
+Commit `24cb4caffed0fd6c735990fa68426ceaf35a7d60` was pushed to main and
+production deployment `dpl_BPGt6KYcz4fAWqpoV2Ar2EKEbZAU` reached READY with the
+existing public aliases. A fresh Chromium visit to the public Lab confirmed the
+entry and clicked it through to `https://bible.kmproto.com/`, where all 31,098
+map nodes loaded with no page errors. The Spotify entry remains and Chroma Loop
+is absent. Live receipt: `outputs/bible-discovery-live-check.json`.
+
+The separate app's Cloudflare deployment passed independent GPT-6-Astra browser
+review, including both-model searches and offline operation on the identical
+preview package, plus final-domain HTTPS, fresh search/context and service-worker
+scope. Its source and deployment records remain in the private Bible Discovery
+repository's `browser-engine` branch.
 
 ---
 
