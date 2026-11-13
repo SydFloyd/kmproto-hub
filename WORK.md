@@ -1,17 +1,24 @@
 # Chroma Loop removal
 
 Updated: 2026-11-12
-Status: removal prepared; publication pending.
+Status: removed from GitHub and the public site; verified.
 
 The owner requested complete removal of Chroma Loop. Removed its game scripts,
 styles, HTML, manifest, icons, artwork, bundled font, two test files, Lab listing,
 redirect and README documentation. The earlier local deletions are now authorized
 for publication. Obsolete generated release copies and deployment payloads that
-contained the game are being cleared as part of this change.
+contained the game were cleared as part of this change.
 
 The Spotify playlist exporter remains in the Lab. This release also synchronizes
-its previously API-published source with GitHub. The remote main branch was
-verified at `09f4facc300a4b50f8675e8b19d97385d580a100` before preparing the commit.
+its previously API-published source with GitHub. Commit
+`abb2e726ecd01bb5b3d464e05f480768e11cfc8b` was pushed to main. Production
+deployment `dpl_4e1BcwVwXMT2Aa7dVFBD9DBkfheB` reports READY on the public domains.
+
+Verification: TypeScript, the production build and diff checks pass. Source and
+built runtime scans find no game files or references. The former game page,
+`app.js` and `engine.js` return HTTP 404. The Lab and Spotify export pages return
+200; the published shared Lab bundle omits the removed game and retains the
+Spotify exporter link. Check records are in `outputs/chroma-removal.json`.
 
 ---
 
