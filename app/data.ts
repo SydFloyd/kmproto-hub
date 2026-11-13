@@ -49,6 +49,7 @@ export const projects = [
 
 export const labProjects = [
   ...projects,
+  { name: "Bible Discovery", description: "Explore Scripture in a movable 3D map, search by meaning, and follow connections with the surrounding text. Runs on your device and can be saved for offline use.", category: "Experimental Bible exploration", href: "https://bible.kmproto.com/" },
   { name: "Playlist to TXT", description: "Save a Spotify playlist as a readable text file of songs and artists, ready to keep, print or share.", category: "Music tools", href: "/lab/spotify-to-txt" },
   { name: "Smoker Control Lab", description: "Explore dedicated wood and pellet fireboxes, adjust each intake, and watch a software controller balance heat in one pit.", category: "Thermodynamics", href: "/lab/smoker" },
   { name: "Arcade", description: "Recreations of classic arcade and console games, playable in your browser.", category: "Classic recreations", href: "/lab/games" },

@@ -1,3 +1,22 @@
+# Bible Discovery link
+
+Updated: 2026-11-12
+Status: prepared and locally verified; publication waits for the app's HTTPS deployment check.
+
+The owner authorized deploying Bible Discovery under kmproto.com. Added a Lab
+entry linking to the separate browser application at `https://bible.kmproto.com/`.
+The application and its model/data files deploy independently to the owner's
+Cloudflare account; the existing hub stays on Vercel. This release changes only
+the Lab listing and this handoff record.
+
+Verification: production Vite build, TypeScript and an actual Chromium Lab
+walkthrough pass. The link has the intended destination, the Spotify exporter
+remains listed, and Chroma Loop remains absent. Local receipts are in
+`outputs/bible-discovery-link-check.json` and `outputs/bible-discovery-lab.png`.
+The previous production rollback target is `dpl_A28mbLnaN5GCpbXtdhzBr1niSxq3`.
+
+---
+
 # Chroma Loop removal
 
 Updated: 2026-11-12
